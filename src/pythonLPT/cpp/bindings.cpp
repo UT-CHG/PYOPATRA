@@ -14,7 +14,7 @@
 namespace py = pybind11;
 
 PYBIND11_MODULE(pythonlpt_cpp, m) {
-    m.def("hello", &hello);
+
 }
 
 #endif //PYTHONLPT_BINDINGS_CPP
