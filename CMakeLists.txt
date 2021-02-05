@@ -54,7 +54,7 @@ if (${BUILD_CPP} OR ${DEBUG})
 endif ()
 
 if (${DEBUG})
-    add_executable(lptcpp_test test/test_base.cpp)
+    add_executable(lptcpp_test test/test_base.cpp test/test_particle.cpp)
     target_link_libraries(lptcpp_test lptcpp_lib Catch2::Catch2)
     target_include_directories(lptcpp_test PUBLIC src )
 endif ()
