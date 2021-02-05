@@ -9,12 +9,12 @@
 
 class Particle {
 public:
-    double latitude, longitude, diameter, density, depth;
+    double latitude, longitude, diameter, density, depth, interfacial_tension;
     MeshNode *current_node;
 
     Particle();
     Particle(double latitute, double longitude, double diameter, double density, double depth);
-    void terminal_buoyancy_velocity();
+    double terminal_buoyancy_velocity();
 };
 
 #endif //LPTCPP_PARTICLE_H
