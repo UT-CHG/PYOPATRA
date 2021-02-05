@@ -1,6 +1,6 @@
 site:
-  title: PythonLPT
-  start_page: PythonLPT::index.adoc
+  title: PythonLPT Documentation
+  start_page: pythonlpt::index.adoc
 content:
   sources:
     - url: https://github.com/georgiastuart/PythonLPT.git
