@@ -47,7 +47,7 @@ if (${BUILD_PYTHON})
 endif()
 
 if (${BUILD_CPP} OR ${DEBUG})
-    add_library(lptcpp_lib src/pythonLPT/cpp/particlesolver.cpp src/pythonLPT/cpp/particlesolver.h src/pythonLPT/cpp/particle.cpp src/pythonLPT/cpp/particle.h src/pythonLPT/cpp/particlelist.cpp src/pythonLPT/cpp/particlelist.h)
+    add_library(lptcpp_lib src/pythonLPT/cpp/particlesolver.cpp src/pythonLPT/cpp/particlesolver.h src/pythonLPT/cpp/particle.cpp src/pythonLPT/cpp/particle.h src/pythonLPT/cpp/particlelist.cpp src/pythonLPT/cpp/particlelist.h src/pythonLPT/cpp/mesh.cpp src/pythonLPT/cpp/mesh.h src/pythonLPT/cpp/coordinate.h)
     target_include_directories(lptcpp_lib PUBLIC SYSTEM ${MPI_CXX_INCLUDE_PATH} ${HDF5_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
     target_link_libraries(lptcpp_lib PUBLIC ${MPI_CXX_LIBRARIES} ${HDF5_LIBRARIES} Eigen3::Eigen)
     target_compile_definitions(lptcpp_lib PUBLIC ${HDF5_DEFINITIONS})
