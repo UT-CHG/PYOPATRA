@@ -5,12 +5,16 @@
 #ifndef LPTCPP_PARTICLE_H
 #define LPTCPP_PARTICLE_H
 
+#include "mesh.h"
+
 class Particle {
 public:
     double latitude, longitude, diameter, density, depth;
+    MeshNode *current_node;
 
     Particle();
     Particle(double latitute, double longitude, double diameter, double density, double depth);
+    void terminal_buoyancy_velocity();
 };
 
 #endif //LPTCPP_PARTICLE_H
