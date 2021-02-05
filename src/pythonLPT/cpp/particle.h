@@ -13,8 +13,13 @@ public:
     MeshNode *current_node;
 
     Particle();
-    Particle(double latitute, double longitude, double diameter, double density, double depth);
+    Particle(double latitute, double longitude, double diameter, double density, double depth, double interfacial_tension);
     double terminal_buoyancy_velocity();
+    double calculate_nd();
+    double calculate_reynolds(double Nd);
+    double calculate_critical_diameter();
+    double calculate_morton_number();
+    double calculate_eotvos_number();
 };
 
 #endif //LPTCPP_PARTICLE_H
