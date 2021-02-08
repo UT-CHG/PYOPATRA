@@ -4,22 +4,17 @@
    :maxdepth: 2
    :caption: Getting Started
 
-   howto/installing
-   howto/using
+   howto/index
 
 .. toctree::
    :maxdepth: 2
    :caption: Ocean Modeling Meshes
 
-   mesh/adcirc
-   mesh/hycom
-   mesh/mitgcm
+   mesh/index
 
 .. toctree::
    :maxdepth: 2
    :caption: Oil Droplet Physics
 
-   physics/droplet_shapes
-   physics/buoyancy
-   physics/lpt
+   physics/index
 
