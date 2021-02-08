@@ -143,3 +143,6 @@ cmake-build-debug
 
 # C Library
 *.so
+
+# sphinx build folder
+_build
