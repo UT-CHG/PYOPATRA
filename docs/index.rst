@@ -13,6 +13,7 @@
 
    mesh/adcirc
    mesh/hycom
+   mesh/mitgcm
 
 .. toctree::
    :maxdepth: 2
