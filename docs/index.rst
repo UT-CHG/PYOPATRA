@@ -8,7 +8,13 @@ Welcome to PythonLPT's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Installation
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Physics
+
+   physics/buoyancy
 
 
 
