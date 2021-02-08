@@ -6,3 +6,4 @@ Python LPT User's Guide
 
    installing
    using
+   contributing
