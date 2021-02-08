@@ -8,6 +8,26 @@ imposed on the droplet by the water. Buoyancy is greater deeper in the water col
 Terminology
 -----------
 
+We say that a *droplet* (e.g., oil) is contained within a *continuous fluid* (e.g., water).
+
+Buoyancy for particles involves several physical quantities:
+
+- :math:`U`, the velocity of a droplet, and :math:`U_T`, the terminal velocity of a droplet.
+- :math:`\nu`, the kinematic viscosity of the continuous fluid within which the 
+  droplets are contained.
+- :math:`d`, the diameter of the droplet, for spheres, or :math:`d_e`, the effective 
+  diameter for ellipsoids or spherical caps (i.e., the diameter of an equivalent volume sphere).
+- :math:`R`, Reynolds Number: the ratio of inertial forces to viscous forces. 
+  typically :math:`Ud/\nu` for particles.
+- :math:`\rho`, the density of the continuous fluid, and :math:`\Delta \rho`,
+  the difference between the density of the continuous fluid and the 
+  density of the droplet.
+- :math:`g`, the acceleration due to gravity. :math:`9.8 \, \text{m/s}^2` in this package.
+- :math:`\mu`, the viscosity of the continuous fluid, and :math:`\mu_w` the viscosity of water
+  from Braida (0.0009 kg/ms).
+- :math:`M`, Morton number, and :math:`E_O`, Eötvös number, used to characterize the shape of ellipsoid 
+  spherical cap particles.
+- :math:`\sigma`, the interfacial tension.
 
 
 Terminal Velocity Equations
@@ -24,7 +44,7 @@ Spherical Small Size (diameter less than 1 mm)
 
    U_T = \frac{R \mu}{\rho d}
 
-Where the Reynold's number :math:`R` is calculated from the Best number :math:`N_D` as follows:
+Where the Reynold's number, :math:`R`, is calculated from the Best number, :math:`N_D`, as follows:
 
 .. math::
 
@@ -43,6 +63,64 @@ Where the Reynold's number :math:`R` is calculated from the Best number :math:`N
      - :math:`\log R = -1.81391 + 1.34671 \log N_D - 0.12427 (\log N_D)^2 + 0.006344 (\log N_D)^3`
 
 
+Ellipsoid (Intermediate Size) and Spherical Caps (Large Size)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We require the Morton number and Eötvös numbers:
+
+.. math::
+   
+   M = \frac{g \mu^4 \Delta \rho}{\rho^2 \sigma^3}
+
+   E_O = \frac{g \Delta \rho d^2_e}{\sigma}.
+
+Ellipsoid (:math:`M < 10^{-3}` and :math:`E_O \leq 40`)
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+We have:
+
+.. math::
+   :label: ellipsoid
+   
+   U_T = \frac{\mu}{\rho d_e} M^{-0.149} (J - 0.857).
+
+We calculate an intermediate value, :math:`H`:
+
+.. math::
+
+   H = \frac{4}{3} E_O M^{-0.149}(\mu / \mu_w )^{-0.14}.
+
+For :math:`2 < H \leq 59.3`,
+
+.. math::
+
+   J = 0.94 H^{0.757}.
+
+For :math:`H > 59.3`,
+
+.. math::
+
+   J = 3.42 H^{0.441}.
+
+
+Spherical Cap (:math:`E_O > 40`)
+++++++++++++++++++++++++++++++++
+
+In this range, we simply have
+
+.. math::
+   :label: spherical-cap
+
+   U_T = 0.711 \sqrt{g d_e \Delta \rho / \rho}
+   
+
+
+Critical Diameter
++++++++++++++++++
+
+Zheng and Yapa (2000) introduce an approximate method to find the critical diameter which separates the ellipsoid droplets from spherical caps.
+They assume that Equation :eq:`ellipsoid` and :eq:`spherical-cap` represent straight lines in logarithmic coordinates, and then locate the intersection
+of the two lines to find the critical diameter.
 
 References
 ----------
