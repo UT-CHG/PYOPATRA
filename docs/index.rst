@@ -9,7 +9,7 @@
 
 .. toctree::
    :maxdepth: 2
-   :caption: Compatible Meshes
+   :caption: Compatible Ocean Modeling Meshes
 
    mesh/adcirc
    mesh/hycom
