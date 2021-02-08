@@ -146,3 +146,6 @@ cmake-build-debug
 
 # sphinx build folder
 _build
+
+# VS Code settings
+.vscode
