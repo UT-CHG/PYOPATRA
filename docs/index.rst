@@ -1,26 +1,24 @@
-.. PythonLPT documentation master file, created by
-   sphinx-quickstart on Mon Feb  8 10:32:33 2021.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-Welcome to PythonLPT's documentation!
-=====================================
+.. include:: ../README.rst
 
 .. toctree::
    :maxdepth: 2
-   :caption: Installation
+   :caption: Getting Started
+
+   howto/installing
+   howto/using
 
 .. toctree::
    :maxdepth: 2
-   :caption: Physics
+   :caption: Compatible Meshes
 
+   mesh/adcirc
+   mesh/hycom
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Oil Droplet Physics
+
+   physics/droplet_shapes
    physics/buoyancy
+   physics/lpt
 
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
