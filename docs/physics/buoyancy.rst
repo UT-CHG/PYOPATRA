@@ -79,10 +79,11 @@ Ellipsoid (:math:`M < 10^{-3}` and :math:`E_O \leq 40`)
 
 We have:
 
-.. math::
+.. math:: 
+   U_T = \frac{\mu}{\rho d_e} M^{-0.149} (J - 0.857).
    :label: ellipsoid
    
-   U_T = \frac{\mu}{\rho d_e} M^{-0.149} (J - 0.857).
+   
 
 We calculate an intermediate value, :math:`H`:
 
@@ -108,10 +109,11 @@ Spherical Cap (:math:`E_O > 40`)
 
 In this range, we simply have
 
-.. math::
+.. math:: 
+   U_T = 0.711 \sqrt{g d_e \Delta \rho / \rho}
    :label: spherical-cap
 
-   U_T = 0.711 \sqrt{g d_e \Delta \rho / \rho}
+   
    
 
 
@@ -119,7 +121,7 @@ Critical Diameter
 +++++++++++++++++
 
 Zheng and Yapa (2000) introduce an approximate method to find the critical diameter which separates the ellipsoid droplets from spherical caps.
-They assume that Equation :eq:`ellipsoid` and :eq:`spherical-cap` represent straight lines in logarithmic coordinates, and then locate the intersection
+They assume that Equations :eq:`ellipsoid` and :eq:`spherical-cap` represent straight lines in logarithmic coordinates, and then locate the intersection
 of the two lines to find the critical diameter.
 
 References
