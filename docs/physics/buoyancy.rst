@@ -122,7 +122,22 @@ Critical Diameter
 
 Zheng and Yapa (2000) introduce an approximate method to find the critical diameter which separates the ellipsoid droplets from spherical caps.
 They assume that Equations :eq:`ellipsoid` and :eq:`spherical-cap` represent straight lines in logarithmic coordinates, and then locate the intersection
-of the two lines to find the critical diameter.
+of the two lines to find the critical diameter:
+
+.. math::
+   \log d_c = \frac{b_2 - b_1}{a_1 - a_2}
+
+where, for points :math:`(x_1,\,y_1)` and :math:`(x_2,\,y_2)` of :math:`(\log d_e,\,\log U_T)` when :math:`H=59.3` and :math:`d_e = 15` mm, respectively,
+
+.. math::
+   \begin{align}
+      a_1 &= 0.5 \\
+      b_1 &= \log \left[0.711 (g \Delta \rho / \rho)^{1/2}\right] \\
+      a_2 &= \frac{y_2 - y_1}{x_2 - x_1} \\
+      b_2 &= y_1 - a_2 x_1.
+   \end{align}
+
+
 
 References
 ----------
