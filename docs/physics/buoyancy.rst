@@ -10,7 +10,7 @@ imposed on the droplet by the water. Buoyancy is greater deeper in the water col
 Terminology
 -----------
 
-We say that a *droplet* (e.g., oil) is contained within a *continuous fluid* (e.g., water).
+We say that a *droplet* (e.g., of oil) is contained within a *continuous fluid* (e.g., water).
 
 Buoyancy for particles involves several physical quantities:
 
