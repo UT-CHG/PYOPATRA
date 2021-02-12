@@ -10,7 +10,7 @@ Velocity
 +++++++++++++++++++
 
 The velocity of a surface droplet is influenced both by current velocity in the water and wind velocity. We can write
-the droplet velocity, :math:`\boldsymbol{u_d}`, at a position :math:`\boldsymbol{x_d} = (x_d, y_d)` as a combination of 
+the droplet velocity, :math:`\boldsymbol{u_d}`, at a position :math:`\boldsymbol{x_d} = (x_d,\,y_d)` as a combination of 
 current velocity, :math:`\boldsymbol{u_c}`, and wind velocity, :math:`\boldsymbol{u_w}`:
 
 .. math::
@@ -20,6 +20,15 @@ where :math:`F_c` and :math:`F_w` are the current and wind modifiers, respective
 
 3D Velocity
 +++++++++++
+
+When extending to 3D, we incorporate :ref:`buoyancy <buoyancy>` into the :math:`z_d` component of :math:`\boldsymbol{x_d} = (x_d,\,y_d,\,z_d)`:
+
+.. math::
+   u_{d_z}(\boldsymbol{x_d}) = F_c u_{c_z}(\boldsymbol{x_d}) + F_w(z_d) u_{w_z}(\boldsymbol{x_d}) + u_T(\boldsymbol{x_d})
+
+where :math:`u_{c_z}` and :math:`u_{w_z}` are the :math:`z` components of :math:`\boldsymbol{u_d}` and :math:`\boldsymbol{u_w}`, respectively, and 
+:math:`u_T` is the :ref:`bouyant velocity <buoyancy>`.
+
 
 Diffusion
 ---------
