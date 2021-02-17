@@ -18,7 +18,7 @@ import sphinx_rtd_theme
 
 # -- Project information -----------------------------------------------------
 
-project = 'PythonLPT'
+project = 'PYOPATRA'
 copyright = '2021, Computational Hydraulics Group, Oden Institute for Computational Engineering & Sciences, UT Austin'
 author = 'Georgia Stuart'
 

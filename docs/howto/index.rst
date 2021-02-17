@@ -1,4 +1,4 @@
-Python LPT User's Guide
+PYOPATRA's User's Guide
 =======================
 
 .. toctree::

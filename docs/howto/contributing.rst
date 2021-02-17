@@ -1,2 +1,2 @@
-Contributing to PythonLPT
+Contributing to PYOPATRA
 =========================
