@@ -52,7 +52,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 html_theme = 'pydata_sphinx_theme'
 
 html_theme_options = {
-  "github_url": "https://github.com/georgiastuart/PythonLPT",
+  "github_url": "https://github.com/georgiastuart/PYOPATRA",
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
