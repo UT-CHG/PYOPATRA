@@ -15,7 +15,7 @@ install:
 script:
   - mkdir build
   - cd build
-  - cmake .. -DBUILD_TEST -DBUILD_PYTHON
+  - cmake .. -DBUILD_TEST=ON
   - make
   - ./pyopatra_test
 
