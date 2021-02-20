@@ -5,7 +5,7 @@ before_install:
   - sudo apt-get update
 
 install:
-  - sudo apt-get -y install mpich libhdf5-dev
+  - sudo apt-get -y install mpich libhdf5-dev cmake
   - wget https://github.com/catchorg/Catch2/archive/v2.13.4.tar.gz
   - tar -xzf v2.13.4.tar.gz
   - cd Catch2-2.13.4
