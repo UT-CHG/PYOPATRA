@@ -11,6 +11,7 @@ install:
   - cd Catch2-2.13.4
   - cmake -Bbuild -H. -DBUILD_TESTING=OFF
   - sudo cmake --build build/ --target install
+  - cd ..
 
 script:
   - mkdir build
