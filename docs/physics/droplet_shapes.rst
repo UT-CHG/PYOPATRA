@@ -1,4 +1,0 @@
-Shapes of Droplets
-==================
-
-Placeholder

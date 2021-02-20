@@ -1,4 +1,0 @@
-Using PYOPATRA
-===============
-
-placeholder

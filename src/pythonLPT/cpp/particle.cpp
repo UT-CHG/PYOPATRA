@@ -42,6 +42,25 @@ double Particle::terminal_buoyancy_velocity() {
     } else {
         double critical_diameter = calculate_critical_diameter();
 
+        if (diameter <= critical_diameter) {
+            double J;
+            double Eo = calculate_eotvos_number();
+            double M = calculate_morton_number();
+            double H = 4.0 / 3.0 * Eo * pow(M, -0.149)
+                    * pow(current_node->viscosity / WATER_VISCOSITY, -0.14);
+
+            if (2 < H <= 59.3) {
+                J = 0.94 * pow(H, 0.757);
+            } else if (H > 59.3) {
+                J = 3.42 * pow(H, 0.441);
+            } else {
+                throw std::runtime_error(std::string("H >= 2 at ") + std::to_string(H) + std::string("."));
+            }
+
+            return current_node->viscosity / (current_node->density * diameter) * pow(M, -0.149) * (J - 0.857);
+        } else {
+            return 0.711 * sqrt(GRAVITY * diameter * (density - current_node->density) / current_node->density);
+        }
     }
 }
 

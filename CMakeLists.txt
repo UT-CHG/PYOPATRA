@@ -1,13 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 project(lptcpp)
 
-if(NOT DEFINED BUILD_CPP)
-    set(BUILD_CPP OFF)
-endif ()
-
-if(NOT DEFINED BUILD_PYTHON)
-    set(BUILD_PYTHON OFF)
-endif ()
+option(BUILD_CPP "Build the C++ Library" OFF)
+option(BUILD_PYTHON "Build the Python Library" OFF)
 
 message(STATUS ${CMAKE_BUILD_TYPE})
 if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
