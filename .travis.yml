@@ -1,0 +1,20 @@
+language: c++
+dist: focal
+
+before_install:
+  - sudo apt-get update
+
+install:
+  - sudo apt-get -y install mpich hdf5
+  - wget https://github.com/catchorg/Catch2/archive/v2.13.4.tar.gz
+  - tar -xzf Catch2-2.13.4.tar.gz
+  - cd Catch2-2.13.4
+  - cmake -Bbuild -H. -DBUILD_TESTING=OFF
+  - sudo cmake --build build/ --target install
+
+script:
+  - mkdir build
+  - cd build
+  - cmake .. -DBUILD_TEST -DBUILD_PYTHON
+  - make
+  - ./pyopatra_test
