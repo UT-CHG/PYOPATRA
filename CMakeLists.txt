@@ -37,7 +37,7 @@ endif()
 
 if (${BUILD_CPP} OR ${BUILD_TEST})
     add_library(pyopatra_lib src/pythonLPT/cpp/particlesolver.cpp src/pythonLPT/cpp/particlesolver.h src/pythonLPT/cpp/particle.cpp src/pythonLPT/cpp/particle.h src/pythonLPT/cpp/particlelist.cpp src/pythonLPT/cpp/particlelist.h src/pythonLPT/cpp/mesh.cpp src/pythonLPT/cpp/mesh.h src/pythonLPT/cpp/coordinate.h)
-    target_include_directories(pyopatra_lib PUBLIC SYSTEM ${MPI_CXX_INCLUDE_PATH} ${HDF5_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
+    target_include_directories(pyopatra_lib PUBLIC SYSTEM ${HDF5_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
     target_link_libraries(pyopatra_lib PUBLIC ${MPI_CXX_LIBRARIES} ${HDF5_LIBRARIES} Eigen3::Eigen)
     target_compile_definitions(pyopatra_lib PUBLIC ${HDF5_DEFINITIONS})
 endif ()
