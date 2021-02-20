@@ -4,8 +4,6 @@ dist: focal
 before_install:
   - sudo apt-get update
   - sudo apt-get -y install mpich libhdf5-dev cmake lcov
-
-install:
   - wget https://github.com/catchorg/Catch2/archive/v2.13.4.tar.gz
   - tar -xzf v2.13.4.tar.gz
   - cd Catch2-2.13.4
@@ -13,11 +11,13 @@ install:
   - sudo cmake --build build/ --target install
   - cd ..
 
-script:
+install:
   - mkdir build
   - cd build
   - cmake .. -DBUILD_TEST=ON
   - make
+
+script:
   - ./pyopatra_test
 
 after_success:
