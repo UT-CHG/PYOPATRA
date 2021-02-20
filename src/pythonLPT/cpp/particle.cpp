@@ -64,12 +64,12 @@ double Particle::terminal_buoyancy_velocity() {
     }
 }
 
-double Particle::calculate_nd() {
+double Particle::calculate_nd() const {
     return (4.0 * current_node->density * (density - current_node->density)
             * GRAVITY * pow(diameter, 3)) / (3 * pow(current_node->viscosity,2));
 }
 
-double Particle::calculate_reynolds(double Nd) {
+/* static */ double Particle::calculate_reynolds(double Nd) {
     if (Nd <= 73) {
         return Nd / 24.0 - 1.7569e-4 * pow(Nd, 2)
                    + 6.9252e-7 * pow(Nd, 3) - 2.3027e-10 * pow(Nd, 4);
@@ -117,11 +117,11 @@ double Particle::calculate_critical_diameter() {
 }
 
 // Morton + Eotvos Characterize shape of bubbles in a continuous phase
-double Particle::calculate_morton_number() {
+double Particle::calculate_morton_number() const {
     return (GRAVITY * pow(current_node->viscosity, 4) * (density - current_node->density))
            / (pow(current_node->density, 2) * pow(interfacial_tension, 3));
 }
 
-double Particle::calculate_eotvos_number() {
+double Particle::calculate_eotvos_number() const {
     return GRAVITY * (density - current_node->density) * pow(diameter, 2) / interfacial_tension;
 }

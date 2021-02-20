@@ -15,11 +15,11 @@ public:
     Particle();
     Particle(double latitute, double longitude, double diameter, double density, double depth, double interfacial_tension);
     double terminal_buoyancy_velocity();
-    double calculate_nd();
-    double calculate_reynolds(double Nd);
+    double calculate_nd() const;
+    static double calculate_reynolds(double Nd);
     double calculate_critical_diameter();
-    double calculate_morton_number();
-    double calculate_eotvos_number();
+    double calculate_morton_number() const;
+    double calculate_eotvos_number() const;
 };
 
 #endif //LPTCPP_PARTICLE_H
