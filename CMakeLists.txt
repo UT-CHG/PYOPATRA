@@ -5,7 +5,7 @@ option(BUILD_CPP "Build the C++ Library" OFF)
 option(BUILD_PYTHON "Build the Python Library" OFF)
 option(BUILD_TEST "Build the test suite" OFF)
 
-find_package(MPI REQUIRED)
+find_package(MPI REQUIRED COMPONENTS CXX)
 find_package(HDF5 REQUIRED COMPONENTS CXX)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 set(CMAKE_CXX_STANDARD 14)
