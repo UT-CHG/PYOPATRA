@@ -49,6 +49,7 @@ if (${BUILD_CPP} OR ${DEBUG})
 endif ()
 
 if (${DEBUG})
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
     add_executable(pyopatra_test test/test_base.cpp test/test_particle.cpp)
     target_link_libraries(pyopatra_test pyopatra_lib Catch2::Catch2)
     target_include_directories(pyopatra_test PUBLIC src )

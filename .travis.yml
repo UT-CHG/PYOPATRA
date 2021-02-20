@@ -5,7 +5,7 @@ before_install:
   - sudo apt-get update
 
 install:
-  - sudo apt-get -y install mpich libhdf5-dev cmake
+  - sudo apt-get -y install mpich libhdf5-dev cmake lcov
   - wget https://github.com/catchorg/Catch2/archive/v2.13.4.tar.gz
   - tar -xzf v2.13.4.tar.gz
   - cd Catch2-2.13.4
@@ -18,3 +18,11 @@ script:
   - cmake .. -DBUILD_TEST -DBUILD_PYTHON
   - make
   - ./pyopatra_test
+
+after_success:
+  # Create lcov report
+  - lcov --capture --directory . --output-file coverage.info
+  - lcov --remove coverage.info '/usr/*' --output-file coverage.info # filter system-files
+  - lcov --list coverage.info # debug info
+  # Uploading report to CodeCov
+  - bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
