@@ -7,7 +7,6 @@ option(BUILD_TEST "Build the test suite" OFF)
 
 find_package(MPI REQUIRED COMPONENTS CXX)
 find_package(HDF5 REQUIRED COMPONENTS CXX)
-find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -18,7 +17,7 @@ if (${BUILD_PYTHON})
     set(PYBIND11_CPP_STANDARD -std=c++14)
 endif ()
 
-if (${DEBUG})
+if (${BUILD_TEST})
     find_package(Catch2 2 REQUIRED)
 endif ()
 
@@ -31,14 +30,14 @@ if (${BUILD_PYTHON})
     message(STATUS "Building Python library...")
     pybind11_add_module(pyopatra src/pythonLPT/cpp/bindings.cpp)
     target_include_directories(pyopatra PUBLIC SYSTEM ${MPI_CXX_INCLUDE_PATH} ${HDF5_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
-    target_link_libraries(pyopatra PUBLIC ${MPI_CXX_LIBRARIES} ${HDF5_LIBRARIES} Eigen3::Eigen)
+    target_link_libraries(pyopatra PUBLIC ${MPI_CXX_LIBRARIES} ${HDF5_LIBRARIES})
     target_compile_definitions(pyopatra PUBLIC ${HDF5_DEFINITIONS})
 endif()
 
 if (${BUILD_CPP} OR ${BUILD_TEST})
     add_library(pyopatra_lib src/pythonLPT/cpp/particlesolver.cpp src/pythonLPT/cpp/particlesolver.h src/pythonLPT/cpp/particle.cpp src/pythonLPT/cpp/particle.h src/pythonLPT/cpp/particlelist.cpp src/pythonLPT/cpp/particlelist.h src/pythonLPT/cpp/mesh.cpp src/pythonLPT/cpp/mesh.h src/pythonLPT/cpp/coordinate.h)
     target_include_directories(pyopatra_lib PUBLIC SYSTEM ${HDF5_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
-    target_link_libraries(pyopatra_lib PUBLIC ${MPI_CXX_LIBRARIES} ${HDF5_LIBRARIES} Eigen3::Eigen)
+    target_link_libraries(pyopatra_lib PUBLIC ${MPI_CXX_LIBRARIES} ${HDF5_LIBRARIES})
     target_compile_definitions(pyopatra_lib PUBLIC ${HDF5_DEFINITIONS})
 endif ()
 
