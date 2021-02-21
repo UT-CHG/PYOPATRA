@@ -17,7 +17,7 @@ Particle::Particle()
     : diameter(0.0)
     , density(0.0)
     , interfacial_tension(0.0)
-    , position(0.0, 0.0, 0.0)
+    , position()
     , current_node(nullptr)
 { }
 
