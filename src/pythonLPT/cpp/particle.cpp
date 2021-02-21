@@ -9,7 +9,7 @@
 #include "particle.h"
 
 // Acceleration due to gravity in m/s^2
-#define GRAVITY 9.8
+#define GRAVITY (-9.8)
 // Water viscosity from Braida in kg/ms
 #define WATER_VISCOSITY 0.0009
 
@@ -20,9 +20,8 @@ Particle::Particle()
     , density(0)
     , depth(0)
     , interfacial_tension(0)
-{
-    current_node = nullptr;
-}
+    , current_node(nullptr)
+{ }
 
 Particle::Particle(double latitute, double longitude, double diameter, double density, double depth, double interfacial_tension)
     : latitude(latitute)
@@ -31,9 +30,8 @@ Particle::Particle(double latitute, double longitude, double diameter, double de
     , density(density)
     , depth(depth)
     , interfacial_tension(interfacial_tension)
-{
-    current_node = nullptr;
-}
+    , current_node(nullptr)
+{ }
 
 double Particle::terminal_buoyancy_velocity() {
     //  Buoyancy method from Zheng and Yapa (2000)
