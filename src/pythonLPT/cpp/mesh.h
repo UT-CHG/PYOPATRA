@@ -10,7 +10,7 @@
 class MeshNode {
 public:
     double density, temperature, viscosity;
-    CoodinateD velocity, location;
+    CoordinateD velocity, location;
 
     MeshNode();
     MeshNode(double water_density, double temperature, double viscosity);

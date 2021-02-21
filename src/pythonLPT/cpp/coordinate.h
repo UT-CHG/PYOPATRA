@@ -8,10 +8,10 @@
 template<typename T>
 class CoordinateT {
 public:
-    T latitude, longitude, depth;
+    T x, y, z;
 
-    CoordinateT() : latitude(0), longitude(0), depth(0) { }
-    CoordinateT(T latitude, T longitude, T depth) : latitude(latitude), longitude(longitude), depth(depth) { }
+    CoordinateT() : x(0), y(0), z(0) { }
+    CoordinateT(T x, T y, T z) : x(x), y(y), z(z) { }
 };
 
 
