@@ -10,8 +10,6 @@
 
 // Acceleration due to gravity in m/s^2
 #define GRAVITY (-9.8)
-// Water viscosity from Braida in kg/ms
-#define WATER_VISCOSITY 0.0009
 
 Particle::Particle()
     : diameter(0.0)
@@ -47,7 +45,7 @@ double Particle::terminal_buoyancy_velocity() {
             double Eo = calculate_eotvos_number();
             double M = calculate_morton_number();
             double H = 4.0 / 3.0 * Eo * pow(M, -0.149)
-                    * pow(current_node->viscosity / WATER_VISCOSITY, -0.14);
+                    * pow(current_node->viscosity / calculate_water_viscosity(current_node->temperature), -0.14);
 
             if (2 < H && H <= 59.3) {
                 J = 0.94 * pow(H, 0.757);
@@ -86,6 +84,7 @@ double Particle::calculate_nd() const {
     }
 }
 
+
 double Particle::calculate_critical_diameter() const {
     // Calculate x1, y1
     double H = 59.3;
@@ -99,7 +98,7 @@ double Particle::calculate_critical_diameter() const {
 
     // Calculate x2, y2
     double E0 = calculate_eotvos_number();
-    H = 4.0/3.0 * E0 * pow(M, -0.149) * pow(current_node->viscosity / WATER_VISCOSITY, -0.14);
+    H = 4.0/3.0 * E0 * pow(M, -0.149) * pow(current_node->viscosity / calculate_water_viscosity(current_node->temperature), -0.14);
     J = H <= 59.3 ? 0.94 * pow(H, 0.757) : 3.42 * pow(H, 0.441);
     terminal_velocity = current_node->viscosity / (current_node->density * 0.015)
                         * pow(M, -0.149) * (J - 0.857);
@@ -124,4 +123,21 @@ double Particle::calculate_morton_number() const {
 
 double Particle::calculate_eotvos_number() const {
     return GRAVITY * (density - current_node->density) * pow(diameter, 2) / interfacial_tension;
+}
+
+// Water Viscosity
+// From Huber et al 2009
+// Temperature assumed to be Kelvin
+// Density assumed to be kg m^-3
+
+inline double dimensionless_temperature(double temperature) {
+    return temperature / 647.096;
+}
+
+inline double dimensionless_density(double density) {
+    return density / 322.0;
+}
+
+/* static */ double Particle::calculate_water_viscosity(double temperature) {
+    return 2.414e-5 * pow(10.0, 247.8 / (temperature - 140.0));
 }
