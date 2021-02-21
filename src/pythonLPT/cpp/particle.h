@@ -9,11 +9,12 @@
 
 class Particle {
 public:
-    double latitude, longitude, diameter, density, depth, interfacial_tension;
+    double diameter, density, interfacial_tension;
+    CoordinateD position;
     MeshNode *current_node;
 
     Particle();
-    Particle(double latitute, double longitude, double diameter, double density, double depth, double interfacial_tension);
+    Particle(double latitude, double longitude, double diameter, double density, double depth, double interfacial_tension);
     double terminal_buoyancy_velocity();
     double calculate_nd() const;
     static double calculate_reynolds(double Nd);

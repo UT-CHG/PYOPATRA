@@ -14,22 +14,18 @@
 #define WATER_VISCOSITY 0.0009
 
 Particle::Particle()
-    : latitude(0)
-    , longitude(0)
-    , diameter(0)
-    , density(0)
-    , depth(0)
-    , interfacial_tension(0)
+    : diameter(0.0)
+    , density(0.0)
+    , interfacial_tension(0.0)
+    , position(0.0, 0.0, 0.0)
     , current_node(nullptr)
 { }
 
-Particle::Particle(double latitute, double longitude, double diameter, double density, double depth, double interfacial_tension)
-    : latitude(latitute)
-    , longitude(longitude)
-    , diameter(diameter)
+Particle::Particle(double latitude, double longitude, double diameter, double density, double depth, double interfacial_tension)
+    : diameter(diameter)
     , density(density)
-    , depth(depth)
     , interfacial_tension(interfacial_tension)
+    , position(latitude, longitude, depth)
     , current_node(nullptr)
 { }
 
