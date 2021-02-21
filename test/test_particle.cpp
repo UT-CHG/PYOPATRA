@@ -22,7 +22,7 @@ TEST_CASE("Buoyancy Calculated Correctly", "[buoyancy]") {
         particle.current_node = &node;
 
         REQUIRE(particle.calculate_nd() == Approx(0.227683));
-        REQUIRE(particle.calculate_reynolds(particle.calculate_nd()) == Approx(0.009478));
-        REQUIRE(particle.terminal_buoyancy_velocity() == Approx(0.00019));
+        REQUIRE(particle.calculate_reynolds(particle.calculate_nd()) == Approx(0.009477679));
+        REQUIRE(particle.terminal_buoyancy_velocity() == Approx(0.000190274));
     }
 }
