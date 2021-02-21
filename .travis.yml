@@ -4,6 +4,7 @@ addons:
   apt:
     packages:
       - libmpich12
+      - libmpich-dev
       - mpich
       - libhdf5-dev
       - cmake
