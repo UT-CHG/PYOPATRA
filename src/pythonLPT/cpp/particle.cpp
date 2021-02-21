@@ -130,6 +130,15 @@ double Particle::calculate_eotvos_number() const {
 // Temperature assumed to be Kelvin
 // Density assumed to be kg m^-3
 
+const double density_coefficients[6][7] = {
+        {5.20094e-1,    2.22531e-1, -2.81378e-1,    1.61913e-1, -3.25372e-2,    0.0,        0.0},
+        {8.50895e-2,    9.99115e-1, -9.06851e-1,    2.57399e-1, 0.0,            0.0,        0.0},
+        {-1.08374,      1.88797,    -7.72479e-1,    0.0,        0.0,            0.0,        0.0},
+        {-2.89555e-1,   1.26613,    -4.89827e-1,    0.0,        6.98452e-2,     0.0,        -4.35673e-3},
+        {0.0,           0.0,        -2.57040e-1,    0.0,        0.0,            8.72102e-3, 0.0},
+        {0.0,           1.20573e-1, 0.0,            0.0,        0.0,            0.0,        -5.93264e-4}
+};
+
 inline double dimensionless_temperature(double temperature) {
     return temperature / 647.096;
 }
@@ -138,6 +147,11 @@ inline double dimensionless_density(double density) {
     return density / 322.0;
 }
 
+double dimensionless_viscosity_density_zero(double temperature) {
+    double T = dimensionless_temperature(temperature);
+    return (100.0 * sqrt(T)) / (1.67752 + 2.20462 / T + 0.6366564 / pow(T, 2) - 0.241605 / pow(T, 3));
+}
+
 /* static */ double Particle::calculate_water_viscosity(double temperature) {
-    return 2.414e-5 * pow(10.0, 247.8 / (temperature - 140.0));
+    return
 }
