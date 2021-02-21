@@ -44,10 +44,10 @@ We follow Huber et al (2009) to calculate water viscosity. In essence, the dimen
 water velocity is calculated as
 
 .. math::
-   \bar{\mu} = \bar{\mu}_0(\bar{T}) \times \bar{\mu}_1(\bar{T},\,\bar{\rho}) \times \bar{\mu}_2(\bar{T},\,\bar{\rho})
+   \bar{\mu} = \bar{\mu}_0(\bar{T}) \times \bar{\mu}_1(\bar{T},\,\bar{\rho}))
 
-where :math:`\bar{\mu}_0` is viscosity when density is 0 (in the limit), :math:`\bar{\mu}_1` is viscosity due to increasing
-density, and :math:`\bar{\mu}_2` is viscosity near the critical point. Furthermore, :math:`\bar{T}` and :math:`\bar{\rho}`
+where :math:`\bar{\mu}_0` is viscosity when density is 0 (in the limit) and :math:`\bar{\mu}_1` is viscosity due to increasing
+density. Furthermore, :math:`\bar{T}` and :math:`\bar{\rho}`
 represent dimensionless quantities:
 
 .. math::
