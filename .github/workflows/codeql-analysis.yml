@@ -49,8 +49,8 @@ jobs:
 
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
     # If this step fails, then you should remove it and run the build manually (see below)
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v1
+#    - name: Autobuild
+#      uses: github/codeql-action/autobuild@v1
 
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 https://git.io/JvXDl
@@ -59,9 +59,18 @@ jobs:
     #    and modify them (or add more) to build your code if your project
     #    uses a compiled language
 
-    #- run: |
-    #   make bootstrap
-    #   make release
+    - run: |
+       sudo apt-get update
+       sudo apt-get install mpich libmpich-dev cmake libhdf5-dev pybind11-dev
+       wget https://github.com/catchorg/Catch2/archive/v2.13.4.tar.gz
+       tar -xzf v2.13.4.tar.gz
+       cd Catch2-2.13.4
+       cmake -Bbuild -H. -DBUILD_TESTING=OFF
+       sudo cmake --build build/ --target install
+       cd ..
+       mkdir build
+       cd build
+       cmake -DBUILD_TEST=ON -DBUILD_PYTHON=ON
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
