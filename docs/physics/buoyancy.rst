@@ -73,7 +73,81 @@ This term depends on both dimensionless temperature :math:`\bar{T}`, and on dime
 :math:`\bar{\rho}`:
 
 .. math::
-   \bar{\mu}_1(\bar{T},\,\bar{\rho}) = \exp\left[ \sum^5_{i=0}\left( \frac{1}{\bar{T}} - 1 \right)^i \sum^6_{j=0} \left( \bar{\rho} - 1 \right)^j \right]
+   \bar{\mu}_1(\bar{T},\,\bar{\rho}) = \exp\left[ \sum^5_{i=0}\left( \frac{1}{\bar{T}} - 1 \right)^i \sum^6_{j=0} H_{ij} \left( \bar{\rho} - 1 \right)^j \right]
+
+where :math:`H_{ij}` are determined by the following table:
+
+.. list-table:: Viscosity Coefficients
+   :header-rows: 1
+
+   * - :math:`i`
+     - :math:`j`
+     - :math:`H_{ij}`
+   * - 0
+     - 0
+     - 0.520094
+   * - 1
+     - 0
+     - 0.0850895
+   * - 2
+     - 0
+     - -1.08374
+   * - 3
+     - 0
+     - -0.289555
+   * - 0
+     - 1
+     - 0.222531
+   * - 1
+     - 1
+     - 0.999115
+   * - 2
+     - 1
+     - 1.88797
+   * - 3
+     - 1
+     - 1.26613
+   * - 5
+     - 1
+     - 0.120573
+   * - 0
+     - 2
+     - -0.281378
+   * - 1
+     - 2
+     - -0.906851
+   * - 2
+     - 2
+     - -0.772479
+   * - 3
+     - 2
+     - -0.489837
+   * - 4
+     - 2
+     - -0.257040
+   * - 0
+     - 3
+     - 0.161913
+   * - 1
+     - 3
+     - 0.257399
+   * - 0
+     - 4
+     - -0.0325372
+   * - 3
+     - 4
+     - 0.0698452
+   * - 4
+     - 5
+     - 0.00872102
+   * - 3
+     - 6
+     - -0.00435673
+   * - 5
+     - 6
+     - -0.000593264
+
+Values not in the table are 0.0.
 
 Terminal Velocity Equations
 ---------------------------
