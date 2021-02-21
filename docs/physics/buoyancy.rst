@@ -32,6 +32,49 @@ Buoyancy for particles involves several physical quantities:
 - :math:`\sigma`, the interfacial tension.
 
 
+Water Viscosity
+---------------
+
+Water viscosity plays an important role in buoyancy. However, water viscosity is
+dependent on density, :math:`\rho`, and temperature, :math:`T`, both of which depend
+on depth in bodies of water. So, to calculate water viscosity, we must take into account
+the depth of the particle in question.
+
+We follow Huber et al (2009) to calculate water viscosity. In essence, the dimensionless
+water velocity is calculated as
+
+.. math::
+   \bar{\mu} = \bar{\mu}_0(\bar{T}) \times \bar{\mu}_1(\bar{T},\,\bar{\rho}) \times \bar{\mu}_2(\bar{T},\,\bar{\rho})
+
+where :math:`\bar{\mu}_0` is viscosity when density is 0 (in the limit), :math:`\bar{\mu}_1` is viscosity due to increasing
+density, and :math:`\bar{\mu}_2` is viscosity near the critical point. Furthermore, :math:`\bar{T}` and :math:`\bar{\rho}`
+represent dimensionless quantities:
+
+.. math::
+   \begin{align}
+      \bar{T} &= \frac{T}{T^\star} = \frac{T}{647.096 \text{ K}} \\
+      \bar{\rho} &= \frac{\rho}{\rho^\star} = \frac{\rho}{322.0 \text{ kg m}^{-3}}
+   \end{align}
+
+Viscosity at the Zero Density Limit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We use the following equation from Huber et al (2009):
+
+.. math::
+   \bar{\mu}_0 = \frac{100 \, \bar{T}}{1.67752 + \frac{2.20462}{\bar{T}} + \frac{0.6366564}{\bar{T}^2} - \frac{0.241605}{\bar{T}^3}}.
+
+The coefficients were obtained by orthogonal distance regression on observational data.
+
+Viscosity due to Increasing Density
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This term depends on both dimensionless temperature :math:`\bar{T}`, and on dimensionless density,
+:math:`\bar{\rho}`:
+
+.. math::
+   \bar{\mu}_1(\bar{T},\,\bar{\rho}) = \exp\left[ \sum^5_{i=0}\left( \frac{1}{\bar{T}} - 1 \right)^i \sum^6_{j=0} \left( \bar{\rho} - 1 \right)^j \right]
+
 Terminal Velocity Equations
 ---------------------------
 
@@ -145,6 +188,8 @@ References
 ----------
 
 Clift, R., J. R. Grace, and M. E. Weber, 2005, `Bubbles, Drops, and Particles <https://www.google.com/books/edition/_/UUrOmD8niUQC?hl=en>`_.
+
+Huber, M. L., R. A. Perkins, A. Laesecke, D. G. Friend, J. V. Sengers, M. J. Assael, I. N. Metaxa, E. Vogel, R. Mareš, and K. Miyagawa, 2009, `New international formulation for the viscosity of H2O <https://aip.scitation.org/doi/full/10.1063/1.3088050>`_: Journal of Physical and Chemical Reference Data, 38, 101–125.
 
 Zheng Li, and Yapa Poojitha D., 2000, `Buoyant Velocity of Spherical and Nonspherical
 Bubbles/Droplets <https://ascelibrary.org/doi/abs/10.1061/(ASCE)0733-9429(2000)126:11(852)>`_:
