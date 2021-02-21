@@ -1,11 +1,18 @@
 language: c++
 dist: focal
+addons:
+  apt:
+    packages:
+      - libmpich12
+      - mpich
+      - libhdf5-dev
+      - cmake
+      - lcov
+    update: true
 
 before_install:
   - test -n $CC  && unset CC
   - test -n $CXX && unset CXX
-  - sudo apt-get update
-  - sudo apt-get -y install libmpich12 mpich libhdf5-dev cmake lcov
   - wget https://github.com/catchorg/Catch2/archive/v2.13.4.tar.gz
   - tar -xzf v2.13.4.tar.gz
   - cd Catch2-2.13.4
