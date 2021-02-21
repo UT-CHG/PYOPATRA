@@ -49,7 +49,7 @@ double Particle::terminal_buoyancy_velocity() {
             double H = 4.0 / 3.0 * Eo * pow(M, -0.149)
                     * pow(current_node->viscosity / WATER_VISCOSITY, -0.14);
 
-            if (2 < H <= 59.3) {
+            if (2 < H && H <= 59.3) {
                 J = 0.94 * pow(H, 0.757);
             } else if (H > 59.3) {
                 J = 3.42 * pow(H, 0.441);
@@ -86,7 +86,7 @@ double Particle::calculate_nd() const {
     }
 }
 
-double Particle::calculate_critical_diameter() {
+double Particle::calculate_critical_diameter() const {
     // Calculate x1, y1
     double H = 59.3;
     double J = 0.94 * pow(H, 0.757);
