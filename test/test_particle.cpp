@@ -5,8 +5,8 @@
 #include <catch2/catch.hpp>
 #include <stdexcept>
 #include <iostream>
-#include "../src/pythonLPT/cpp/particle.h"
-#include "../src/pythonLPT/cpp/mesh.h"
+#include "../src/PYOPATRA/cpp/particle.h"
+#include "../src/PYOPATRA/cpp/mesh.h"
 
 TEST_CASE("Buoyancy Calculated Correctly", "[buoyancy]") {
     SECTION("Reynold's Numbers") {

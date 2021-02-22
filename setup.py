@@ -104,7 +104,7 @@ class CMakeBuild(build_ext):
         print()  # Add an empty line for cleaner output
 
 setup(
-    name='pythonLPT',
+    name='PYOPATRA',
     version='0.1',
     author='Georgia Stuart',
     author_email='georgia.stuart@austin.utexas.edu',
@@ -122,7 +122,7 @@ setup(
     package_dir={'':'src'},
     # add an extension module named 'python_cpp_example' to the package
     # 'python_cpp_example'
-    ext_modules=[CMakeExtension('pythonLPT/pythonLPT')],
+    ext_modules=[CMakeExtension('PYOPATRA/PYOPATRA')],
     # add custom build_ext command
     zip_safe=False,
 )

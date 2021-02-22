@@ -3,7 +3,7 @@
 //
 
 #include <catch2/catch.hpp>
-#include "../src/pythonLPT/cpp/mesh.h"
+#include "../src/PYOPATRA/cpp/mesh.h"
 
 TEST_CASE("Mesh Tests", "[mesh-tests]") {
     SECTION("Water Viscosity Tests") {
