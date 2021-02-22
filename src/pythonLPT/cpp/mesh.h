@@ -5,15 +5,20 @@
 #ifndef LPTCPP_MESH_H
 #define LPTCPP_MESH_H
 
+#include <vector>
 #include "coordinate.h"
 
 class MeshNode {
 public:
-    double density, temperature, viscosity;
+    int num_depth_layers;
+    std::vector<double> density, temperature, salinity, water_viscosity, viscosity;
     CoordinateD velocity, location;
 
     MeshNode();
-    MeshNode(double water_density, double temperature, double viscosity);
+    explicit MeshNode(int num_depths);
+    explicit MeshNode(double density, double temperature, double salinity);
+    static double calculate_water_viscosity(double temperature, double density);
+    static double calculate_salt_water_viscosity(double temperature, double density, double salinity);
 };
 
 class Mesh {};

@@ -11,6 +11,7 @@ class Particle {
 public:
     double diameter, density, interfacial_tension;
     CoordinateD position;
+    int depth_index;
     MeshNode *current_node;
 
     Particle();
@@ -18,7 +19,6 @@ public:
     double terminal_buoyancy_velocity();
     double calculate_nd() const;
     static double calculate_reynolds(double Nd);
-    static double calculate_water_viscosity(double temperature);
     double calculate_critical_diameter() const;
     double calculate_morton_number() const;
     double calculate_eotvos_number() const;
