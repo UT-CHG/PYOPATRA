@@ -40,6 +40,10 @@ dependent on density, :math:`\rho`, and temperature, :math:`T`, both of which de
 on depth in bodies of water. So, to calculate water viscosity, we must take into account
 the depth of the particle in question.
 
+Water Viscosity With Respect to Density
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Ocean water contains salt, which can impact density as well as temperature.
 We follow Huber et al (2009) to calculate water viscosity. In essence, the dimensionless
 water velocity is calculated as
 
@@ -57,7 +61,7 @@ represent dimensionless quantities:
    \end{align}
 
 Viscosity at the Zero Density Limit
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++++++++++++++++++++++++++++++++++++
 
 We use the following equation from Huber et al (2009):
 
@@ -67,7 +71,7 @@ We use the following equation from Huber et al (2009):
 The coefficients were obtained by orthogonal distance regression on observational data.
 
 Viscosity due to Increasing Density
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++++++++++++++++++++++++++++++++++++
 
 This term depends on both dimensionless temperature :math:`\bar{T}`, and on dimensionless density,
 :math:`\bar{\rho}`:
@@ -148,6 +152,19 @@ where :math:`H_{ij}` are determined by the following table:
      - -0.000593264
 
 Values not in the table are 0.0.
+
+Pure Water Viscosity with Respect to Temperature
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For pure water we make a simplifying assumption and assume we are at atmospheric pressure. Though pressure does increase
+with depth in the ocean, the contribution of the increased pressure to density is small. We use the following equation
+from Patek et al (2009):
+
+.. math::
+   \bar{\mu} = 280.68 \bar{T}^{-1.9} + 511.45 \bar{T}^-{7.7} + 61.131 \bar{T}^{-19.6} + 0.45903 \bar{T}^{-40.0}
+
+where :math:`\bar{T} = T / 300` K.
+
 
 Terminal Velocity Equations
 ---------------------------

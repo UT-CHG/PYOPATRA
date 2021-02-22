@@ -71,7 +71,8 @@ double dimensionless_viscosity_due_to_density(double temperature, double density
     return 1.0e-6 * dimensionless_viscosity_density_zero(temperature) * dimensionless_viscosity_due_to_density(temperature, density);
 }
 
+// This equation is only recommended for the temperature range of 253.15 K to 383.15 K (-20 C to 110 C).
 /* static */ double MeshNode::calculate_pure_water_viscosity(double temperature) {
-    // PLACEHOLDER. FIX THIS!!
-    return temperature;
+    double T = temperature / 300.0;
+    return 1.0e-6 * (280.68 * pow(T, -1.9) + 511.45 * pow(T, -7.7) + 61.131 * pow(T, -19.6) + 0.45903 * pow(T, -40.0));
 }
