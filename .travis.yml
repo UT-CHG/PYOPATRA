@@ -24,7 +24,7 @@ before_install:
 install:
   - mkdir build
   - cd build
-  - cmake .. -DBUILD_TEST=ON
+  - cmake .. -DBUILD_TEST=ON -DCODE_COVERAGE=ON
   - make
 
 script:
