@@ -2,8 +2,8 @@
 // Created by Georgia Stuart on 2/4/21.
 //
 
-#ifndef LPTCPP_MESH_H
-#define LPTCPP_MESH_H
+#ifndef PYOPATRA_MESH_H
+#define PYOPATRA_MESH_H
 
 #include <vector>
 #include "coordinate.h"
@@ -23,4 +23,4 @@ public:
 
 class Mesh {};
 
-#endif //LPTCPP_MESH_H
+#endif //PYOPATRA_MESH_H

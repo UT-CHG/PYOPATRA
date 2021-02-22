@@ -2,8 +2,8 @@
 // Created by Georgia Stuart on 2/3/21.
 //
 
-#ifndef LPTCPP_PARTICLELIST_H
-#define LPTCPP_PARTICLELIST_H
+#ifndef PYOPATRA_PARTICLELIST_H
+#define PYOPATRA_PARTICLELIST_H
 
 #include "particle.h"
 
@@ -29,4 +29,4 @@ public:
     Node& operator[](int index) const;
 };
 
-#endif //LPTCPP_PARTICLELIST_H
+#endif //PYOPATRA_PARTICLELIST_H

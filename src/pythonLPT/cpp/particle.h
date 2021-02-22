@@ -2,8 +2,8 @@
 // Created by Georgia Stuart on 2/3/21.
 //
 
-#ifndef LPTCPP_PARTICLE_H
-#define LPTCPP_PARTICLE_H
+#ifndef PYOPATRA_PARTICLE_H
+#define PYOPATRA_PARTICLE_H
 
 #include "mesh.h"
 
@@ -24,4 +24,4 @@ public:
     double calculate_eotvos_number() const;
 };
 
-#endif //LPTCPP_PARTICLE_H
+#endif //PYOPATRA_PARTICLE_H

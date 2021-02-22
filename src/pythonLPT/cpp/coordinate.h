@@ -2,8 +2,8 @@
 // Created by Georgia Stuart on 2/4/21.
 //
 
-#ifndef LPTCPP_COORDINATE_H
-#define LPTCPP_COORDINATE_H
+#ifndef PYOPATRA_COORDINATE_H
+#define PYOPATRA_COORDINATE_H
 
 template<typename T>
 class CoordinateT {
@@ -18,4 +18,4 @@ public:
 typedef CoordinateT<double> CoordinateD;
 typedef CoordinateT<float> CoordinateF;
 typedef CoordinateT<int> CoordinateI;
-#endif //LPTCPP_COORDINATE_H
+#endif //PYOPATRA_COORDINATE_H

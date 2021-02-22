@@ -2,8 +2,8 @@
 // Created by Georgia Stuart on 2/3/21.
 //
 
-#ifndef LPTCPP_PARTICLESOLVER_H
-#define LPTCPP_PARTICLESOLVER_H
+#ifndef PYOPATRA_PARTICLESOLVER_H
+#define PYOPATRA_PARTICLESOLVER_H
 
 
 
@@ -15,4 +15,4 @@ public:
     ParticleSolver();
 };
 
-#endif //LPTCPP_PARTICLESOLVER_H
+#endif //PYOPATRA_PARTICLESOLVER_H
