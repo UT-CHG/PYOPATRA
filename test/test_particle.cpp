@@ -17,12 +17,12 @@ TEST_CASE("Buoyancy Calculated Correctly", "[buoyancy]") {
     }
 
     SECTION("Water Viscosity") {
-//        REQUIRE(Particle::calculate_water_viscosity(10.0) == Approx(0.001308));
+//        REQUIRE(Particle::calculate_fluid_viscosity(10.0) == Approx(0.001308));
     }
 
     SECTION("Test configuration 1, small particle, oil in water") {
         Particle particle(0.0, 0.0, 0.00005, 858.0, -15.0, 0.023);
-        MeshNode node(998.2071, 10.0, 0.001002);
+        MeshNode node(998.2071, 10.0 + 273.15);
         particle.current_node = &node;
 
 //        REQUIRE(particle.calculate_nd() == Approx(0.227683));
