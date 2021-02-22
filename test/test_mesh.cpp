@@ -20,4 +20,10 @@ TEST_CASE("Mesh Tests", "[mesh-tests]") {
         REQUIRE(MeshNode::calculate_fluid_viscosity(1173.15, 100) == Approx(0.000047640433));
         REQUIRE(MeshNode::calculate_fluid_viscosity(1173.15, 400) == Approx(0.000064154608));
     }
+
+    SECTION("Pure water viscosity tests") {
+        REQUIRE(MeshNode::calculate_pure_water_viscosity(10.0 + 273.15) == Approx(1305.90172775e-6));
+        REQUIRE(MeshNode::calculate_pure_water_viscosity(298.15) == Approx(889.996773679e-6));
+
+    }
 }
