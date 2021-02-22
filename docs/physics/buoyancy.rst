@@ -158,7 +158,7 @@ Pure Water Viscosity with Respect to Temperature
 
 For pure water we make a simplifying assumption and assume we are at atmospheric pressure. Though pressure does increase
 with depth in the ocean, the contribution of the increased pressure to density is small. We use the following equation
-from Patek et al (2009):
+from Pátek et al (2009):
 
 .. math::
    \bar{\mu} = 280.68 \bar{T}^{-1.9} + 511.45 \bar{T}^-{7.7} + 61.131 \bar{T}^{-19.6} + 0.45903 \bar{T}^{-40.0}
@@ -282,6 +282,8 @@ References
 Clift, R., J. R. Grace, and M. E. Weber, 2005, `Bubbles, Drops, and Particles <https://www.google.com/books/edition/_/UUrOmD8niUQC?hl=en>`_.
 
 Huber, M. L., R. A. Perkins, A. Laesecke, D. G. Friend, J. V. Sengers, M. J. Assael, I. N. Metaxa, E. Vogel, R. Mareš, and K. Miyagawa, 2009, `New international formulation for the viscosity of H2O <https://aip.scitation.org/doi/full/10.1063/1.3088050>`_: Journal of Physical and Chemical Reference Data, 38, 101–125.
+
+Pátek, J., J. Hrubý, J. Klomfar, M. Součková, and A. H. Harvey, 2009, `Reference correlations for thermophysical properties of liquid water at 0.1 MPa <https://aip.scitation.org/doi/full/10.1063/1.3043575>`_: Journal of Physical and Chemical Reference Data, 38, 21–29.
 
 Zheng Li, and Yapa Poojitha D., 2000, `Buoyant Velocity of Spherical and Nonspherical
 Bubbles/Droplets <https://ascelibrary.org/doi/abs/10.1061/(ASCE)0733-9429(2000)126:11(852)>`_:
