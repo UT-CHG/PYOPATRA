@@ -163,7 +163,8 @@ from Patek et al (2009):
 .. math::
    \bar{\mu} = 280.68 \bar{T}^{-1.9} + 511.45 \bar{T}^-{7.7} + 61.131 \bar{T}^{-19.6} + 0.45903 \bar{T}^{-40.0}
 
-where :math:`\bar{T} = T / 300` K.
+where :math:`\bar{T} = T / 300` K. This equation is only recommended in the temperature range of 253.15 K to 383.15 K
+(-20 C to 110 C).
 
 
 Terminal Velocity Equations
