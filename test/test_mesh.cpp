@@ -26,4 +26,34 @@ TEST_CASE("Mesh Tests", "[mesh-tests]") {
         REQUIRE(MeshNode::calculate_pure_water_viscosity(298.15) == Approx(889.996773679e-6));
 
     }
+
+    SECTION("Mesh Node Constructor Test") {
+        MeshNode node1(25);
+
+        REQUIRE(node1.num_depth_layers == 25);
+        REQUIRE(node1.density.size() == 25);
+        REQUIRE(node1.temperature.size() == 25);
+        REQUIRE(node1.water_viscosity.size() == 25);
+        REQUIRE(node1.viscosity.size() == 25);
+        REQUIRE(node1.velocity.x == 0.0);
+        REQUIRE(node1.velocity.y == 0.0);
+        REQUIRE(node1.velocity.z == 0.0);
+        REQUIRE(node1.location.x == 0.0);
+        REQUIRE(node1.location.y == 0.0);
+        REQUIRE(node1.location.z == 0.0);
+
+        MeshNode node2;
+
+        REQUIRE(node2.num_depth_layers == 0);
+        REQUIRE(node2.density.empty());
+        REQUIRE(node2.temperature.empty());
+        REQUIRE(node2.water_viscosity.empty());
+        REQUIRE(node2.viscosity.empty());
+        REQUIRE(node1.velocity.x == 0.0);
+        REQUIRE(node1.velocity.y == 0.0);
+        REQUIRE(node1.velocity.z == 0.0);
+        REQUIRE(node1.location.x == 0.0);
+        REQUIRE(node1.location.y == 0.0);
+        REQUIRE(node1.location.z == 0.0);
+    }
 }
