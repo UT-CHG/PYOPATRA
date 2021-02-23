@@ -20,8 +20,9 @@ public:
     double calculate_nd() const;
     static double calculate_reynolds(double Nd);
     double calculate_critical_diameter() const;
+    double calculate_diameter_from_H(double H, double M) const;
     double calculate_morton_number() const;
-    double calculate_eotvos_number() const;
+    double calculate_eotvos_number(double diameter_effective) const;
 };
 
 #endif //PYOPATRA_PARTICLE_H
