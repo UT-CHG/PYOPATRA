@@ -2,7 +2,7 @@
 // Created by Georgia Stuart on 2/4/21.
 //
 
-#include <math.h>
+#include <cmath>
 #include "mesh.h"
 
 MeshNode::MeshNode() 
