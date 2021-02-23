@@ -1,5 +1,5 @@
 //
-// Created by georgia on 2/23/21.
+// Created by Georgia Stuart on 2/23/21.
 //
 
 #ifndef PYOPATRA_ILLNODE_H
