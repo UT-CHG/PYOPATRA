@@ -16,7 +16,7 @@ TEST_CASE("Particles Initialized Correctly", "[particle-constructors]") {
         REQUIRE(p.density == 0.0);
         REQUIRE(p.interfacial_tension == 0.0);
         REQUIRE(p.depth_index == 0);
-        REQUIRE(p.current_node == nullptr);
+        REQUIRE(p.current_mesh_node == nullptr);
         REQUIRE(p.position.x == 0.0);
         REQUIRE(p.position.y == 0.0);
         REQUIRE(p.position.z == 0.0);
@@ -28,7 +28,7 @@ TEST_CASE("Particles Initialized Correctly", "[particle-constructors]") {
         REQUIRE(p.density == 858.0);
         REQUIRE(p.interfacial_tension == 0.023);
         REQUIRE(p.depth_index == 0);
-        REQUIRE(p.current_node == nullptr);
+        REQUIRE(p.current_mesh_node == nullptr);
         REQUIRE(p.position.x == 10.0);
         REQUIRE(p.position.y == -20.0);
         REQUIRE(p.position.z == -15.0);
@@ -46,7 +46,7 @@ TEST_CASE("Buoyancy Calculated Correctly", "[buoyancy]") {
     SECTION("Test configuration 1, small particle, oil in water") {
         Particle particle(0.0, 0.0, 0.0005, 858.0, -15.0, 0.023);
         MeshNode node(998.2071, 10.0 + 273.15);
-        particle.current_node = &node;
+        particle.current_mesh_node = &node;
 
 
         REQUIRE(particle.calculate_nd() == Approx(134.04346406465507));
@@ -62,7 +62,7 @@ TEST_CASE("Buoyancy Calculated Correctly", "[buoyancy]") {
     SECTION("Test configuration 2, ellpsoid particle, oil in water") {
         Particle particle(0.0, 0.0, 0.01, 858.0, -15.0, 0.023);
         MeshNode node(998.2071, 10.0 + 273.15);
-        particle.current_node = &node;
+        particle.current_mesh_node = &node;
 
         REQUIRE(particle.calculate_morton_number() == Approx(3.296180248036054e-10));
         REQUIRE(particle.calculate_eotvos_number(0.01) == Approx(5.974041652173913));
@@ -72,7 +72,7 @@ TEST_CASE("Buoyancy Calculated Correctly", "[buoyancy]") {
     SECTION("Test configuration 2, spherical cap particle, oil in water") {
         Particle particle(0.0, 0.0, 0.02, 858.0, -15.0, 0.023);
         MeshNode node(998.2071, 10.0 + 273.15);
-        particle.current_node = &node;
+        particle.current_mesh_node = &node;
 
         REQUIRE(particle.calculate_morton_number() == Approx(3.296180248036054e-10));
         REQUIRE(particle.calculate_eotvos_number(0.02) == Approx(23.89616660869565));

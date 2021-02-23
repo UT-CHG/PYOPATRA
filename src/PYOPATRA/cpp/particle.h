@@ -13,14 +13,14 @@ public:
     double diameter, density, interfacial_tension;
     CoordinateD position;
     int depth_index;
-    MeshNode *current_node;
+    MeshNode *current_mesh_node;
 
     // Enable Intrusive Linked List Structure
     ILLNode<Particle> node;
 
     Particle();
     Particle(double latitude, double longitude, double diameter, double density, double depth, double interfacial_tension);
-    double terminal_buoyancy_velocity();
+    double terminal_buoyancy_velocity() const;
     double calculate_nd() const;
     static double calculate_reynolds(double Nd);
     double calculate_critical_diameter() const;
