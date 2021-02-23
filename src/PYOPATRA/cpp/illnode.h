@@ -12,7 +12,7 @@ public:
     T *owner;
 
     ILLNode() : next(nullptr), prev(nullptr), owner(nullptr) {};
-    explicit ILLNode(T &owner) : next(nullptr), prev(nullptr), owner(&owner) {};
+    explicit ILLNode(T *owner) : next(nullptr), prev(nullptr), owner(owner) {};
 
     void remove();
     void insert_after(ILLNode<T> &node);
