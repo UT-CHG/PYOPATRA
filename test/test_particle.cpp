@@ -8,6 +8,33 @@
 #include "../src/PYOPATRA/cpp/particle.h"
 #include "../src/PYOPATRA/cpp/mesh.h"
 
+TEST_CASE("Particles Initialized Correctly", "[particle-constructors]") {
+    SECTION("Default Constructor") {
+        Particle p;
+
+        REQUIRE(p.diameter == 0.0);
+        REQUIRE(p.density == 0.0);
+        REQUIRE(p.interfacial_tension == 0.0);
+        REQUIRE(p.depth_index == 0);
+        REQUIRE(p.current_node == nullptr);
+        REQUIRE(p.position.x == 0.0);
+        REQUIRE(p.position.y == 0.0);
+        REQUIRE(p.position.z == 0.0);
+    }
+
+    SECTION("Full Constructor") {
+    Particle p(10.0, -20.0, 0.0005, 858.0, -15.0, 0.023);
+        REQUIRE(p.diameter == 0.0005);
+        REQUIRE(p.density == 858.0);
+        REQUIRE(p.interfacial_tension == 0.023);
+        REQUIRE(p.depth_index == 0);
+        REQUIRE(p.current_node == nullptr);
+        REQUIRE(p.position.x == 10.0);
+        REQUIRE(p.position.y == -20.0);
+        REQUIRE(p.position.z == -15.0);
+    }
+}
+
 TEST_CASE("Buoyancy Calculated Correctly", "[buoyancy]") {
     SECTION("Reynold's Numbers") {
         REQUIRE(Particle::calculate_reynolds(50.0) == Approx(1.72923));
