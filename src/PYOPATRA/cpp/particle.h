@@ -6,6 +6,7 @@
 #define PYOPATRA_PARTICLE_H
 
 #include "mesh.h"
+#include "particlenode.h"
 
 class Particle {
 public:
@@ -13,6 +14,9 @@ public:
     CoordinateD position;
     int depth_index;
     MeshNode *current_node;
+
+    // Enable Intrusive Linked List Structure
+    ParticleNode node;
 
     Particle();
     Particle(double latitude, double longitude, double diameter, double density, double depth, double interfacial_tension);
@@ -24,5 +28,6 @@ public:
     double calculate_morton_number() const;
     double calculate_eotvos_number(double diameter_effective) const;
 };
+
 
 #endif //PYOPATRA_PARTICLE_H
