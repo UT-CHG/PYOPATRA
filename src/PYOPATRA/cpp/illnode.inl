@@ -6,7 +6,7 @@ void ILLNode<T>::remove() {
     next->prev = prev;
     next = this;
     prev = this;
-};
+}
 
 template <class T>
 void ILLNode<T>::insert_after(ILLNode<T> &node) {
@@ -15,4 +15,4 @@ void ILLNode<T>::insert_after(ILLNode<T> &node) {
     next = node.next;
     node.next = this;
     next->prev = this;
-};
+}
