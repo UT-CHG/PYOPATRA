@@ -13,23 +13,42 @@ TEST_CASE("Buoyancy Calculated Correctly", "[buoyancy]") {
         REQUIRE(Particle::calculate_reynolds(50.0) == Approx(1.72923));
         REQUIRE(Particle::calculate_reynolds(400.0) == Approx(9.50261));
         REQUIRE(Particle::calculate_reynolds(1000.0) == Approx(19.0142));
-//        REQUIRE_THROWS_AS(Particle::calculate_reynolds(1.0e8), std::runtime_error);
-    }
-
-    SECTION("Water Viscosity") {
-//        REQUIRE(Particle::calculate_fluid_viscosity(10.0) == Approx(0.001308));
+        REQUIRE_THROWS_AS(Particle::calculate_reynolds(1.0e8), std::runtime_error);
     }
 
     SECTION("Test configuration 1, small particle, oil in water") {
-        Particle particle(0.0, 0.0, 0.00005, 858.0, -15.0, 0.023);
+        Particle particle(0.0, 0.0, 0.0005, 858.0, -15.0, 0.023);
         MeshNode node(998.2071, 10.0 + 273.15);
         particle.current_node = &node;
 
-//        REQUIRE(particle.calculate_nd() == Approx(0.227683));
-//        REQUIRE(particle.calculate_reynolds(particle.calculate_nd()) == Approx(0.009477679));
-//        REQUIRE(particle.terminal_buoyancy_velocity() == Approx(0.000190274));
-//        REQUIRE(particle.calculate_morton_number() == Approx(1.142463e-10));
-//        REQUIRE(particle.calculate_eotvos_number() == Approx(0.00014935));
-//        REQUIRE(particle.calculate_critical_diameter() == Approx())
+
+        REQUIRE(particle.calculate_nd() == Approx(134.04346406465507));
+        REQUIRE(particle.calculate_reynolds(particle.calculate_nd()) == Approx(4.022917436868935));
+        REQUIRE(particle.terminal_buoyancy_velocity() == Approx(0.010525927697382923));
+        REQUIRE(particle.calculate_morton_number() == Approx(3.296180248036054e-10));
+        REQUIRE(particle.calculate_eotvos_number(0.0005) == Approx(0.01493510413043478));
+        REQUIRE(particle.calculate_eotvos_number(0.015) == Approx(13.441593717391305));
+        REQUIRE(particle.calculate_diameter_from_H(59.3, particle.calculate_morton_number()) == Approx(0.0053635079976646));
+        REQUIRE(particle.calculate_critical_diameter() == Approx(0.017986694144167818));
+    }
+
+    SECTION("Test configuration 2, ellpsoid particle, oil in water") {
+        Particle particle(0.0, 0.0, 0.01, 858.0, -15.0, 0.023);
+        MeshNode node(998.2071, 10.0 + 273.15);
+        particle.current_node = &node;
+
+        REQUIRE(particle.calculate_morton_number() == Approx(3.296180248036054e-10));
+        REQUIRE(particle.calculate_eotvos_number(0.01) == Approx(5.974041652173913));
+        REQUIRE(particle.terminal_buoyancy_velocity() == Approx(0.11845922340015877));
+    }
+
+    SECTION("Test configuration 2, spherical cap particle, oil in water") {
+        Particle particle(0.0, 0.0, 0.02, 858.0, -15.0, 0.023);
+        MeshNode node(998.2071, 10.0 + 273.15);
+        particle.current_node = &node;
+
+        REQUIRE(particle.calculate_morton_number() == Approx(3.296180248036054e-10));
+        REQUIRE(particle.calculate_eotvos_number(0.02) == Approx(23.89616660869565));
+        REQUIRE(particle.terminal_buoyancy_velocity() == Approx(0.11797019910948671));
     }
 }
