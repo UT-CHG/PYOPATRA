@@ -37,7 +37,7 @@ if (${BUILD_PYTHON})
 endif()
 
 if (${BUILD_CPP} OR ${BUILD_TEST})
-    add_library(pyopatra_lib src/PYOPATRA/cpp/particlesolver.cpp src/PYOPATRA/cpp/particlesolver.h src/PYOPATRA/cpp/particle.cpp src/PYOPATRA/cpp/particle.h src/PYOPATRA/cpp/particlelist.cpp src/PYOPATRA/cpp/particlelist.h src/PYOPATRA/cpp/mesh.cpp src/PYOPATRA/cpp/mesh.h src/PYOPATRA/cpp/coordinate.h src/PYOPATRA/cpp/particlenode.cpp src/PYOPATRA/cpp/particlenode.h)
+    add_library(pyopatra_lib src/PYOPATRA/cpp/particlesolver.cpp src/PYOPATRA/cpp/particlesolver.h src/PYOPATRA/cpp/particle.cpp src/PYOPATRA/cpp/particle.h src/PYOPATRA/cpp/particlelist.cpp src/PYOPATRA/cpp/particlelist.h src/PYOPATRA/cpp/mesh.cpp src/PYOPATRA/cpp/mesh.h src/PYOPATRA/cpp/coordinate.h src/PYOPATRA/cpp/illnode.h)
     target_include_directories(pyopatra_lib PUBLIC SYSTEM ${HDF5_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
     target_link_libraries(pyopatra_lib PUBLIC ${MPI_CXX_LIBRARIES} ${HDF5_LIBRARIES})
     target_compile_definitions(pyopatra_lib PUBLIC ${HDF5_DEFINITIONS})

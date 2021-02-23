@@ -6,7 +6,7 @@
 #define PYOPATRA_PARTICLE_H
 
 #include "mesh.h"
-#include "particlenode.h"
+#include "illnode.h"
 
 class Particle {
 public:
@@ -16,7 +16,7 @@ public:
     MeshNode *current_node;
 
     // Enable Intrusive Linked List Structure
-    ParticleNode node;
+    ILLNode<Particle> node;
 
     Particle();
     Particle(double latitude, double longitude, double diameter, double density, double depth, double interfacial_tension);
