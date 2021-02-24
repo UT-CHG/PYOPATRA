@@ -7,3 +7,4 @@ PYOPATRA's User's Guide
    installing
    using
    contributing
+   api
