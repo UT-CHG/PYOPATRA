@@ -10,3 +10,4 @@ we use output from existing ocean model solvers: ADCIRC, HYCOM, MIT-GCM, and POM
    adcirc
    hycom
    mitgcm
+   pom
