@@ -13,6 +13,7 @@ void List<T>::remove(ILLNode<T> &node) {
     length--;
 }
 
+template <class T>
 ILLNode<T>* pop_current() {
     ILLNode<T>* temp = current;
     current = temp->prev;
