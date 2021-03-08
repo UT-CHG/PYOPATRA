@@ -29,5 +29,15 @@ TEST_CASE("Intrusive Linked List", "[ill]") {
         REQUIRE(p2.node.next == &p3.node);
         REQUIRE(p3.node.prev == &p2.node);
         REQUIRE(p3.node.next == nullptr);
+
+        Particle *particle = &p;
+        int len = 1;
+
+        while (particle->node.next != nullptr) {
+            particle = particle->node.next->owner;
+            len++;
+        }
+
+        REQUIRE(len == 3);
     }
 }
