@@ -1,5 +1,7 @@
 // Method Definitions for ILLNode
 
+#include <iostream>
+
 template <class T>
 void ILLNode<T>::remove() {
     prev->next = next;

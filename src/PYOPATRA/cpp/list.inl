@@ -14,10 +14,10 @@ void List<T>::remove(ILLNode<T> &node) {
 }
 
 template <class T>
-ILLNode<T>* pop_current() {
+ILLNode<T>* List<T>::pop_current() {
     ILLNode<T>* temp = current;
     current = temp->prev;
-    temp.remove();
+    temp->remove();
     return temp;
 }
 

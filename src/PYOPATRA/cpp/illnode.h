@@ -11,8 +11,8 @@ public:
     ILLNode *next, *prev;
     T *owner;
 
-    ILLNode() : next(nullptr), prev(nullptr), owner(nullptr) {};
-    explicit ILLNode(T *owner) : next(nullptr), prev(nullptr), owner(owner) {};
+    ILLNode() : next(this), prev(this), owner(nullptr) {};
+    explicit ILLNode(T *owner) : next(this), prev(this), owner(owner) {};
 
     void remove();
     void insert_after(ILLNode<T> &node);
