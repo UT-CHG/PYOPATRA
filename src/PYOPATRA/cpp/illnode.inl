@@ -4,10 +4,16 @@
 
 template <class T>
 void ILLNode<T>::remove() {
-    prev->next = next;
-    next->prev = prev;
-    next = this;
-    prev = this;
+    if (prev != nullptr) {
+        prev->next = next;
+    }
+
+    if (prev != nullptr) {
+        next->prev = prev;
+    }
+
+    next = nullptr;
+    prev = nullptr;
 }
 
 template <class T>
@@ -16,5 +22,8 @@ void ILLNode<T>::insert_after(ILLNode<T> &node) {
     prev = &node;
     next = node.next;
     node.next = this;
-    next->prev = this;
+
+    if (next != nullptr) {
+        next->prev = this;
+    }
 }

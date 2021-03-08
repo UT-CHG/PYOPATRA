@@ -17,15 +17,17 @@ TEST_CASE("Intrusive Linked List", "[ill]") {
 
 
         REQUIRE(p.node.owner == &p);
+        REQUIRE(p.node.next == nullptr);
+        REQUIRE(p.node.prev == nullptr);
 
+        p2.node.insert_after(p.node);
         p3.node.insert_after(p2.node);
-//        p2.node.insert_after(p.node);
 
-//        REQUIRE(p.node.prev == nullptr);
-//        REQUIRE(p.node.next == &p2.node);
-//        REQUIRE(p2.node.prev == &p.node);
-//        REQUIRE(p2.node.next == &p3.node);
-//        REQUIRE(p3.node.prev == &p2.node);
-//        REQUIRE(p3.node.next == nullptr);
+        REQUIRE(p.node.prev == nullptr);
+        REQUIRE(p.node.next == &p2.node);
+        REQUIRE(p2.node.prev == &p.node);
+        REQUIRE(p2.node.next == &p3.node);
+        REQUIRE(p3.node.prev == &p2.node);
+        REQUIRE(p3.node.next == nullptr);
     }
 }
