@@ -39,5 +39,12 @@ TEST_CASE("Intrusive Linked List", "[ill]") {
         }
 
         REQUIRE(len == 3);
+
+        p2.node.remove();
+
+        REQUIRE(p.node.next == &p3.node);
+        REQUIRE(p3.node.prev == &p.node);
+        REQUIRE(p2.node.next == nullptr);
+        REQUIRE(p2.node.prev == nullptr);
     }
 }
