@@ -3,7 +3,7 @@
 //
 
 #include <catch2/catch.hpp>
-#include "../src/PYOPATRA/cpp/mesh.h"
+#include "../src/PYOPATRA/cpp/mesh_node.h"
 
 TEST_CASE("Mesh Tests", "[mesh-tests]") {
     SECTION("Water Viscosity Tests") {
@@ -19,6 +19,8 @@ TEST_CASE("Mesh Tests", "[mesh-tests]") {
         REQUIRE(MeshNode::calculate_fluid_viscosity(1173.15, 1) == Approx(0.000044217245));
         REQUIRE(MeshNode::calculate_fluid_viscosity(1173.15, 100) == Approx(0.000047640433));
         REQUIRE(MeshNode::calculate_fluid_viscosity(1173.15, 400) == Approx(0.000064154608));
+
+        REQUIRE(MeshNode::calculate_fluid_viscosity(10.0 + 273.15, 998.2071) == Approx(0.00130877));
     }
 
     SECTION("Pure water viscosity tests") {
@@ -28,8 +30,9 @@ TEST_CASE("Mesh Tests", "[mesh-tests]") {
     }
 
     SECTION("Mesh Node Constructor Test") {
-        MeshNode node1(25);
+        MeshNode node1(50, 25);
 
+        REQUIRE(node1.mesh_index == 50);
         REQUIRE(node1.num_depth_layers == 25);
         REQUIRE(node1.density.size() == 25);
         REQUIRE(node1.temperature.size() == 25);
@@ -44,16 +47,46 @@ TEST_CASE("Mesh Tests", "[mesh-tests]") {
 
         MeshNode node2;
 
+        REQUIRE(node2.mesh_index == 0);
         REQUIRE(node2.num_depth_layers == 0);
         REQUIRE(node2.density.empty());
         REQUIRE(node2.temperature.empty());
         REQUIRE(node2.water_viscosity.empty());
         REQUIRE(node2.viscosity.empty());
-        REQUIRE(node1.velocity.x == 0.0);
-        REQUIRE(node1.velocity.y == 0.0);
-        REQUIRE(node1.velocity.z == 0.0);
-        REQUIRE(node1.location.x == 0.0);
-        REQUIRE(node1.location.y == 0.0);
-        REQUIRE(node1.location.z == 0.0);
+        REQUIRE(node2.velocity.x == 0.0);
+        REQUIRE(node2.velocity.y == 0.0);
+        REQUIRE(node2.velocity.z == 0.0);
+        REQUIRE(node2.location.x == 0.0);
+        REQUIRE(node2.location.y == 0.0);
+        REQUIRE(node2.location.z == 0.0);
+
+        MeshNode node3(50);
+
+        REQUIRE(node3.mesh_index == 50);
+        REQUIRE(node3.num_depth_layers == 0);
+        REQUIRE(node3.density.empty());
+        REQUIRE(node3.temperature.empty());
+        REQUIRE(node3.water_viscosity.empty());
+        REQUIRE(node3.viscosity.empty());
+        REQUIRE(node3.velocity.x == 0.0);
+        REQUIRE(node3.velocity.y == 0.0);
+        REQUIRE(node3.velocity.z == 0.0);
+        REQUIRE(node3.location.x == 0.0);
+        REQUIRE(node3.location.y == 0.0);
+        REQUIRE(node3.location.z == 0.0);
+
+        MeshNode node4(50, 998, 298.15);
+        REQUIRE(node4.mesh_index == 50);
+        REQUIRE(node4.num_depth_layers == 1);
+        REQUIRE(node4.density[0] == 998);
+        REQUIRE(node4.temperature[0] == 298.15);
+        REQUIRE(node4.water_viscosity[0] == Approx(889.996773679e-6));
+        REQUIRE(node4.viscosity[0] == Approx(0.000889735100));
+        REQUIRE(node4.velocity.x == 0.0);
+        REQUIRE(node4.velocity.y == 0.0);
+        REQUIRE(node4.velocity.z == 0.0);
+        REQUIRE(node4.location.x == 0.0);
+        REQUIRE(node4.location.y == 0.0);
+        REQUIRE(node4.location.z == 0.0);
     }
 }

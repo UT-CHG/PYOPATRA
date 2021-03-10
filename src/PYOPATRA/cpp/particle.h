@@ -5,7 +5,7 @@
 #ifndef PYOPATRA_PARTICLE_H
 #define PYOPATRA_PARTICLE_H
 
-#include "mesh.h"
+#include "mesh_node.h"
 #include "illnode.h"
 
 class Particle {

@@ -5,24 +5,32 @@
 #include <cmath>
 #include "mesh_node.h"
 
-MeshNode::MeshNode() 
-    : num_depth_layers(0)
+MeshNode::MeshNode()
+        : num_depth_layers(0)
+        , mesh_index(0)
 {}
 
-MeshNode::MeshNode(int num_depths)
+MeshNode::MeshNode(int mesh_index)
+    : num_depth_layers(0)
+    , mesh_index(mesh_index)
+{}
+
+MeshNode::MeshNode(int mesh_index, int num_depths)
     : num_depth_layers(num_depths)
+    , mesh_index(mesh_index)
     , density(num_depths)
     , temperature(num_depths)
     , water_viscosity(num_depths)
     , viscosity(num_depths)
 {}
 
-MeshNode::MeshNode(double density, double temperature)
+MeshNode::MeshNode(int mesh_index, double density, double temperature)
     : num_depth_layers(1)
+    , mesh_index(mesh_index)
     , density(1, density)
     , temperature(1, temperature)
-    , water_viscosity(1, calculate_fluid_viscosity(temperature, density))
-    , viscosity(1, calculate_pure_water_viscosity(temperature))
+    , water_viscosity(1, calculate_pure_water_viscosity(temperature))
+    , viscosity(1, calculate_fluid_viscosity(temperature, density))
 {}
 
 // Water Viscosity

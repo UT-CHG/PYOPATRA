@@ -14,8 +14,20 @@ public:
     CoordinateT(T x, T y, T z) : x(x), y(y), z(z) { }
 };
 
+template<typename T>
+class LocationT {
+public:
+    T latitude, longitude;
+
+    LocationT() : latitude(0), longitude(0) { }
+    LocationT(T latitude, T longitude) : latitude(latitude), longitude(longitude) { }
+};
+
 
 typedef CoordinateT<double> CoordinateD;
 typedef CoordinateT<float> CoordinateF;
 typedef CoordinateT<int> CoordinateI;
+
+typedef LocationT<double> Location;
+
 #endif //PYOPATRA_COORDINATE_H
