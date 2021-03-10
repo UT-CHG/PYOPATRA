@@ -3,7 +3,7 @@
 //
 
 #include <cmath>
-#include "mesh.h"
+#include "mesh_node.h"
 
 MeshNode::MeshNode() 
     : num_depth_layers(0)
