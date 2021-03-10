@@ -13,7 +13,8 @@ class MeshNode {
 public:
     int num_depth_layers, mesh_index;
     std::vector<double> density, temperature, water_viscosity, viscosity;
-    CoordinateD velocity, location;
+    CoordinateD velocity;
+    Location location;
 
     MeshNode();
     explicit MeshNode(int mesh_index);

@@ -41,9 +41,8 @@ TEST_CASE("Mesh Tests", "[mesh-tests]") {
         REQUIRE(node1.velocity.x == 0.0);
         REQUIRE(node1.velocity.y == 0.0);
         REQUIRE(node1.velocity.z == 0.0);
-        REQUIRE(node1.location.x == 0.0);
-        REQUIRE(node1.location.y == 0.0);
-        REQUIRE(node1.location.z == 0.0);
+        REQUIRE(node1.location.latitude == 0.0);
+        REQUIRE(node1.location.longitude == 0.0);
 
         MeshNode node2;
 
@@ -56,9 +55,8 @@ TEST_CASE("Mesh Tests", "[mesh-tests]") {
         REQUIRE(node2.velocity.x == 0.0);
         REQUIRE(node2.velocity.y == 0.0);
         REQUIRE(node2.velocity.z == 0.0);
-        REQUIRE(node2.location.x == 0.0);
-        REQUIRE(node2.location.y == 0.0);
-        REQUIRE(node2.location.z == 0.0);
+        REQUIRE(node1.location.latitude == 0.0);
+        REQUIRE(node1.location.longitude == 0.0);
 
         MeshNode node3(50);
 
@@ -71,9 +69,8 @@ TEST_CASE("Mesh Tests", "[mesh-tests]") {
         REQUIRE(node3.velocity.x == 0.0);
         REQUIRE(node3.velocity.y == 0.0);
         REQUIRE(node3.velocity.z == 0.0);
-        REQUIRE(node3.location.x == 0.0);
-        REQUIRE(node3.location.y == 0.0);
-        REQUIRE(node3.location.z == 0.0);
+        REQUIRE(node1.location.latitude == 0.0);
+        REQUIRE(node1.location.longitude == 0.0);
 
         MeshNode node4(50, 998, 298.15);
         REQUIRE(node4.mesh_index == 50);
@@ -85,8 +82,7 @@ TEST_CASE("Mesh Tests", "[mesh-tests]") {
         REQUIRE(node4.velocity.x == 0.0);
         REQUIRE(node4.velocity.y == 0.0);
         REQUIRE(node4.velocity.z == 0.0);
-        REQUIRE(node4.location.x == 0.0);
-        REQUIRE(node4.location.y == 0.0);
-        REQUIRE(node4.location.z == 0.0);
+        REQUIRE(node1.location.latitude == 0.0);
+        REQUIRE(node1.location.longitude == 0.0);
     }
 }
