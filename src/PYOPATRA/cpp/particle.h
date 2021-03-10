@@ -5,7 +5,7 @@
 #ifndef PYOPATRA_PARTICLE_H
 #define PYOPATRA_PARTICLE_H
 
-#include "mesh_node.h"
+#include "mesh/mesh_element.h"
 #include "illnode.h"
 
 class Particle {
@@ -13,7 +13,7 @@ public:
     double diameter, density, interfacial_tension;
     CoordinateD position;
     int depth_index;
-    MeshNode *current_mesh_node;
+    MeshElement *current_mesh_node;
 
     // Enable Intrusive Linked List Structure
     ILLNode<Particle> node;

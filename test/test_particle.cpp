@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <iostream>
 #include "../src/PYOPATRA/cpp/particle.h"
-#include "../src/PYOPATRA/cpp/mesh_node.h"
+#include "PYOPATRA/cpp/mesh/mesh_element.h"
 
 TEST_CASE("Particles Initialized Correctly", "[particle-constructors]") {
     SECTION("Default Constructor") {
@@ -45,7 +45,7 @@ TEST_CASE("Buoyancy Calculated Correctly", "[buoyancy]") {
 
     SECTION("Test configuration 1, small particle, oil in water") {
         Particle particle(0.0, 0.0, 0.0005, 858.0, -15.0, 0.023);
-        MeshNode node(0, 998.2071, 10.0 + 273.15);
+        MeshElement node(0, 998.2071, 10.0 + 273.15);
         particle.current_mesh_node = &node;
 
 
@@ -61,7 +61,7 @@ TEST_CASE("Buoyancy Calculated Correctly", "[buoyancy]") {
 
     SECTION("Test configuration 2, ellpsoid particle, oil in water") {
         Particle particle(0.0, 0.0, 0.01, 858.0, -15.0, 0.023);
-        MeshNode node(0, 998.2071, 10.0 + 273.15);
+        MeshElement node(0, 998.2071, 10.0 + 273.15);
         particle.current_mesh_node = &node;
 
         REQUIRE(particle.calculate_morton_number() == Approx(3.3252247175369584e-10));
@@ -71,7 +71,7 @@ TEST_CASE("Buoyancy Calculated Correctly", "[buoyancy]") {
 
     SECTION("Test configuration 2, spherical cap particle, oil in water") {
         Particle particle(0.0, 0.0, 0.02, 858.0, -15.0, 0.023);
-        MeshNode node(0, 998.2071, 10.0 + 273.15);
+        MeshElement node(0, 998.2071, 10.0 + 273.15);
         particle.current_mesh_node = &node;
 
         REQUIRE(particle.calculate_morton_number() == Approx(3.3252247175369584e-10));

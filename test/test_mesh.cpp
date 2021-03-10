@@ -3,34 +3,34 @@
 //
 
 #include <catch2/catch.hpp>
-#include "../src/PYOPATRA/cpp/mesh_node.h"
+#include "PYOPATRA/cpp/mesh/mesh_element.h"
 
 TEST_CASE("Mesh Tests", "[mesh-tests]") {
     SECTION("Water Viscosity Tests") {
         // Values from Huber et al (2009)
-        REQUIRE(MeshNode::calculate_fluid_viscosity(298.15, 998) == Approx(0.000889735100));
-        REQUIRE(MeshNode::calculate_fluid_viscosity(298.15, 1200) == Approx(0.001437649467));
-        REQUIRE(MeshNode::calculate_fluid_viscosity(373.15, 1000) == Approx(0.000307883622));
-        REQUIRE(MeshNode::calculate_fluid_viscosity(433.15, 1) == Approx(0.000014538324));
-        REQUIRE(MeshNode::calculate_fluid_viscosity(433.15, 1000) == Approx(0.000217685358));
-        REQUIRE(MeshNode::calculate_fluid_viscosity(873.15, 1) == Approx(0.000032619287));
-        REQUIRE(MeshNode::calculate_fluid_viscosity(873.15, 100) == Approx(0.000035802262));
-        REQUIRE(MeshNode::calculate_fluid_viscosity(873.15, 600) == Approx(0.000077430195));
-        REQUIRE(MeshNode::calculate_fluid_viscosity(1173.15, 1) == Approx(0.000044217245));
-        REQUIRE(MeshNode::calculate_fluid_viscosity(1173.15, 100) == Approx(0.000047640433));
-        REQUIRE(MeshNode::calculate_fluid_viscosity(1173.15, 400) == Approx(0.000064154608));
+        REQUIRE(MeshElement::calculate_fluid_viscosity(298.15, 998) == Approx(0.000889735100));
+        REQUIRE(MeshElement::calculate_fluid_viscosity(298.15, 1200) == Approx(0.001437649467));
+        REQUIRE(MeshElement::calculate_fluid_viscosity(373.15, 1000) == Approx(0.000307883622));
+        REQUIRE(MeshElement::calculate_fluid_viscosity(433.15, 1) == Approx(0.000014538324));
+        REQUIRE(MeshElement::calculate_fluid_viscosity(433.15, 1000) == Approx(0.000217685358));
+        REQUIRE(MeshElement::calculate_fluid_viscosity(873.15, 1) == Approx(0.000032619287));
+        REQUIRE(MeshElement::calculate_fluid_viscosity(873.15, 100) == Approx(0.000035802262));
+        REQUIRE(MeshElement::calculate_fluid_viscosity(873.15, 600) == Approx(0.000077430195));
+        REQUIRE(MeshElement::calculate_fluid_viscosity(1173.15, 1) == Approx(0.000044217245));
+        REQUIRE(MeshElement::calculate_fluid_viscosity(1173.15, 100) == Approx(0.000047640433));
+        REQUIRE(MeshElement::calculate_fluid_viscosity(1173.15, 400) == Approx(0.000064154608));
 
-        REQUIRE(MeshNode::calculate_fluid_viscosity(10.0 + 273.15, 998.2071) == Approx(0.00130877));
+        REQUIRE(MeshElement::calculate_fluid_viscosity(10.0 + 273.15, 998.2071) == Approx(0.00130877));
     }
 
     SECTION("Pure water viscosity tests") {
-        REQUIRE(MeshNode::calculate_pure_water_viscosity(10.0 + 273.15) == Approx(1305.90172775e-6));
-        REQUIRE(MeshNode::calculate_pure_water_viscosity(298.15) == Approx(889.996773679e-6));
+        REQUIRE(MeshElement::calculate_pure_water_viscosity(10.0 + 273.15) == Approx(1305.90172775e-6));
+        REQUIRE(MeshElement::calculate_pure_water_viscosity(298.15) == Approx(889.996773679e-6));
 
     }
 
     SECTION("Mesh Node Constructor Test") {
-        MeshNode node1(50, 25);
+        MeshElement node1(50, 25);
 
         REQUIRE(node1.mesh_index == 50);
         REQUIRE(node1.num_depth_layers == 25);
@@ -44,7 +44,7 @@ TEST_CASE("Mesh Tests", "[mesh-tests]") {
         REQUIRE(node1.location.latitude == 0.0);
         REQUIRE(node1.location.longitude == 0.0);
 
-        MeshNode node2;
+        MeshElement node2;
 
         REQUIRE(node2.mesh_index == 0);
         REQUIRE(node2.num_depth_layers == 0);
@@ -58,7 +58,7 @@ TEST_CASE("Mesh Tests", "[mesh-tests]") {
         REQUIRE(node1.location.latitude == 0.0);
         REQUIRE(node1.location.longitude == 0.0);
 
-        MeshNode node3(50);
+        MeshElement node3(50);
 
         REQUIRE(node3.mesh_index == 50);
         REQUIRE(node3.num_depth_layers == 0);
@@ -72,7 +72,7 @@ TEST_CASE("Mesh Tests", "[mesh-tests]") {
         REQUIRE(node1.location.latitude == 0.0);
         REQUIRE(node1.location.longitude == 0.0);
 
-        MeshNode node4(50, 998, 298.15);
+        MeshElement node4(50, 998, 298.15);
         REQUIRE(node4.mesh_index == 50);
         REQUIRE(node4.num_depth_layers == 1);
         REQUIRE(node4.density[0] == 998);
