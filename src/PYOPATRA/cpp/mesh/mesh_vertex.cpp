@@ -45,6 +45,37 @@ MeshVertex::MeshVertex(double latitude, double longitude, double bathymetric_dep
     , temperature(temperature)
 {}
 
+
+void MeshVertex::set_temperature(size_t depth_index, size_t time_index, double new_temperature) {
+    temperature(depth_index, time_index) = new_temperature;
+}
+
+void MeshVertex::set_density(size_t depth_index, size_t time_index, double new_density) {
+    temperature(depth_index, time_index) = new_density;
+}
+
+void MeshVertex::calculate_all_fluid_viscosity() {
+    auto num_rows = (size_t) viscosity.rows();
+    auto num_cols = (size_t) viscosity.cols();
+
+    for (size_t col = 0; col < num_cols; col++) {
+        for (size_t row = 0; row < num_rows; row++) {
+            viscosity(row, col) = calculate_fluid_viscosity(temperature(row, col), density(row, col));
+        }
+    }
+}
+
+void MeshVertex::calculate_all_pure_water_viscosity() {
+    auto num_rows = (size_t) viscosity.rows();
+    auto num_cols = (size_t) viscosity.cols();
+
+    for (size_t col = 0; col < num_cols; col++) {
+        for (size_t row = 0; row < num_rows; row++) {
+            viscosity(row, col) = calculate_pure_water_viscosity(temperature(row, col));
+        }
+    }
+}
+
 // Water Viscosity
 // From Huber et al 2009
 // Temperature assumed to be Kelvin

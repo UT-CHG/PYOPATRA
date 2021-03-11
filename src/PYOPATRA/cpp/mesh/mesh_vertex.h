@@ -34,9 +34,13 @@ public:
     const Eigen::Tensor<double, 3>& get_velocity() const { return velocity.get_velocity(); }
     Coordinate3D get_velocity(size_t depth_index, size_t time_index) const { return velocity.get_velocity(depth_index, time_index); }
 
-    void set_temperature(Eigen::Ref<const Eigen::ArrayXXd>& temp) { temperature = temp; }
-    void set_density(Eigen::Ref<const Eigen::ArrayXXd>& dense) { density = dense; }
+    void set_temperature(size_t depth_index, size_t time_index, double new_temperature);
+    void set_density(size_t depth_index, size_t time_index, double new_density);
+    void set_temperature(Eigen::Ref<const Eigen::ArrayXXd>& new_temperature) { temperature = new_temperature; }
+    void set_density(Eigen::Ref<const Eigen::ArrayXXd>& new_density) { density = new_density; }
 
+    void calculate_all_fluid_viscosity();
+    void calculate_all_pure_water_viscosity();
     static double calculate_fluid_viscosity(double temperature, double density);
     static double calculate_pure_water_viscosity(double temperature);
 };
