@@ -8,6 +8,7 @@
 #include <string>
 #include <iomanip>
 #include "particle.h"
+#include "mesh/mesh_base.h"
 
 // Acceleration due to gravity in m/s^2
 #define GRAVITY (-9.8)
@@ -25,7 +26,7 @@ Particle::Particle(double latitude, double longitude, double diameter, double de
     : diameter(diameter)
     , density(density)
     , interfacial_tension(interfacial_tension)
-    , position(latitude, longitude, depth)
+    , location(latitude, longitude, depth)
     , depth_index(0) // FIX THIS LATER!!!!
     , current_mesh_node(nullptr)
     , node(this)
@@ -34,22 +35,27 @@ Particle::Particle(double latitude, double longitude, double diameter, double de
 double Particle::terminal_buoyancy_velocity() const {
     //  Buoyancy method from Zheng and Yapa (2000)
     //  Diameter assumed to be in meters
+
+    double fluid_viscosity = current_mesh_node->sample_viscosity_at_point(location);
+    double water_viscosity = current_mesh_node->sample_viscosity_at_point(location);
+    double fluid_density = current_mesh_node->sample_density_at_point(location);
+
     if (diameter <= 0.001) {
         //  Archimedes number * 4/3
-        double Nd = calculate_nd();
+        double Nd = calculate_nd(fluid_density, fluid_viscosity);
         double reynolds = calculate_reynolds(Nd);
 
-        return (reynolds * current_mesh_node->viscosity[depth_index]) / (current_mesh_node->density[depth_index] * diameter);
+        return (reynolds * fluid_viscosity) / (fluid_density * diameter);
 
     } else {
-        double critical_diameter = calculate_critical_diameter();
+        double critical_diameter = calculate_critical_diameter(fluid_density, fluid_viscosity, water_viscosity);
 
         if (diameter <= critical_diameter) {
             double J;
-            double Eo = calculate_eotvos_number(diameter);
-            double M = calculate_morton_number();
+            double Eo = calculate_eotvos_number(diameter, fluid_density);
+            double M = calculate_morton_number(fluid_density, fluid_viscosity);
             double H = 4.0 / 3.0 * Eo * pow(M, -0.149)
-                    * pow(current_mesh_node->viscosity[depth_index] / current_mesh_node->water_viscosity[depth_index], -0.14);
+                    * pow(fluid_viscosity / water_viscosity, -0.14);
 
             if (2 < H && H <= 59.3) {
                 J = 0.94 * pow(H, 0.757);
@@ -59,16 +65,16 @@ double Particle::terminal_buoyancy_velocity() const {
                 throw std::runtime_error(std::string("H >= 2 at ") + std::to_string(H) + std::string("."));
             }
 
-            return current_mesh_node->viscosity[depth_index] / (current_mesh_node->density[depth_index] * diameter) * pow(M, -0.149) * (J - 0.857);
+            return fluid_viscosity / (fluid_density * diameter) * pow(M, -0.149) * (J - 0.857);
         } else {
-            return 0.711 * sqrt(GRAVITY * diameter * (density - current_mesh_node->density[depth_index]) / current_mesh_node->density[depth_index]);
+            return 0.711 * sqrt(GRAVITY * diameter * (density - fluid_density) / fluid_density);
         }
     }
 }
 
-double Particle::calculate_nd() const {
-    return (4.0 * current_mesh_node->density[depth_index] * (density - current_mesh_node->density[depth_index])
-            * GRAVITY * pow(diameter, 3)) / (3 * pow(current_mesh_node->viscosity[depth_index], 2));
+double Particle::calculate_nd(double fluid_density, double fluid_viscosity) const {
+    return (4.0 * fluid_density * (density - fluid_density)
+            * GRAVITY * pow(diameter, 3)) / (3 * pow(fluid_viscosity, 2));
 }
 
 /* static */ double Particle::calculate_reynolds(double Nd) {
@@ -89,23 +95,23 @@ double Particle::calculate_nd() const {
 }
 
 
-double Particle::calculate_critical_diameter() const {
+double Particle::calculate_critical_diameter(double fluid_density, double fluid_viscosity, double water_viscosity) const {
     // Calculate x1, y1
     double H = 59.3;
     double J = 0.94 * pow(H, 0.757);
-    double M = calculate_morton_number();
-    double temp_diameter = calculate_diameter_from_H(H, M);
-    double terminal_velocity = current_mesh_node->viscosity[depth_index] / (current_mesh_node->density[depth_index] * temp_diameter)
+    double M = calculate_morton_number(fluid_density, fluid_viscosity);
+    double temp_diameter = calculate_diameter_from_H(H, M, fluid_density, fluid_viscosity, water_viscosity);
+    double terminal_velocity = fluid_viscosity / (fluid_density * temp_diameter)
                                * pow(M, -0.149) * (J - 0.857);
 
     double x1 = log10(temp_diameter);
     double y1 = log10(terminal_velocity);
 
     // Calculate x2, y2
-    double E0 = calculate_eotvos_number(0.015);
-    H = 4.0/3.0 * E0 * pow(M, -0.149) * pow(current_mesh_node->viscosity[depth_index] / current_mesh_node->water_viscosity[depth_index], -0.14);
+    double E0 = calculate_eotvos_number(0.015, fluid_density);
+    H = 4.0/3.0 * E0 * pow(M, -0.149) * pow(fluid_viscosity / water_viscosity, -0.14);
     J = H <= 59.3 ? 0.94 * pow(H, 0.757) : 3.42 * pow(H, 0.441);
-    terminal_velocity = current_mesh_node->viscosity[depth_index] / (current_mesh_node->density[depth_index] * 0.015)
+    terminal_velocity = fluid_viscosity / (fluid_density * 0.015)
                         * pow(M, -0.149) * (J - 0.857);
 
     double x2 = log10(0.015);
@@ -113,7 +119,7 @@ double Particle::calculate_critical_diameter() const {
 
     // Calculate a1, b1, a2, b2
     double a1 = 0.5;
-    double b1 = log10(0.711 * pow(GRAVITY * (density - current_mesh_node->density[depth_index]) / current_mesh_node->density[depth_index], 0.5));
+    double b1 = log10(0.711 * pow(GRAVITY * (density - fluid_density) / fluid_density, 0.5));
     double a2 = (y2 - y1) / (x2 - x1);
     double b2 = y1 - a2 * x1;
 
@@ -121,18 +127,18 @@ double Particle::calculate_critical_diameter() const {
 }
 
 // Diameter from a give H, needed for computing critical diameter
-double Particle::calculate_diameter_from_H(double H, double M) const {
-    double E0 = 3.0/4.0 * H * pow(M, 0.149) * pow(current_mesh_node->viscosity[depth_index]
-                                                  / current_mesh_node->water_viscosity[depth_index], 0.14);
-    return sqrt(E0 * interfacial_tension / (GRAVITY * (density - current_mesh_node->density[depth_index])));
+double Particle::calculate_diameter_from_H(double H, double M, double fluid_density, double fluid_viscosity, double water_viscosity) const {
+    double E0 = 3.0/4.0 * H * pow(M, 0.149) * pow(fluid_viscosity
+                                                  / water_viscosity, 0.14);
+    return sqrt(E0 * interfacial_tension / (GRAVITY * (density - fluid_density)));
 }
 
 // Morton + Eotvos Characterize shape of bubbles in a continuous phase
-double Particle::calculate_morton_number() const {
-    return (GRAVITY * pow(current_mesh_node->viscosity[depth_index], 4) * (density - current_mesh_node->density[depth_index]))
-           / (pow(current_mesh_node->density[depth_index], 2) * pow(interfacial_tension, 3));
+double Particle::calculate_morton_number(double fluid_density, double fluid_viscosity) const {
+    return (GRAVITY * pow(fluid_viscosity, 4) * (density - fluid_density))
+           / (pow(fluid_density, 2) * pow(interfacial_tension, 3));
 }
 
-double Particle::calculate_eotvos_number(double diameter_effective) const {
-    return GRAVITY * (density - current_mesh_node->density[depth_index]) * pow(diameter_effective, 2) / interfacial_tension;
+double Particle::calculate_eotvos_number(double diameter_effective, double fluid_density) const {
+    return GRAVITY * (density - fluid_density) * pow(diameter_effective, 2) / interfacial_tension;
 }

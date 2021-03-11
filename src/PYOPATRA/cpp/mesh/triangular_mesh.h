@@ -15,15 +15,15 @@
 
 class TriangularMesh: public MeshBase {
 protected:
-    using AdjacencyElement = std::array<MeshElement*, 3>;
+    using AdjacencyElement = std::array<TriangularMeshElement*, 3>;
     std::vector<AdjacencyElement> adjacency_list;
-    std::vector<>
+
 public:
     TriangularMesh();
     explicit TriangularMesh(int num_elements);
 
-    MeshElement* find_particle_location(Particle &particle) override;
-    const std::vector<AdjacencyElement>& GetList() const;
+    TriangularMeshElement* find_particle_location(Particle &particle) override;
+    const std::vector<AdjacencyElement>& GetList() const { return adjacency_list; }
     void setup_mesh(Eigen::Ref<Eigen::ArrayXXd> node_coordinates, Eigen::Ref<Eigen::ArrayXXi> element_nodes);
 };
 

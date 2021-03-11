@@ -11,7 +11,3 @@ TriangularMesh::TriangularMesh()
 TriangularMesh::TriangularMesh(int num_elements)
     : adjacency_list(num_elements)
 {}
-
-const std::vector<TriangularMesh::AdjacencyElement> & TriangularMesh::GetList() const {
-    return adjacency_list;
-}

@@ -8,9 +8,7 @@
 
 
 MeshVertex::MeshVertex()
-    : latitude(0.0)
-    , longitude(0.0)
-    , bathymetric_depth(0.0)
+    : location(0.0, 0.0, 0.0)
     , density(1, 1)
     , temperature(1, 1)
     , water_viscosity(1, 1)
@@ -18,9 +16,7 @@ MeshVertex::MeshVertex()
 {}
 
 MeshVertex::MeshVertex(double latitude, double longitude)
-        : latitude(latitude)
-        , longitude(longitude)
-        , bathymetric_depth(0.0)
+        : location(latitude, longitude, 0.0)
         , density(1, 1)
         , temperature(1, 1)
         , water_viscosity(1, 1)
@@ -28,9 +24,7 @@ MeshVertex::MeshVertex(double latitude, double longitude)
 {}
 
 MeshVertex::MeshVertex(double latitude, double longitude, double bathymetric_depth, int num_depth_layers)
-    : latitude(latitude)
-    , longitude(longitude)
-    , bathymetric_depth(bathymetric_depth)
+    : location(latitude, longitude, bathymetric_depth)
     , density(num_depth_layers, 1)
     , temperature(num_depth_layers, 1)
     , water_viscosity(num_depth_layers, 1)
@@ -38,9 +32,7 @@ MeshVertex::MeshVertex(double latitude, double longitude, double bathymetric_dep
 {}
 
 MeshVertex::MeshVertex(double latitude, double longitude, double bathymetric_depth, int num_depth_layers, int num_time_steps)
-        : latitude(latitude)
-        , longitude(longitude)
-        , bathymetric_depth(bathymetric_depth)
+        : location(latitude, longitude, bathymetric_depth)
         , density(num_depth_layers, num_time_steps)
         , temperature(num_depth_layers, num_time_steps)
         , water_viscosity(num_depth_layers, num_time_steps)
@@ -48,9 +40,7 @@ MeshVertex::MeshVertex(double latitude, double longitude, double bathymetric_dep
 {}
 
 MeshVertex::MeshVertex(double latitude, double longitude, double bathymetric_depth, Eigen::Ref<const Eigen::ArrayXXd>& density, Eigen::Ref<const Eigen::ArrayXXd>& temperature)
-    : latitude(latitude)
-    , longitude(longitude)
-    , bathymetric_depth(bathymetric_depth)
+    : location(latitude, longitude, bathymetric_depth)
     , density(density)
     , temperature(temperature)
 {}

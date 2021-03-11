@@ -5,29 +5,19 @@
 #ifndef PYOPATRA_COORDINATE_H
 #define PYOPATRA_COORDINATE_H
 
-template<typename T>
-class CoordinateT {
-public:
-    T x, y, z;
+#include <Eigen/Dense>
 
-    CoordinateT() : x(0), y(0), z(0) { }
-    CoordinateT(T x, T y, T z) : x(x), y(y), z(z) { }
-};
+using Eigen::Array3d;
+using Eigen::Vector3d;
+using Eigen::Vector2d;
 
-template<typename T>
-class LocationT {
-public:
-    T latitude, longitude;
+// Latitude = 0 index
+// Longitude = 1 index
+// Depth = 2 index
+using Coordinate3D = Vector3d;
 
-    LocationT() : latitude(0), longitude(0) { }
-    LocationT(T latitude, T longitude) : latitude(latitude), longitude(longitude) { }
-};
-
-
-typedef CoordinateT<double> CoordinateD;
-typedef CoordinateT<float> CoordinateF;
-typedef CoordinateT<int> CoordinateI;
-
-typedef LocationT<double> Location;
+// Latitude = 0 index
+// Longitude = 1 index
+using Coordinate2D = Vector2d;
 
 #endif //PYOPATRA_COORDINATE_H

@@ -7,9 +7,11 @@
 
 #include <Eigen/Dense>
 
+#include "../coordinate.h"
+
 class MeshVertex {
 private:
-    const double latitude, longitude, bathymetric_depth;
+    Coordinate3D location;
     Eigen::ArrayXXd density, temperature, water_viscosity, viscosity;
 
 public:
@@ -19,9 +21,9 @@ public:
     MeshVertex(double latitude, double longitude, double bathymetric_depth, int num_depth_layers, int num_time_steps);
     MeshVertex(double latitude, double longitude, double bathymetric_depth, Eigen::Ref<const Eigen::ArrayXXd>& density, Eigen::Ref<const Eigen::ArrayXXd>& temperature);
 
-    double get_latitude() const { return latitude; }
-    double get_longitude() const { return longitude; }
-    double get_bathymetric_depth() const { return bathymetric_depth; }
+    double get_latitude() const { return location[0]; }
+    double get_longitude() const { return location[1]; }
+    double get_bathymetric_depth() const { return location[2]; }
     const Eigen::ArrayXXd& get_density() const { return density; }
     const Eigen::ArrayXXd& get_temperature() const { return temperature; }
     const Eigen::ArrayXXd& get_water_viscosity() const { return water_viscosity; }

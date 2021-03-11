@@ -8,12 +8,14 @@
 #include "mesh/mesh_element.h"
 #include "illnode.h"
 
+class MeshBase;
+
 class Particle {
 public:
     double diameter, density, interfacial_tension;
-    CoordinateD position;
+    Coordinate3D location;
     int depth_index;
-    MeshElement *current_mesh_node;
+    MeshElementBase *current_mesh_node;
 
     // Enable Intrusive Linked List Structure
     ILLNode<Particle> node;
@@ -21,12 +23,12 @@ public:
     Particle();
     Particle(double latitude, double longitude, double diameter, double density, double depth, double interfacial_tension);
     double terminal_buoyancy_velocity() const;
-    double calculate_nd() const;
+    double calculate_nd(double fluid_density, double fluid_viscosity) const;
     static double calculate_reynolds(double Nd);
-    double calculate_critical_diameter() const;
-    double calculate_diameter_from_H(double H, double M) const;
-    double calculate_morton_number() const;
-    double calculate_eotvos_number(double diameter_effective) const;
+    double calculate_critical_diameter(double fluid_density, double fluid_viscosity, double water_viscosity) const;
+    double calculate_diameter_from_H(double H, double M, double fluid_density, double fluid_viscosity, double water_viscosity) const;
+    double calculate_morton_number(double fluid_density, double fluid_viscosity) const;
+    double calculate_eotvos_number(double diameter_effective, double fluid_density) const;
 };
 
 
