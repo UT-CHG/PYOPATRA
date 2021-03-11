@@ -9,6 +9,7 @@ addons:
       - libhdf5-dev
       - cmake
       - lcov
+      - libeigen3-dev
     update: true
 
 before_install:
