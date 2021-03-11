@@ -10,6 +10,7 @@
 using Eigen::Array3d;
 using Eigen::Vector3d;
 using Eigen::Vector2d;
+using Eigen::ArrayXXd;
 
 // Latitude = 0 index
 // Longitude = 1 index

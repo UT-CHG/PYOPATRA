@@ -17,6 +17,7 @@ Particle::Particle()
     : diameter(0.0)
     , density(0.0)
     , interfacial_tension(0.0)
+    , location(0.0, 0.0, 0.0)
     , depth_index(0)
     , current_mesh_node(nullptr)
     , node(this)
@@ -32,13 +33,9 @@ Particle::Particle(double latitude, double longitude, double diameter, double de
     , node(this)
 { }
 
-double Particle::terminal_buoyancy_velocity() const {
+double Particle::terminal_buoyancy_velocity(double fluid_density, double fluid_viscosity, double water_viscosity) const {
     //  Buoyancy method from Zheng and Yapa (2000)
     //  Diameter assumed to be in meters
-
-    double fluid_viscosity = current_mesh_node->sample_viscosity_at_point(location);
-    double water_viscosity = current_mesh_node->sample_viscosity_at_point(location);
-    double fluid_density = current_mesh_node->sample_density_at_point(location);
 
     if (diameter <= 0.001) {
         //  Archimedes number * 4/3

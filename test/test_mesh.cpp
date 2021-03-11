@@ -32,57 +32,45 @@ TEST_CASE("Mesh Tests", "[mesh-tests]") {
     SECTION("Mesh Node Constructor Test") {
         MeshVertex node1(50, 25);
 
-        REQUIRE(node1.mesh_index == 50);
-        REQUIRE(node1.num_depth_layers == 25);
-        REQUIRE(node1.density.size() == 25);
-        REQUIRE(node1.temperature.size() == 25);
-        REQUIRE(node1.water_viscosity.size() == 25);
-        REQUIRE(node1.viscosity.size() == 25);
-        REQUIRE(node1.velocity.x == 0.0);
-        REQUIRE(node1.velocity.y == 0.0);
-        REQUIRE(node1.velocity.z == 0.0);
-        REQUIRE(node1.location.latitude == 0.0);
-        REQUIRE(node1.location.longitude == 0.0);
+        REQUIRE(node1.get_density().size() == 1);
+        REQUIRE(node1.get_temperature().size() == 1);
+        REQUIRE(node1.get_water_viscosity().size() == 1);
+        REQUIRE(node1.get_viscosity().size() == 1);
+        REQUIRE(node1.get_latitude() == 50);
+        REQUIRE(node1.get_longitude() == 25);
+        REQUIRE(node1.get_bathymetric_depth() == 0.0);
 
         MeshVertex node2;
 
-        REQUIRE(node2.mesh_index == 0);
-        REQUIRE(node2.num_depth_layers == 0);
-        REQUIRE(node2.density.empty());
-        REQUIRE(node2.temperature.empty());
-        REQUIRE(node2.water_viscosity.empty());
-        REQUIRE(node2.viscosity.empty());
-        REQUIRE(node2.velocity.x == 0.0);
-        REQUIRE(node2.velocity.y == 0.0);
-        REQUIRE(node2.velocity.z == 0.0);
-        REQUIRE(node1.location.latitude == 0.0);
-        REQUIRE(node1.location.longitude == 0.0);
+        REQUIRE(node2.get_density().size() == 1);
+        REQUIRE(node2.get_temperature().size() == 1);
+        REQUIRE(node2.get_water_viscosity().size() == 1);
+        REQUIRE(node2.get_viscosity().size() == 1);
+        REQUIRE(node2.get_latitude() == 0.0);
+        REQUIRE(node2.get_longitude() == 0.0);
+        REQUIRE(node2.get_bathymetric_depth() == 0.0);
 
-        MeshVertex node3(50);
+        MeshVertex node3(50, 25, 33.7, 12);
 
-        REQUIRE(node3.mesh_index == 50);
-        REQUIRE(node3.num_depth_layers == 0);
-        REQUIRE(node3.density.empty());
-        REQUIRE(node3.temperature.empty());
-        REQUIRE(node3.water_viscosity.empty());
-        REQUIRE(node3.viscosity.empty());
-        REQUIRE(node3.velocity.x == 0.0);
-        REQUIRE(node3.velocity.y == 0.0);
-        REQUIRE(node3.velocity.z == 0.0);
-        REQUIRE(node1.location.latitude == 0.0);
-        REQUIRE(node1.location.longitude == 0.0);
+        REQUIRE(node3.get_density().size() == 12);
+        REQUIRE(node3.get_temperature().size() == 12);
+        REQUIRE(node3.get_water_viscosity().size() == 12);
+        REQUIRE(node3.get_viscosity().size() == 12);
+        REQUIRE(node3.get_latitude() == 50.0);
+        REQUIRE(node3.get_longitude() == 25.0);
+        REQUIRE(node3.get_bathymetric_depth() == 33.7);
 
-        MeshVertex node4(50, 998, 298.15);
-        REQUIRE(node4.mesh_index == 50);
-        REQUIRE(node4.num_depth_layers == 1);
-        REQUIRE(node4.density[0] == 998);
-        REQUIRE(node4.temperature[0] == 298.15);
-        REQUIRE(node4.water_viscosity[0] == Approx(889.996773679e-6));
-        REQUIRE(node4.viscosity[0] == Approx(0.000889735100));
-        REQUIRE(node4.velocity.x == 0.0);
-        REQUIRE(node4.velocity.y == 0.0);
-        REQUIRE(node4.velocity.z == 0.0);
-        REQUIRE(node1.location.latitude == 0.0);
-        REQUIRE(node1.location.longitude == 0.0);
+//        MeshVertex node4(50, 998, 298.15);
+//        REQUIRE(node4.mesh_index == 50);
+//        REQUIRE(node4.num_depth_layers == 1);
+//        REQUIRE(node4.density[0] == 998);
+//        REQUIRE(node4.temperature[0] == 298.15);
+//        REQUIRE(node4.water_viscosity[0] == Approx(889.996773679e-6));
+//        REQUIRE(node4.viscosity[0] == Approx(0.000889735100));
+//        REQUIRE(node4.velocity.x == 0.0);
+//        REQUIRE(node4.velocity.y == 0.0);
+//        REQUIRE(node4.velocity.z == 0.0);
+//        REQUIRE(node1.location.latitude == 0.0);
+//        REQUIRE(node1.location.longitude == 0.0);
     }
 }

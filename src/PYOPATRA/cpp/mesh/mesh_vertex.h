@@ -6,13 +6,16 @@
 #define PYOPATRA_MESH_VERTEX_H
 
 #include <Eigen/Dense>
+#include <unsupported/Eigen/CXX11/Tensor>
 
 #include "../coordinate.h"
+#include "velocity.h"
 
 class MeshVertex {
 private:
     Coordinate3D location;
-    Eigen::ArrayXXd density, temperature, water_viscosity, viscosity;
+    Velocity velocity;
+    ArrayXXd density, temperature, water_viscosity, viscosity;
 
 public:
     MeshVertex();
@@ -28,6 +31,8 @@ public:
     const Eigen::ArrayXXd& get_temperature() const { return temperature; }
     const Eigen::ArrayXXd& get_water_viscosity() const { return water_viscosity; }
     const Eigen::ArrayXXd& get_viscosity() const { return viscosity; }
+    const Eigen::Tensor<double, 3>& get_velocity() const { return velocity.get_velocity(); }
+    Coordinate3D get_velocity(size_t depth_index, size_t time_index) const { return velocity.get_velocity(depth_index, time_index); }
 
     void set_temperature(Eigen::Ref<const Eigen::ArrayXXd>& temp) { temperature = temp; }
     void set_density(Eigen::Ref<const Eigen::ArrayXXd>& dense) { density = dense; }

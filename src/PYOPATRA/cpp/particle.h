@@ -22,7 +22,7 @@ public:
 
     Particle();
     Particle(double latitude, double longitude, double diameter, double density, double depth, double interfacial_tension);
-    double terminal_buoyancy_velocity() const;
+    double terminal_buoyancy_velocity(double fluid_density, double fluid_viscosity, double water_viscosity) const;
     double calculate_nd(double fluid_density, double fluid_viscosity) const;
     static double calculate_reynolds(double Nd);
     double calculate_critical_diameter(double fluid_density, double fluid_viscosity, double water_viscosity) const;
