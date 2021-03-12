@@ -66,12 +66,12 @@ void MeshVertex::calculate_all_fluid_viscosity() {
 }
 
 void MeshVertex::calculate_all_pure_water_viscosity() {
-    auto num_rows = (size_t) viscosity.rows();
-    auto num_cols = (size_t) viscosity.cols();
+    auto num_rows = (size_t) water_viscosity.rows();
+    auto num_cols = (size_t) water_viscosity.cols();
 
     for (size_t col = 0; col < num_cols; col++) {
         for (size_t row = 0; row < num_rows; row++) {
-            viscosity(row, col) = calculate_pure_water_viscosity(temperature(row, col));
+            water_viscosity(row, col) = calculate_pure_water_viscosity(temperature(row, col));
         }
     }
 }
