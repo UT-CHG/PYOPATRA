@@ -32,45 +32,42 @@ TEST_CASE("Mesh Vertex Tests", "[mesh-vertex-tests]") {
     SECTION("Mesh Vertex Constructor Test") {
         MeshVertex node1(50, 25);
 
-        REQUIRE(node1.get_density().size() == 1);
-        REQUIRE(node1.get_temperature().size() == 1);
-        REQUIRE(node1.get_water_viscosity().size() == 1);
-        REQUIRE(node1.get_viscosity().size() == 1);
+        REQUIRE(node1.get_density() == 0.0);
+        REQUIRE(node1.get_temperature() == 0.0);
+        REQUIRE(node1.get_water_viscosity() == 0.0);
+        REQUIRE(node1.get_viscosity() == 0.0);
         REQUIRE(node1.get_latitude() == 50);
         REQUIRE(node1.get_longitude() == 25);
-        REQUIRE(node1.get_bathymetric_depth() == 0.0);
+        REQUIRE(node1.get_depth() == 0.0);
 
         MeshVertex node2;
 
-        REQUIRE(node2.get_density().size() == 1);
-        REQUIRE(node2.get_temperature().size() == 1);
-        REQUIRE(node2.get_water_viscosity().size() == 1);
-        REQUIRE(node2.get_viscosity().size() == 1);
+        REQUIRE(node2.get_density() == 0.0);
+        REQUIRE(node2.get_temperature() == 0.0);
+        REQUIRE(node2.get_water_viscosity() == 0.0);
+        REQUIRE(node2.get_viscosity() == 0.0);
         REQUIRE(node2.get_latitude() == 0.0);
         REQUIRE(node2.get_longitude() == 0.0);
-        REQUIRE(node2.get_bathymetric_depth() == 0.0);
+        REQUIRE(node2.get_depth() == 0.0);
 
-        MeshVertex node3(50, 25, 33.7, 12);
+        MeshVertex node3(-89.4960990000, 30.1932510000, -0.7478574510, 998.2071, 283.15);
 
-        REQUIRE(node3.get_density().size() == 12);
-        REQUIRE(node3.get_temperature().size() == 12);
-        REQUIRE(node3.get_water_viscosity().size() == 12);
-        REQUIRE(node3.get_viscosity().size() == 12);
-        REQUIRE(node3.get_latitude() == 50.0);
-        REQUIRE(node3.get_longitude() == 25.0);
-        REQUIRE(node3.get_bathymetric_depth() == 33.7);
+        REQUIRE(node3.get_density() == 998.2071);
+        REQUIRE(node3.get_temperature() == 283.15);
+        REQUIRE(node3.get_water_viscosity() == Approx(1305.90172775e-6));
+        REQUIRE(node3.get_viscosity() == Approx(0.00130877));
+        REQUIRE(node3.get_latitude() == -89.4960990000);
+        REQUIRE(node3.get_longitude() == 30.1932510000);
+        REQUIRE(node3.get_depth() == -0.7478574510);
 
-//        MeshVertex node4(50, 998, 298.15);
-//        REQUIRE(node4.mesh_index == 50);
-//        REQUIRE(node4.num_depth_layers == 1);
-//        REQUIRE(node4.density[0] == 998);
-//        REQUIRE(node4.temperature[0] == 298.15);
-//        REQUIRE(node4.water_viscosity[0] == Approx(889.996773679e-6));
-//        REQUIRE(node4.viscosity[0] == Approx(0.000889735100));
-//        REQUIRE(node4.velocity.x == 0.0);
-//        REQUIRE(node4.velocity.y == 0.0);
-//        REQUIRE(node4.velocity.z == 0.0);
-//        REQUIRE(node1.location.latitude == 0.0);
-//        REQUIRE(node1.location.longitude == 0.0);
+        MeshVertex node4(-89.4960990000, 30.1932510000, -0.7478574510);
+
+        REQUIRE(node4.get_density() == 0.0);
+        REQUIRE(node4.get_temperature() == 0.0);
+        REQUIRE(node4.get_water_viscosity() == 0.0);
+        REQUIRE(node4.get_viscosity() == 0.0);
+        REQUIRE(node4.get_latitude() == -89.4960990000);
+        REQUIRE(node4.get_longitude() == 30.1932510000);
+        REQUIRE(node4.get_depth() == -0.7478574510);
     }
 }
