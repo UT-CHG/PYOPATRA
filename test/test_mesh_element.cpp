@@ -13,7 +13,7 @@ TEST_CASE("Triangle Mesh Element Tests", "[triangle-mesh-element-tests]") {
     MeshVertex v2(-89.4966660000, 30.0901150000, 3.9491493700);
     MeshVertex v3(-89.4889400000, 30.0744220000, 1.9666023300);
 
-    TriangularMeshElement mesh_element = {&v1, &v2, &v3};
+    TriangularMeshElement3D mesh_element(&v1, &v2, &v3);
 
     REQUIRE(*(mesh_element.get_vertices()[0]) == v1);
     REQUIRE(*(mesh_element.get_vertices()[1]) == v2);
