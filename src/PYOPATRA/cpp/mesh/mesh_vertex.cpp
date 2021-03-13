@@ -9,72 +9,47 @@
 
 MeshVertex::MeshVertex()
     : location(0.0, 0.0, 0.0)
-    , density(1, 1)
-    , temperature(1, 1)
-    , water_viscosity(1, 1)
-    , viscosity(1, 1)
+    , density(0.0)
+    , temperature(0.0)
+    , water_viscosity(0.0)
+    , viscosity(0.0)
 {}
 
 MeshVertex::MeshVertex(double latitude, double longitude)
         : location(latitude, longitude, 0.0)
-        , density(1, 1)
-        , temperature(1, 1)
-        , water_viscosity(1, 1)
-        , viscosity(1, 1)
+        , density(0.0)
+        , temperature(0.0)
+        , water_viscosity(0.0)
+        , viscosity(0.0)
 {}
 
-MeshVertex::MeshVertex(double latitude, double longitude, double bathymetric_depth, int num_depth_layers)
+MeshVertex::MeshVertex(double latitude, double longitude, double bathymetric_depth)
     : location(latitude, longitude, bathymetric_depth)
-    , density(num_depth_layers, 1)
-    , temperature(num_depth_layers, 1)
-    , water_viscosity(num_depth_layers, 1)
-    , viscosity(num_depth_layers, 1)
+    , density(0.0)
+    , temperature(0.0)
+    , water_viscosity(0.0)
+    , viscosity(0.0)
 {}
 
-MeshVertex::MeshVertex(double latitude, double longitude, double bathymetric_depth, int num_depth_layers, int num_time_steps)
+MeshVertex::MeshVertex(double latitude, double longitude, double bathymetric_depth, double density, double temperature)
         : location(latitude, longitude, bathymetric_depth)
-        , density(num_depth_layers, num_time_steps)
-        , temperature(num_depth_layers, num_time_steps)
-        , water_viscosity(num_depth_layers, num_time_steps)
-        , viscosity(num_depth_layers, num_time_steps)
-{}
-
-MeshVertex::MeshVertex(double latitude, double longitude, double bathymetric_depth, Eigen::Ref<const Eigen::ArrayXXd>& density, Eigen::Ref<const Eigen::ArrayXXd>& temperature)
-    : location(latitude, longitude, bathymetric_depth)
-    , density(density)
-    , temperature(temperature)
+        , density(density)
+        , temperature(temperature)
+        , water_viscosity(calculate_pure_water_viscosity(temperature))
+        , viscosity(calculate_fluid_viscosity(temperature, density))
 {}
 
 
-void MeshVertex::set_temperature(size_t depth_index, size_t time_index, double new_temperature) {
-    temperature(depth_index, time_index) = new_temperature;
+
+
+void MeshVertex::set_temperature(double new_temperature) {
+    temperature = new_temperature;
 }
 
-void MeshVertex::set_density(size_t depth_index, size_t time_index, double new_density) {
-    temperature(depth_index, time_index) = new_density;
+void MeshVertex::set_density(double new_density) {
+    density = new_density;
 }
 
-void MeshVertex::calculate_all_fluid_viscosity() {
-    auto num_rows = (size_t) viscosity.rows();
-    auto num_cols = (size_t) viscosity.cols();
-
-    for (size_t col = 0; col < num_cols; col++) {
-        for (size_t row = 0; row < num_rows; row++) {
-            viscosity(row, col) = calculate_fluid_viscosity(temperature(row, col), density(row, col));
-        }
-    }
-}
-
-void MeshVertex::calculate_all_pure_water_viscosity() {
-    auto num_rows = (size_t) water_viscosity.rows();
-    auto num_cols = (size_t) water_viscosity.cols();
-
-    for (size_t col = 0; col < num_cols; col++) {
-        for (size_t row = 0; row < num_rows; row++) {
-            water_viscosity(row, col) = calculate_pure_water_viscosity(temperature(row, col));
-        }
-    }
-}
 
 // Water Viscosity
 // From Huber et al 2009
