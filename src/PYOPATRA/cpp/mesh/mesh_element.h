@@ -25,8 +25,12 @@ public:
 class TriangularMeshElement: public MeshElementBase {
 private:
     std::array<MeshVertex*, 3> vertices;
+    Vector3d v0, v1;
+    double d00, d01, d11, denom;
 
 public:
+    TriangularMeshElement(MeshVertex *vertex_0, MeshVertex *vertex_1, MeshVertex *vertex_2);
+
     Vector3d calculate_barycentric_coordinate(const Coordinate3D& point);
 };
 
