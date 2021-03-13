@@ -8,7 +8,7 @@ TriangularMeshElement::TriangularMeshElement(MeshVertex *vertex_0, MeshVertex *v
     : vertices({vertex_0, vertex_1, vertex_2})
 {}
 
-// From https://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
+// From Real Time Collision Detection by Christer Ericson
 Vector3d TriangularMeshElement::calculate_barycentric_coordinate(const Coordinate3D &point) {
     Vector3d pq(0.0, 0.0, 1.0);
     Vector3d pa = vertices[0]->get_location() - point;
