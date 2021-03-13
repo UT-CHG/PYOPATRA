@@ -5,7 +5,7 @@
 #include <catch2/catch.hpp>
 #include "PYOPATRA/cpp/mesh/mesh_vertex.h"
 
-TEST_CASE("Mesh Tests", "[mesh-tests]") {
+TEST_CASE("Mesh Vertex Tests", "[mesh-vertex-tests]") {
     SECTION("Water Viscosity Tests") {
         // Values from Huber et al (2009)
         REQUIRE(MeshVertex::calculate_fluid_viscosity(298.15, 998) == Approx(0.000889735100));
@@ -29,7 +29,7 @@ TEST_CASE("Mesh Tests", "[mesh-tests]") {
 
     }
 
-    SECTION("Mesh Node Constructor Test") {
+    SECTION("Mesh Vertex Constructor Test") {
         MeshVertex node1(50, 25);
 
         REQUIRE(node1.get_density().size() == 1);
