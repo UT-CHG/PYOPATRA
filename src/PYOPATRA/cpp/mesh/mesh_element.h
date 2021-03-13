@@ -7,37 +7,53 @@
 
 #include <vector>
 #include <array>
+#include <initializer_list>
 #include "../coordinate.h"
 #include "mesh_vertex.h"
 
-class MeshElementBase {
+template <int num_vertices>
+class MeshElementT {
 private:
+    std::vector<MeshVertex*> vertices;
+
     int mesh_index;
 
 public:
-    virtual ~MeshElementBase() = default;
+    using VectorTd = Eigen::Matrix<double, num_vertices, 1>;
 
-    template<typename vector_type>
-    double sample_density_at_point(const vector_type barycentric_coordinates);
+    MeshElementT(std::initializer_list<MeshVertex*> vertex_list) : vertices{vertex_list} {};
 
-    template<typename vector_type>
-    double sample_viscosity_at_point(const vector_type barycentric_coordinates);
-
-    template<typename vector_type>
-    double sample_water_viscosity_at_point(const vector_type barycentric_coordinates);
+    Vector3d calculate_velocity(Vector3d& point);
+    VectorTd calculate_barycentric_coordinate(const VectorTd& point);
+    const std::vector<MeshVertex*>& get_vertices() const { return vertices; }
+    double sample_density_at_point(const VectorTd& barycentric_coordinates);
+    double sample_viscosity_at_point(const VectorTd& barycentric_coordinates);
+    double sample_water_viscosity_at_point(const VectorTd& barycentric_coordinates);
 };
 
+class MeshElementCursor {
+public:
+    virtual ~MeshElementCursor() = default;
+    virtual Vector3d calculate_velocity(Vector3d& point) = 0;
+};
 
-class TriangularMeshElement: public MeshElementBase {
+template <int num_vertices>
+class MeshElementCursorT : public MeshElementCursor {
 private:
-    std::array<MeshVertex*, 3> vertices;
+    MeshElementT<num_vertices> *p_impl;
 
 public:
-    TriangularMeshElement(MeshVertex *vertex_0, MeshVertex *vertex_1, MeshVertex *vertex_2);
+    using MeshElementImpl = MeshElementT<num_vertices>;
+    MeshElementCursorT(MeshElementImpl* mesh_element) : p_impl(mesh_element) {}
 
-    Vector3d calculate_barycentric_coordinate(const Coordinate3D& point);
-    std::array<MeshVertex*, 3>& get_vertices() { return vertices; }
+    virtual Vector3d calculate_velocity(Vector3d& point) {
+        return p_impl->calculate_velocity(point);
+    }
+
+    void move(MeshElementT<num_vertices>* new_p_impl) { p_impl = new_p_impl; }
 };
+
+typedef  MeshElementT<3> TriangularMeshElement;
 
 #include "mesh_element.inl"
 

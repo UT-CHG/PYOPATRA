@@ -15,7 +15,7 @@ public:
     double diameter, density, interfacial_tension;
     Coordinate3D location;
     int depth_index;
-    MeshElementBase *current_mesh_node;
+    MeshElementCursor *current_mesh_node;
 
     // Enable Intrusive Linked List Structure
     ILLNode<Particle> node;

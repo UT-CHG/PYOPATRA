@@ -4,10 +4,10 @@
 
 #include "triangular_mesh.h"
 
-TriangularMesh::TriangularMesh()
-    : adjacency_list(0)
-{}
-
-TriangularMesh::TriangularMesh(int num_elements)
-    : adjacency_list(num_elements)
-{}
+//TriangularMesh::TriangularMesh()
+//    : adjacency_list(0)
+//{}
+//
+//TriangularMesh::TriangularMesh(int num_elements)
+//    : adjacency_list(num_elements)
+//{}

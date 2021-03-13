@@ -10,11 +10,11 @@
 #include "../particle.h"
 
 class MeshBase {
-public:
-    time_t time;
-
-    virtual ~MeshBase() = default;
-    virtual MeshElementBase* find_particle_location(Particle &particle) = 0;
+//public:
+//    time_t time;
+//
+//    virtual ~MeshBase() = default;
+//    virtual MeshElementT* find_particle_location(Particle &particle) = 0;
 };
 
 #endif //PYOPATRA_MESH_BASE_H
