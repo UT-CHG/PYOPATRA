@@ -39,4 +39,6 @@ public:
     static double calculate_pure_water_viscosity(double temperature);
 };
 
+bool operator==(const MeshVertex& lhs, const MeshVertex& rhs);
+
 #endif //PYOPATRA_MESH_VERTEX_H

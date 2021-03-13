@@ -50,7 +50,11 @@ void MeshVertex::set_density(double new_density) {
     density = new_density;
 }
 
-
+bool operator==(const MeshVertex& lhs, const MeshVertex& rhs) {
+    return (lhs.get_location() == rhs.get_location()
+            && lhs.get_density() == rhs.get_density()
+            && lhs.get_temperature() == rhs.get_temperature());
+}
 // Water Viscosity
 // From Huber et al 2009
 // Temperature assumed to be Kelvin
