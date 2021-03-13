@@ -24,6 +24,7 @@ public:
     MeshVertex(double latitude, double longitude, double bathymetric_depth, int num_depth_layers, int num_time_steps);
     MeshVertex(double latitude, double longitude, double bathymetric_depth, Eigen::Ref<const Eigen::ArrayXXd>& density, Eigen::Ref<const Eigen::ArrayXXd>& temperature);
 
+    Coordinate3D get_location() const { return location; }
     double get_latitude() const { return location[0]; }
     double get_longitude() const { return location[1]; }
     double get_bathymetric_depth() const { return location[2]; }
