@@ -16,22 +16,29 @@ private:
 
 public:
     virtual ~MeshElementBase() = default;
-    virtual double sample_density_at_point(const Coordinate3D& location);
-    virtual double sample_viscosity_at_point(const Coordinate3D& location);
-    virtual double sample_water_viscosity_at_point(const Coordinate3D& location);
+
+    template<typename vector_type>
+    double sample_density_at_point(const vector_type barycentric_coordinates);
+
+    template<typename vector_type>
+    double sample_viscosity_at_point(const vector_type barycentric_coordinates);
+
+    template<typename vector_type>
+    double sample_water_viscosity_at_point(const vector_type barycentric_coordinates);
 };
 
 
 class TriangularMeshElement: public MeshElementBase {
 private:
     std::array<MeshVertex*, 3> vertices;
-    Vector3d v0, v1;
-    double d00, d01, d11, denom;
 
 public:
     TriangularMeshElement(MeshVertex *vertex_0, MeshVertex *vertex_1, MeshVertex *vertex_2);
 
     Vector3d calculate_barycentric_coordinate(const Coordinate3D& point);
+    std::array<MeshVertex*, 3>& get_vertices() { return vertices; }
 };
+
+#include "mesh_element.inl"
 
 #endif //PYOPATRA_MESH_ELEMENT_H
