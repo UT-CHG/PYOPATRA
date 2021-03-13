@@ -69,5 +69,11 @@ TEST_CASE("Mesh Vertex Tests", "[mesh-vertex-tests]") {
         REQUIRE(node4.get_latitude() == -89.4960990000);
         REQUIRE(node4.get_longitude() == 30.1932510000);
         REQUIRE(node4.get_depth() == -0.7478574510);
+
+        node4.set_temperature(283.15);
+        node4.set_density(998.2071);
+
+        REQUIRE(node4.get_density() == 998.2071);
+        REQUIRE(node4.get_temperature() == 283.15);
     }
 }
