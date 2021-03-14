@@ -4,14 +4,6 @@
 
 #include <stdexcept>
 
-//template <int num_vertices>
-//Vector3d MeshElementT<num_vertices, 3>::calculate_velocity(Vector3d &point) {
-//    auto barycentric_coords = calculate_barycentric_coordinate(point);
-//    double density = sample_density_at_point(barycentric_coords);
-//    double viscosity = sample_viscosity_at_point(barycentric_coords);
-//    double water_viscosity = sample_water_viscosity_at_point(barycentric_coords);
-//}
-//
 
 template <int num_vertices, int dimensions>
 typename MeshElementT<num_vertices, dimensions>::VectorTd MeshElementT<num_vertices, dimensions>::calculate_barycentric_coordinate(const Vector3d & point) const {
@@ -60,6 +52,7 @@ int MeshElementT<num_vertices, dimensions>::check_halfspace(const Vector3d &poin
     }
 }
 
+
 template <int num_vertices, int dimensions>
 Vector3d MeshElementT<num_vertices, dimensions>::sample_velocity_at_barycentric_coordinate(const VectorTd& barycentric_coordinates) {
     Vector3d velocity = Eigen::Vector3d::Zero();
@@ -70,6 +63,7 @@ Vector3d MeshElementT<num_vertices, dimensions>::sample_velocity_at_barycentric_
 
     return velocity;
 }
+
 
 template <int num_vertices, int dimensions>
 double MeshElementT<num_vertices, dimensions>::sample_viscosity_at_barycentric_coordinate(const VectorTd& barycentric_coordinates) {
@@ -82,6 +76,7 @@ double MeshElementT<num_vertices, dimensions>::sample_viscosity_at_barycentric_c
     return viscosity;
 }
 
+
 template <int num_vertices, int dimensions>
 double MeshElementT<num_vertices, dimensions>::sample_density_at_barycentric_coordinate(const VectorTd& barycentric_coordinates) {
     double density = 0.0;
@@ -93,6 +88,7 @@ double MeshElementT<num_vertices, dimensions>::sample_density_at_barycentric_coo
     return density;
 }
 
+
 template <int num_vertices, int dimensions>
 double MeshElementT<num_vertices, dimensions>::sample_water_viscosity_at_barycentric_coordinate(const VectorTd& barycentric_coordinates) {
     double viscosity = 0.0;
@@ -103,8 +99,3 @@ double MeshElementT<num_vertices, dimensions>::sample_water_viscosity_at_barycen
 
     return viscosity;
 }
-
-//template <int num_vertices, int dimensions>
-//Vector3d MeshElementT<num_vertices, dimensions>::calculate_velocity(const Vector3d& point) const {
-//    auto bc = calculate_barycentric_coordinate(point);
-//}
