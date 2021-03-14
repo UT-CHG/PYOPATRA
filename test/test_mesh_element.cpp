@@ -50,9 +50,28 @@ TEST_CASE("Triangle Mesh Element Tests", "[triangle-mesh-element-tests]") {
 
     SECTION("Cursor Checks") {
         TriangularMeshCursor3D cursor(&mesh_element);
+        InterpolatedValues interp;
 
         REQUIRE(cursor.get_depth_at_point(p) == Approx(2.81808521));
         REQUIRE(cursor.check_halfspace(p) == 1);
         REQUIRE(cursor.check_halfspace(p2) == -1);
+
+        cursor.get_interpolated_values(p, interp);
+
+        REQUIRE(interp.density == Approx(1005.2828979957392));
+        REQUIRE(interp.viscosity == Approx(
+                bc[0] * mesh_element.get_vertices()[0]->get_viscosity() +
+                bc[1] * mesh_element.get_vertices()[1]->get_viscosity() +
+                bc[2] * mesh_element.get_vertices()[2]->get_viscosity()));
+        REQUIRE(interp.water_viscosity == Approx(
+                bc[0] * mesh_element.get_vertices()[0]->get_water_viscosity() +
+                bc[1] * mesh_element.get_vertices()[1]->get_water_viscosity() +
+                bc[2] * mesh_element.get_vertices()[2]->get_water_viscosity()));
+
+        Vector3d bc_velocity = bc[0] * mesh_element.get_vertices()[0]->get_velocity() +
+                               bc[1] * mesh_element.get_vertices()[1]->get_velocity() +
+                               bc[2] * mesh_element.get_vertices()[2]->get_velocity();
+
+        REQUIRE((interp.velocity - bc_velocity).norm() < 10e-6);
     }
 }
