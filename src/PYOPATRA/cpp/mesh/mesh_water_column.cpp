@@ -5,7 +5,7 @@
 #include <cmath>
 #include "mesh_water_column.h"
 
-std::tuple<MeshElementCursor*, MeshElementCursor*> WaterColumn::get_element_depth_bounds(const Vector3d &location) {
+std::tuple<MeshElementCursor*, MeshElementCursor*> WaterColumn::get_element_depth_bounds(const Vector3d& location) {
     int above = 0;
     int below = num_depths - 1;
 
