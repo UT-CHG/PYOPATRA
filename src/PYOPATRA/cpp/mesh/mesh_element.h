@@ -32,9 +32,9 @@ public:
         , normals{(a->get_location() - b->get_location()).cross(a->get_location() - c->get_location()), (a->get_location() - c->get_location()).cross(a->get_location() - d->get_location())}
         , mesh_index(mesh_index) {}
 
-    Vector3d calculate_velocity(Vector3d& point);
-    VectorTd calculate_barycentric_coordinate(const Vector3d& point);
-    double calculate_depth_at_point(const Vector3d& point);
+    Vector3d calculate_velocity(const Vector3d& point) const;
+    VectorTd calculate_barycentric_coordinate(const Vector3d& point) const;
+    double calculate_depth_at_point(const Vector3d& point) const;
     const VertexArray& get_vertices() const { return vertices; }
     double sample_density_at_point(const VectorTd& barycentric_coordinates);
     double sample_viscosity_at_point(const VectorTd& barycentric_coordinates);
@@ -46,7 +46,7 @@ public:
 class MeshElementCursor {
 public:
     virtual ~MeshElementCursor() = default;
-    virtual Vector3d calculate_velocity(const Vector3d& point) = 0;
+    virtual Vector3d calculate_velocity(const Vector3d& point) const = 0;
     virtual double get_depth_at_point(const Vector3d& point) = 0;
     virtual int check_halfspace(const Vector3d& point) = 0;
 };
@@ -60,15 +60,15 @@ public:
     using MeshElementImpl = MeshElementT<num_vertices, num_dimensions>;
     MeshElementCursorT(MeshElementImpl* mesh_element) : p_impl(mesh_element) {}
 
-    virtual Vector3d calculate_velocity(const Vector3d& point) {
+    [[nodiscard]] Vector3d calculate_velocity(const Vector3d& point) const override {
         return p_impl->calculate_velocity(point);
     }
 
-    virtual double get_depth_at_point(const Vector3d& point) {
+    double get_depth_at_point(const Vector3d& point) override {
         return p_impl->calculate_depth_at_point(point);
     }
 
-    virtual int check_halfspace(const Vector3d& point) {
+    int check_halfspace(const Vector3d& point) override {
         return p_impl->check_halfspace(point);
     }
 
@@ -77,6 +77,9 @@ public:
 
 typedef MeshElementT<3, 2> TriangularMeshElement2D;
 typedef MeshElementT<3, 3> TriangularMeshElement3D;
+
+typedef MeshElementCursorT<3, 2> TriangularMeshCursor2D;
+typedef MeshElementCursorT<3, 3> TriangularMeshCursor3D;
 
 #include "mesh_element.inl"
 

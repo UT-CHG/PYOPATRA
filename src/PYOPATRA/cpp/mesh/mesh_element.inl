@@ -14,7 +14,7 @@
 //
 
 template <int num_vertices, int dimensions>
-typename MeshElementT<num_vertices, dimensions>::VectorTd MeshElementT<num_vertices, dimensions>::calculate_barycentric_coordinate(const Vector3d & point) {
+typename MeshElementT<num_vertices, dimensions>::VectorTd MeshElementT<num_vertices, dimensions>::calculate_barycentric_coordinate(const Vector3d & point) const {
     // From Real Time Collision Detection by Christer Ericson
     if constexpr (num_vertices == 3) {
         Vector3d pq(0.0, 0.0, 1.0);
@@ -36,7 +36,7 @@ typename MeshElementT<num_vertices, dimensions>::VectorTd MeshElementT<num_verti
 
 
 template <int num_vertices, int dimensions>
-double MeshElementT<num_vertices, dimensions>::calculate_depth_at_point(const Vector3d& point) {
+double MeshElementT<num_vertices, dimensions>::calculate_depth_at_point(const Vector3d& point) const {
     auto bc = calculate_barycentric_coordinate(point);
     return (vertices[0]->get_location() * bc[0] + vertices[1]->get_location() * bc[1] + vertices[2]->get_location() * bc[2])[2];
 }
