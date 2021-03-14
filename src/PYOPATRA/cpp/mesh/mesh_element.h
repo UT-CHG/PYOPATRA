@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <array>
+#include <tuple>
 #include <initializer_list>
 #include "../coordinate.h"
 #include "mesh_vertex.h"
@@ -43,12 +44,19 @@ public:
     int check_halfspace(const Vector3d& point);
 };
 
+class InterpolatedValues {
+public:
+    Vector3d velocity;
+    double density, viscosity, water_viscosity;
+};
+
 class MeshElementCursor {
 public:
     virtual ~MeshElementCursor() = default;
     [[nodiscard]] virtual Vector3d calculate_velocity(const Vector3d& point) const = 0;
     [[nodiscard]] virtual double get_depth_at_point(const Vector3d& point) const = 0;
     [[nodiscard]] virtual int check_halfspace(const Vector3d& point) const = 0;
+    virtual void get_interpolated_values(const Vector3d& point, InterpolatedValues& interpolated_values) const = 0;
 };
 
 template <int num_vertices, int num_dimensions>
@@ -71,6 +79,15 @@ public:
     [[nodiscard]] int check_halfspace(const Vector3d& point) const override {
         return p_impl->check_halfspace(point);
     }
+
+    void get_interpolated_values(const Vector3d& point, InterpolatedValues& interpolated_values) const override {
+        auto bc = p_impl->calculate_barycentric_coordinate(point);
+        interpolated_values.velocity = p_impl->sample_velocity_at_barycentric_coordinate(bc);
+        interpolated_values.density = p_impl->sample_density_at_barycentric_coordinate(bc);
+        interpolated_values.viscosity = p_impl->sample_viscosity_at_barycentric_coordinate(bc);
+        interpolated_values.water_viscosity = p_impl->sample_water_viscosity_at_barycentric_coordinate(bc);
+    }
+
 
     void move(MeshElementT<num_vertices, num_dimensions>* new_p_impl) { p_impl = new_p_impl; }
 };
