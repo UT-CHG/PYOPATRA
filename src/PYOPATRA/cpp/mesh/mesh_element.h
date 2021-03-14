@@ -15,27 +15,40 @@ template <int num_vertices, int dimensions>
 class MeshElementT {
 public:
     using VertexArray = std::array<MeshVertex*, num_vertices>;
+    using PlaneNormalArray = std::array<Vector3d, num_vertices - 2>;
     using VectorTd = Eigen::Matrix<double, num_vertices, 1>;
 private:
     VertexArray vertices;
+    PlaneNormalArray normals;
     int mesh_index;
 
 public:
-    MeshElementT(MeshVertex* a, MeshVertex* b, MeshVertex* c) : vertices{a, b, c} {};
-    MeshElementT(MeshVertex* a, MeshVertex* b, MeshVertex* c, MeshVertex* d) : vertices{a, b, c, d} {};
+    MeshElementT(MeshVertex* a, MeshVertex* b, MeshVertex* c, int mesh_index)
+        : vertices{a, b, c}
+        , normals{(a->get_location() - b->get_location()).cross(a->get_location() - c->get_location())}
+        , mesh_index(mesh_index) {}
+    MeshElementT(MeshVertex* a, MeshVertex* b, MeshVertex* c, MeshVertex* d, int mesh_index)
+        : vertices{a, b, c, d}
+        , normals{(a->get_location() - b->get_location()).cross(a->get_location() - c->get_location()), (a->get_location() - c->get_location()).cross(a->get_location() - d->get_location())}
+        , mesh_index(mesh_index) {}
 
     Vector3d calculate_velocity(Vector3d& point);
     VectorTd calculate_barycentric_coordinate(const Vector3d& point);
+    double calculate_depth_at_point(const Vector3d& point);
     const VertexArray& get_vertices() const { return vertices; }
     double sample_density_at_point(const VectorTd& barycentric_coordinates);
     double sample_viscosity_at_point(const VectorTd& barycentric_coordinates);
     double sample_water_viscosity_at_point(const VectorTd& barycentric_coordinates);
+    // 1 if deeper, -1 if shallower, 0 if on the element
+    int check_halfspace(const Vector3d& point);
 };
 
 class MeshElementCursor {
 public:
     virtual ~MeshElementCursor() = default;
-    virtual Vector3d calculate_velocity(Vector3d& point) = 0;
+    virtual Vector3d calculate_velocity(const Vector3d& point) = 0;
+    virtual double get_depth_at_point(const Vector3d& point) = 0;
+    virtual int check_halfspace(const Vector3d& point) = 0;
 };
 
 template <int num_vertices, int num_dimensions>
@@ -47,8 +60,16 @@ public:
     using MeshElementImpl = MeshElementT<num_vertices, num_dimensions>;
     MeshElementCursorT(MeshElementImpl* mesh_element) : p_impl(mesh_element) {}
 
-    virtual Vector3d calculate_velocity(Vector3d& point) {
+    virtual Vector3d calculate_velocity(const Vector3d& point) {
         return p_impl->calculate_velocity(point);
+    }
+
+    virtual double get_depth_at_point(const Vector3d& point) {
+        return p_impl->calculate_depth_at_point(point);
+    }
+
+    virtual int check_halfspace(const Vector3d& point) {
+        return p_impl->check_halfspace(point);
     }
 
     void move(MeshElementT<num_vertices, num_dimensions>* new_p_impl) { p_impl = new_p_impl; }

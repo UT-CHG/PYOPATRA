@@ -33,3 +33,29 @@ typename MeshElementT<num_vertices, dimensions>::VectorTd MeshElementT<num_verti
         throw std::logic_error(std::string("Barycentric coordinates are not implemented for polygons with ") + std::to_string(num_vertices) + std::string(" vertices."));
     }
 }
+
+
+template <int num_vertices, int dimensions>
+double MeshElementT<num_vertices, dimensions>::calculate_depth_at_point(const Vector3d& point) {
+    auto bc = calculate_barycentric_coordinate(point);
+    return (vertices[0]->get_location() * bc[0] + vertices[1]->get_location() * bc[1] + vertices[2]->get_location() * bc[2])[2];
+}
+
+
+template <int num_vertices, int dimensions>
+int MeshElementT<num_vertices, dimensions>::check_halfspace(const Vector3d &point) {
+    if constexpr (num_vertices == 3) {
+        double dot = normals[0].dot(point - vertices[0]->get_location());
+
+        if (dot < 0) {
+            return -1;
+        } else if (dot > 0) {
+            return 1;
+        } else {
+            return 0;
+        }
+
+    } else {
+        throw std::logic_error(std::string("Check halfspace is not implemented for polygons with ") + std::to_string(num_vertices) + std::string(" vertices."));
+    }
+}
