@@ -59,3 +59,52 @@ int MeshElementT<num_vertices, dimensions>::check_halfspace(const Vector3d &poin
         throw std::logic_error(std::string("Check halfspace is not implemented for polygons with ") + std::to_string(num_vertices) + std::string(" vertices."));
     }
 }
+
+template <int num_vertices, int dimensions>
+Vector3d MeshElementT<num_vertices, dimensions>::sample_velocity_at_barycentric_coordinate(const VectorTd& barycentric_coordinates) {
+    Vector3d velocity = Eigen::Vector3d::Zero();
+
+    for (int i = 0; i < num_vertices; i++) {
+        velocity += vertices[i]->get_velocity() * barycentric_coordinates[i];
+    }
+
+    return velocity;
+}
+
+template <int num_vertices, int dimensions>
+double MeshElementT<num_vertices, dimensions>::sample_viscosity_at_barycentric_coordinate(const VectorTd& barycentric_coordinates) {
+    double viscosity = 0.0;
+
+    for (int i = 0; i < num_vertices; i++) {
+        viscosity += vertices[i]->get_viscosity() * barycentric_coordinates[i];
+    }
+
+    return viscosity;
+}
+
+template <int num_vertices, int dimensions>
+double MeshElementT<num_vertices, dimensions>::sample_density_at_barycentric_coordinate(const VectorTd& barycentric_coordinates) {
+    double density = 0.0;
+
+    for (int i = 0; i < num_vertices; i++) {
+        density += vertices[i]->get_density() * barycentric_coordinates[i];
+    }
+
+    return density;
+}
+
+template <int num_vertices, int dimensions>
+double MeshElementT<num_vertices, dimensions>::sample_water_viscosity_at_barycentric_coordinate(const VectorTd& barycentric_coordinates) {
+    double viscosity = 0.0;
+
+    for (int i = 0; i < num_vertices; i++) {
+        viscosity += vertices[i]->get_water_viscosity() * barycentric_coordinates[i];
+    }
+
+    return viscosity;
+}
+
+//template <int num_vertices, int dimensions>
+//Vector3d MeshElementT<num_vertices, dimensions>::calculate_velocity(const Vector3d& point) const {
+//    auto bc = calculate_barycentric_coordinate(point);
+//}

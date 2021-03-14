@@ -9,9 +9,9 @@
 
 
 TEST_CASE("Triangle Mesh Element Tests", "[triangle-mesh-element-tests]") {
-    MeshVertex v1(-89.4717160000, 30.0866470000, 3.0000000000);
-    MeshVertex v2(-89.4966660000, 30.0901150000, 3.9491493700);
-    MeshVertex v3(-89.4889400000, 30.0744220000, 1.9666023300);
+    MeshVertex v1(-89.4717160000, 30.0866470000, 3.0000000000, 998, 273.15);
+    MeshVertex v2(-89.4966660000, 30.0901150000, 3.9491493700, 1005, 275.15);
+    MeshVertex v3(-89.4889400000, 30.0744220000, 1.9666023300, 1010, 277.15);
 
     Coordinate3D p(-89.486445 , 30.0822685, 4.0);
     Coordinate3D p2(-89.486445 , 30.0822685, 1.0);
@@ -26,6 +26,23 @@ TEST_CASE("Triangle Mesh Element Tests", "[triangle-mesh-element-tests]") {
     SECTION("Barycentric Coordinate Tests") {
         REQUIRE((mesh_element.calculate_barycentric_coordinate(p) - bc).norm() < 10e-6);
         REQUIRE(mesh_element.calculate_depth_at_point(p) == Approx(2.81808521));
+
+        REQUIRE(mesh_element.sample_density_at_barycentric_coordinate(bc) == Approx(1005.2828979957392));
+        REQUIRE(mesh_element.sample_viscosity_at_barycentric_coordinate(bc) == Approx(
+                bc[0] * mesh_element.get_vertices()[0]->get_viscosity() +
+                bc[1] * mesh_element.get_vertices()[1]->get_viscosity() +
+                bc[2] * mesh_element.get_vertices()[2]->get_viscosity()));
+        REQUIRE(mesh_element.sample_water_viscosity_at_barycentric_coordinate(bc) == Approx(
+                bc[0] * mesh_element.get_vertices()[0]->get_water_viscosity() +
+                bc[1] * mesh_element.get_vertices()[1]->get_water_viscosity() +
+                bc[2] * mesh_element.get_vertices()[2]->get_water_viscosity()));
+
+        Vector3d bc_velocity = bc[0] * mesh_element.get_vertices()[0]->get_velocity() +
+                               bc[1] * mesh_element.get_vertices()[1]->get_velocity() +
+                               bc[2] * mesh_element.get_vertices()[2]->get_velocity();
+
+        REQUIRE((mesh_element.sample_velocity_at_barycentric_coordinate(bc) - bc_velocity).norm() < 10e-6);
+
 
         REQUIRE(mesh_element.check_halfspace(p) == 1);
         REQUIRE(mesh_element.check_halfspace(p2) == -1);
