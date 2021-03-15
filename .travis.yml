@@ -11,6 +11,9 @@ addons:
       - lcov
       - libeigen3-dev
       - pybind11-dev
+      - python3
+      - libpython3-dev
+      - pip3
     update: true
 
 before_install:
@@ -22,10 +25,7 @@ before_install:
   - cmake -Bbuild -H. -DBUILD_TESTING=OFF
   - sudo cmake --build build/ --target install
   - cd ..
-  - wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-  - bash Miniconda3-latest-Linux-x86_64.sh -b
-  - source .bashrc
-  - conda install numpy scipy matplotlib
+  - pip3 install numpy scipy matplotlib
 
 install:
   - mkdir cpp_build
@@ -33,7 +33,7 @@ install:
   - cmake .. -DBUILD_TEST=ON -DCODE_COVERAGE=ON
   - make
   - cd ..
-  - pip install -e .
+  - pip3 install -e .
 
 script:
   - ./cpp_build/pyopatra_test
