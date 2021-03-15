@@ -37,7 +37,8 @@ install:
 
 script:
   - ./cpp_build/pyopatra_test
-  - python -m unittest discover -s test/python_tests -p '*_test.py'
+  - cd test/python_tests
+  - python -m unittest discover -s . -p '*_test.py'
 
 after_success:
   # Create lcov report
