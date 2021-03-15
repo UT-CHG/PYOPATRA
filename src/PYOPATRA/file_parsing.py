@@ -2,6 +2,8 @@
 #  Created by Georgia Stuart on 24 February 2021
 #
 
+import numpy as np
+
 
 class FileParserBase:
     """
@@ -16,6 +18,10 @@ class FileParserBase:
         """Number of grid vertices"""
         self.vertices_per_polygon = None
         """Number of vertices that form each grid polygon"""
+        self.vertices = None
+        """Raw Vertex Information"""
+        self.element_vertices = None
+        """Defines the vertex indices that make up each element"""
         self.grid = None
         """Raw Grid Information"""
         self.boundary = None
@@ -72,6 +78,22 @@ class ADCIRCFileParser(FileParserBase):
 
             print('Reading {} grid with {} elements and {} vertices'.format(self.grid_name, self.num_elements, self.num_vertices))
 
+            self.vertices = np.zeros((self.num_vertices, 3))
+
+            for i in range(self.num_vertices):
+                vertex = fp.readline().strip().split()
+                index = int(vertex[0]) - 1
+                coords = np.array(vertex[1:])
+                self.vertices[index, :] = coords
+
+            # We currently only support triangular ADCIRC meshes
+            self.element_vertices = np.zeros((self.num_elements, 3), dtype='int')
+
+            for i in range(self.num_elements):
+                element = fp.readline().strip().split()
+                index = int(element[0]) - 1
+                vertices = np.array(element[2:], dtype='int') - 1
+                self.element_vertices[index, :] = vertices
 
     def read_density_temperature_salinity(self, file=None):
         """
