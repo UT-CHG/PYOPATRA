@@ -9,12 +9,11 @@
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
 #include <pybind11/eigen.h>
-#include "library.h"
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(pythonlpt_cpp, m) {
-
-}
+//PYBIND11_MODULE(pythonlpt_cpp, m) {
+//
+//}
 
 #endif //PYTHONLPT_BINDINGS_CPP
