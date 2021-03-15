@@ -25,7 +25,7 @@ before_install:
   - cmake -Bbuild -H. -DBUILD_TESTING=OFF
   - sudo cmake --build build/ --target install
   - cd ..
-  - pip3 install numpy scipy matplotlib coverage
+  - pip3 install numpy scipy matplotlib coverage pytest
 
 install:
   - mkdir cpp_build
