@@ -8,6 +8,14 @@ class FileParserBase:
     The base class for all file parsers.
     """
     def __init__(self):
+        self.grid_name = None
+        """Alpha-numeric grid identifier (name)"""
+        self.num_elements = None
+        """Number of grid elements"""
+        self.num_vertices = None
+        """Number of grid vertices"""
+        self.vertices_per_polygon = None
+        """Number of vertices that form each grid polygon"""
         self.grid = None
         """Raw Grid Information"""
         self.boundary = None
@@ -50,7 +58,20 @@ class ADCIRCFileParser(FileParserBase):
 
         :param file: The ADCIRC fort.14 file to be read. If None, uses the file specified in the constructor.
         """
-        pass
+        if not file:
+            file = self.fort14
+
+        if not file:
+            raise FileNotFoundError('fort.14 file must be specified in either the ADCIRCFileParser constructor or in read_grid_and_bc function.')
+
+        with open(file, 'r') as fp:
+            self.grid_name = fp.readline().strip()
+            num_elements_and_nodes = fp.readline().strip().split()
+            self.num_elements = int(num_elements_and_nodes[0])
+            self.num_vertices = int(num_elements_and_nodes[1])
+
+            print('Reading {} grid with {} elements and {} vertices'.format(self.grid_name, self.num_elements, self.num_vertices))
+
 
     def read_density_temperature_salinity(self, file=None):
         """
