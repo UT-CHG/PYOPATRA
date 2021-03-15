@@ -5,7 +5,7 @@
 #include <catch2/catch.hpp>
 #include <stdexcept>
 #include <iostream>
-#include "../src/PYOPATRA/cpp/particle.h"
+#include "PYOPATRA/cpp/particle.h"
 #include "PYOPATRA/cpp/mesh/mesh_element.h"
 
 TEST_CASE("Particles Initialized Correctly", "[particle-constructors]") {

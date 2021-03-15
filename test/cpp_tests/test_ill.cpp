@@ -4,9 +4,9 @@
 
 #include <catch2/catch.hpp>
 
-#include "../src/PYOPATRA/cpp/illnode.h"
-#include "../src/PYOPATRA/cpp/list.h"
-#include "../src/PYOPATRA/cpp/particle.h"
+#include "PYOPATRA/cpp/illnode.h"
+#include "PYOPATRA/cpp/list.h"
+#include "PYOPATRA/cpp/particle.h"
 
 TEST_CASE("Intrusive Linked List", "[ill]") {
 
