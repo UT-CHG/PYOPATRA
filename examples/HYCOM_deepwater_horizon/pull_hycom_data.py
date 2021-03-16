@@ -1,5 +1,6 @@
 from ftplib import FTP
 from datetime import date, timedelta
+from time import time
 
 if __name__ == '__main__':
     total_days = 8 * 7
@@ -17,8 +18,11 @@ if __name__ == '__main__':
         for day_since_start in range(total_days):
             date = start_date + timedelta(days=day_since_start)
 
-            for time in times:
-                file = 'hycom_gomu_501_{}{:02d}{:02d}00_t{}.nc'.format(date.year, date.month, date.day, time)
+            for time_str in times:
+                file = 'hycom_gomu_501_{}{:02d}{:02d}00_t{}.nc'.format(date.year, date.month, date.day, time_str)
 
+                start = time()
                 with open('data/' + file, 'wb') as fp:
                     ftp.retrbinary('RETR {}'.format(file), fp.write)
+
+                print('Downloaded {} in {} seconds'.format(file, time() - start))
