@@ -21,7 +21,8 @@ protected:
 
 public:
     MeshVertexBase();
-    MeshVertexBase(double latitude, double longitude, std::initializer_list<double> velocity);
+    MeshVertexBase(double latitude, double longitude);
+    MeshVertexBase(double latitude, double longitude, Vector velocity);
 
     Vector get_location() const { return location; }
     double get_latitude() const { return location[0]; }
@@ -44,6 +45,7 @@ public:
     MeshVertex();
     MeshVertex(double latitude, double longitude, double bathymetric_depth);
     MeshVertex(double latitude, double longitude, double bathymetric_depth, double density, double temperature);
+    MeshVertex(double latitude, double longitude, double bathymetric_depth, double density, double temperature, Vector velocity);
 
     double get_density() const { return density; }
     double get_temperature() const { return temperature; }

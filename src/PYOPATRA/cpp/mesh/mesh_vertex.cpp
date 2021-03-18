@@ -26,14 +26,22 @@ MeshVertex3D::MeshVertex(double latitude, double longitude, double bathymetric_d
 }
 
 MeshVertex3D::MeshVertex(double latitude, double longitude, double bathymetric_depth, double density, double temperature)
-        : MeshVertexBase<3>()
+        : MeshVertexBase<3>(latitude, longitude)
         , density(density)
         , temperature(temperature)
         , water_viscosity(calculate_pure_water_viscosity(temperature))
         , viscosity(calculate_fluid_viscosity(temperature, density))
 {
-    location(0) = latitude;
-    location(1) = longitude;
+    location(2) = bathymetric_depth;
+}
+
+MeshVertex3D::MeshVertex(double latitude, double longitude, double bathymetric_depth, double density, double temperature, Vector velocity)
+        : MeshVertexBase<3>(latitude, longitude, velocity)
+        , density(density)
+        , temperature(temperature)
+        , water_viscosity(calculate_pure_water_viscosity(temperature))
+        , viscosity(calculate_fluid_viscosity(temperature, density))
+{
     location(2) = bathymetric_depth;
 }
 

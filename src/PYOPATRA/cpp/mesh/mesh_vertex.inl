@@ -11,8 +11,17 @@ MeshVertexBase<dimension>::MeshVertexBase()
 
 template <int dimension>
 MeshVertexBase<dimension>::MeshVertexBase(double latitude, double longitude)
+    : location(Eigen::Matrix<double, dimension, 1>::Zero())
 {
-    MeshVertexBase<dimension>();
+    location(0) = latitude;
+    location(1) = longitude;
+}
+
+template <int dimension>
+MeshVertexBase<dimension>::MeshVertexBase(double latitude, double longitude, Vector velocity)
+    : location(Eigen::Matrix<double, dimension, 1>::Zero())
+    , velocity(velocity)
+{
     location(0) = latitude;
     location(1) = longitude;
 }
