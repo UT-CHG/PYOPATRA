@@ -1,60 +1,50 @@
 //
-// Created by georgia on 3/10/21.
+// Created by Georgia Stuart on 3/18/21.
 //
-
-#include <cmath>
 
 #include "mesh_vertex.h"
 
-
-MeshVertex::MeshVertex()
-    : location(0.0, 0.0, 0.0)
-    , density(0.0)
-    , temperature(0.0)
-    , water_viscosity(0.0)
-    , viscosity(0.0)
-{}
-
-MeshVertex::MeshVertex(double latitude, double longitude)
-        : location(latitude, longitude, 0.0)
+MeshVertex3D::MeshVertex()
+        : MeshVertexBase<3>()
         , density(0.0)
         , temperature(0.0)
         , water_viscosity(0.0)
         , viscosity(0.0)
 {}
 
-MeshVertex::MeshVertex(double latitude, double longitude, double bathymetric_depth)
-    : location(latitude, longitude, bathymetric_depth)
-    , density(0.0)
-    , temperature(0.0)
-    , water_viscosity(0.0)
-    , viscosity(0.0)
-{}
 
-MeshVertex::MeshVertex(double latitude, double longitude, double bathymetric_depth, double density, double temperature)
-        : location(latitude, longitude, bathymetric_depth)
+MeshVertex3D::MeshVertex(double latitude, double longitude, double bathymetric_depth)
+        : MeshVertexBase<3>()
+        , density(0.0)
+        , temperature(0.0)
+        , water_viscosity(0.0)
+        , viscosity(0.0)
+{
+    location(0) = latitude;
+    location(1) = longitude;
+    location(2) = bathymetric_depth;
+}
+
+MeshVertex3D::MeshVertex(double latitude, double longitude, double bathymetric_depth, double density, double temperature)
+        : MeshVertexBase<3>()
         , density(density)
         , temperature(temperature)
         , water_viscosity(calculate_pure_water_viscosity(temperature))
         , viscosity(calculate_fluid_viscosity(temperature, density))
-{}
+{
+    location(0) = latitude;
+    location(1) = longitude;
+    location(2) = bathymetric_depth;
+}
 
-
-
-
-void MeshVertex::set_temperature(double new_temperature) {
+void MeshVertex3D::set_temperature(double new_temperature) {
     temperature = new_temperature;
 }
 
-void MeshVertex::set_density(double new_density) {
+void MeshVertex3D::set_density(double new_density) {
     density = new_density;
 }
 
-bool operator==(const MeshVertex& lhs, const MeshVertex& rhs) {
-    return (lhs.get_location() == rhs.get_location()
-            && lhs.get_density() == rhs.get_density()
-            && lhs.get_temperature() == rhs.get_temperature());
-}
 // Water Viscosity
 // From Huber et al 2009
 // Temperature assumed to be Kelvin
@@ -97,12 +87,12 @@ double dimensionless_viscosity_due_to_density(double temperature, double density
     return exp(rho * viscosity);
 }
 
-/* static */ double MeshVertex::calculate_fluid_viscosity(double temperature, double density) {
+/* static */ double MeshVertex3D::calculate_fluid_viscosity(double temperature, double density) {
     return 1.0e-6 * dimensionless_viscosity_density_zero(temperature) * dimensionless_viscosity_due_to_density(temperature, density);
 }
 
 // This equation is only recommended for the temperature range of 253.15 K to 383.15 K (-20 C to 110 C).
-/* static */ double MeshVertex::calculate_pure_water_viscosity(double temperature) {
+/* static */ double MeshVertex3D::calculate_pure_water_viscosity(double temperature) {
     double T = temperature / 300.0;
     return 1.0e-6 * (280.68 * pow(T, -1.9) + 511.45 * pow(T, -7.7) + 61.131 * pow(T, -19.6) + 0.45903 * pow(T, -40.0));
 }
