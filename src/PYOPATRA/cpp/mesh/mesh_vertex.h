@@ -21,15 +21,15 @@ public:
     MeshVertex(double latitude, double longitude, double bathymetric_depth);
     MeshVertex(double latitude, double longitude, double bathymetric_depth, double density, double temperature);
 
-    [[nodiscard]] Coordinate3D get_location() const { return location; }
-    [[nodiscard]] double get_latitude() const { return location[0]; }
-    [[nodiscard]] double get_longitude() const { return location[1]; }
-    [[nodiscard]] double get_depth() const { return location[2]; }
-    [[nodiscard]] double get_density() const { return density; }
-    [[nodiscard]] double get_temperature() const { return temperature; }
-    [[nodiscard]] double get_water_viscosity() const { return water_viscosity; }
-    [[nodiscard]] double get_viscosity() const { return viscosity; }
-    [[nodiscard]] Vector3d get_velocity() const { return velocity; }
+    Coordinate3D get_location() const { return location; }
+    double get_latitude() const { return location[0]; }
+    double get_longitude() const { return location[1]; }
+    double get_depth() const { return location[2]; }
+    double get_density() const { return density; }
+    double get_temperature() const { return temperature; }
+    double get_water_viscosity() const { return water_viscosity; }
+    double get_viscosity() const { return viscosity; }
+    Vector3d get_velocity() const { return velocity; }
 
     void set_temperature(double new_temperature);
     void set_density(double new_density);
