@@ -24,4 +24,7 @@ public:
     Vector interpolate_velocity(const Particle<dimension>& particle);
 };
 
+using WaterColumn2D = WaterColumn<2>;
+using WaterColumn3D = WaterColumn<3>;
+
 #endif //PYOPATRA_MESH_WATER_COLUMN_H
