@@ -10,28 +10,30 @@
 
 TEST_CASE("Particles Initialized Correctly", "[particle-constructors]") {
     SECTION("Default Constructor") {
-        Particle p;
+        Particle3D p;
 
-        REQUIRE(p.diameter == 0.0);
-        REQUIRE(p.density == 0.0);
-        REQUIRE(p.interfacial_tension == 0.0);
-        REQUIRE(p.depth_index == 0);
-        REQUIRE(p.current_mesh_node == nullptr);
-        REQUIRE(p.location[0] == Approx(0.0));
-        REQUIRE(p.location[1] == Approx(0.0));
-        REQUIRE(p.location[2] == Approx(0.0));
+        REQUIRE(p.get_diameter() == 0.0);
+        REQUIRE(p.get_density() == 0.0);
+        REQUIRE(p.get_interfacial_tension() == 0.0);
+        REQUIRE(p.get_depth_index() == 0);
+
+        Vector3d location = p.get_location();
+        REQUIRE(location(0) == Approx(0.0));
+        REQUIRE(location(1) == Approx(0.0));
+        REQUIRE(location(2) == Approx(0.0));
     }
 
     SECTION("Full Constructor") {
-    Particle p(10.0, -20.0, 0.0005, 858.0, -15.0, 0.023);
-        REQUIRE(p.diameter == 0.0005);
-        REQUIRE(p.density == 858.0);
-        REQUIRE(p.interfacial_tension == 0.023);
-        REQUIRE(p.depth_index == 0);
-        REQUIRE(p.current_mesh_node == nullptr);
-        REQUIRE(p.location[0] == 10.0);
-        REQUIRE(p.location[1] == -20.0);
-        REQUIRE(p.location[2] == -15.0);
+        Particle3D p(10.0, -20.0, 0.0005, 858.0, -15.0, 0.023);
+        REQUIRE(p.get_diameter() == 0.0005);
+        REQUIRE(p.get_density() == 858.0);
+        REQUIRE(p.get_interfacial_tension() == 0.023);
+        REQUIRE(p.get_depth_index() == 0);
+
+        Vector3d location = p.get_location();
+        REQUIRE(location[0] == 10.0);
+        REQUIRE(location[1] == -20.0);
+        REQUIRE(location[2] == -15.0);
     }
 }
 
@@ -42,14 +44,14 @@ TEST_CASE("Buoyancy Calculated Correctly", "[buoyancy]") {
     double water_viscosity = 1305.90172775e-6;
 
     SECTION("Reynold's Numbers") {
-        REQUIRE(Particle::calculate_reynolds(50.0) == Approx(1.72923));
-        REQUIRE(Particle::calculate_reynolds(400.0) == Approx(9.50261));
-        REQUIRE(Particle::calculate_reynolds(1000.0) == Approx(19.0142));
+        REQUIRE(Particle3D::calculate_reynolds(50.0) == Approx(1.72923));
+        REQUIRE(Particle3D::calculate_reynolds(400.0) == Approx(9.50261));
+        REQUIRE(Particle3D::calculate_reynolds(1000.0) == Approx(19.0142));
 //        REQUIRE_THROWS_AS(Particle::calculate_reynolds(1.0e8), std::runtime_error);
     }
 
     SECTION("Test configuration 1, small particle, oil in water") {
-        Particle particle(0.0, 0.0, 0.0005, 858.0, -15.0, 0.023);
+        Particle3D particle(0.0, 0.0, 0.0005, 858.0, -15.0, 0.023);
 
         REQUIRE(particle.calculate_nd(fluid_density, fluid_visosity) == Approx(133.45677288001536));
         REQUIRE(particle.calculate_reynolds(particle.calculate_nd(fluid_density, fluid_visosity)) == Approx(4.008095982211944));
@@ -62,7 +64,7 @@ TEST_CASE("Buoyancy Calculated Correctly", "[buoyancy]") {
     }
 
     SECTION("Test configuration 2, ellpsoid particle, oil in water") {
-        Particle particle(0.0, 0.0, 0.01, 858.0, -15.0, 0.023);
+        Particle3D particle(0.0, 0.0, 0.01, 858.0, -15.0, 0.023);
 
 
 
@@ -72,7 +74,7 @@ TEST_CASE("Buoyancy Calculated Correctly", "[buoyancy]") {
     }
 
     SECTION("Test configuration 2, spherical cap particle, oil in water") {
-        Particle particle(0.0, 0.0, 0.02, 858.0, -15.0, 0.023);
+        Particle3D particle(0.0, 0.0, 0.02, 858.0, -15.0, 0.023);
 
         REQUIRE(particle.calculate_morton_number(fluid_density, fluid_visosity) == Approx(3.3252247175369584e-10));
         REQUIRE(particle.calculate_eotvos_number(0.02, fluid_density) == Approx(23.89616660869565));

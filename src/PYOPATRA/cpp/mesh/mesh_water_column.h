@@ -11,14 +11,17 @@
 #include "../coordinate.h"
 #include "../particle.h"
 
+template <int dimension>
 class WaterColumn {
+public:
+    using Vector = Eigen::Matrix<double, dimension, 1>;
 private:
-    std::vector<MeshElementCursor*> mesh_elements;
+    std::vector<MeshElementCursor<dimension>*> mesh_elements;
     int num_depths;
-    std::tuple<MeshElementCursor*, MeshElementCursor*> get_element_depth_bounds(const Vector3d &location);
+    std::tuple<MeshElementCursor<dimension>*, MeshElementCursor<dimension>*> get_element_depth_bounds(const Vector3d &location);
 
 public:
-    Vector3d interpolate_velocity(const Particle& particle);
+    Vector interpolate_velocity(const Particle<dimension>& particle);
 };
 
 #endif //PYOPATRA_MESH_WATER_COLUMN_H

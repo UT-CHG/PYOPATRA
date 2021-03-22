@@ -11,49 +11,49 @@
 TEST_CASE("Intrusive Linked List", "[ill]") {
 
     SECTION("Test particle") {
-        Particle p(10.0, -20.0, 0.0005, 858.0, -15.0, 0.023);
-        Particle p2(20.0, -30.0, 0.0005, 858.0, -15.0, 0.023);
-        Particle p3(30.0, -40.0, 0.0005, 858.0, -15.0, 0.023);
+        Particle3D p(10.0, -20.0, 0.0005, 858.0, -15.0, 0.023);
+        Particle3D p2(20.0, -30.0, 0.0005, 858.0, -15.0, 0.023);
+        Particle3D p3(30.0, -40.0, 0.0005, 858.0, -15.0, 0.023);
 
 
-        REQUIRE(p.node.owner == &p);
-        REQUIRE(p.node.next == nullptr);
-        REQUIRE(p.node.prev == nullptr);
+        REQUIRE(p.get_node().owner == &p);
+        REQUIRE(p.get_node().next == nullptr);
+        REQUIRE(p.get_node().prev == nullptr);
 
-        p2.node.insert_after(p.node);
-        p3.node.insert_after(p2.node);
+        p2.get_node().insert_after(p.get_node());
+        p3.get_node().insert_after(p2.get_node());
 
-        REQUIRE(p.node.prev == nullptr);
-        REQUIRE(p.node.next == &p2.node);
-        REQUIRE(p2.node.prev == &p.node);
-        REQUIRE(p2.node.next == &p3.node);
-        REQUIRE(p3.node.prev == &p2.node);
-        REQUIRE(p3.node.next == nullptr);
+        REQUIRE(p.get_node().prev == nullptr);
+        REQUIRE(p.get_node().next == &p2.get_node());
+        REQUIRE(p2.get_node().prev == &p.get_node());
+        REQUIRE(p2.get_node().next == &p3.get_node());
+        REQUIRE(p3.get_node().prev == &p2.get_node());
+        REQUIRE(p3.get_node().next == nullptr);
 
-        Particle *particle = &p;
+        ParticleBase<3> *particle = &p;
         int len = 1;
 
-        while (particle->node.next != nullptr) {
-            particle = particle->node.next->owner;
+        while (particle->get_node().next != nullptr) {
+            particle = particle->get_node().next->owner;
             len++;
         }
 
         REQUIRE(len == 3);
 
-        p2.node.remove();
+        p2.get_node().remove();
 
-        REQUIRE(p.node.next == &p3.node);
-        REQUIRE(p3.node.prev == &p.node);
-        REQUIRE(p2.node.next == nullptr);
-        REQUIRE(p2.node.prev == nullptr);
+        REQUIRE(p.get_node().next == &p3.get_node());
+        REQUIRE(p3.get_node().prev == &p.get_node());
+        REQUIRE(p2.get_node().next == nullptr);
+        REQUIRE(p2.get_node().prev == nullptr);
 
-        p2.node.insert_after(p.node);
+        p2.get_node().insert_after(p.get_node());
 
-        REQUIRE(p.node.prev == nullptr);
-        REQUIRE(p.node.next == &p2.node);
-        REQUIRE(p2.node.prev == &p.node);
-        REQUIRE(p2.node.next == &p3.node);
-        REQUIRE(p3.node.prev == &p2.node);
-        REQUIRE(p3.node.next == nullptr);
+        REQUIRE(p.get_node().prev == nullptr);
+        REQUIRE(p.get_node().next == &p2.get_node());
+        REQUIRE(p2.get_node().prev == &p.get_node());
+        REQUIRE(p2.get_node().next == &p3.get_node());
+        REQUIRE(p3.get_node().prev == &p2.get_node());
+        REQUIRE(p3.get_node().next == nullptr);
     }
 }

@@ -27,12 +27,12 @@ TEST_CASE("Triangle Mesh Element Tests", "[triangle-mesh-element-tests]") {
         REQUIRE((mesh_element.calculate_barycentric_coordinate(p) - bc).norm() < 10e-6);
         REQUIRE(mesh_element.calculate_depth_at_point(p) == Approx(2.81808521));
 
-        REQUIRE(mesh_element.sample_density_at_barycentric_coordinate(bc) == Approx(1005.2828979957392));
-        REQUIRE(mesh_element.sample_viscosity_at_barycentric_coordinate(bc) == Approx(
+        REQUIRE(mesh_element.sample_density(bc) == Approx(1005.2828979957392));
+        REQUIRE(mesh_element.sample_viscosity(bc) == Approx(
                 bc[0] * mesh_element.get_vertices()[0]->get_viscosity() +
                 bc[1] * mesh_element.get_vertices()[1]->get_viscosity() +
                 bc[2] * mesh_element.get_vertices()[2]->get_viscosity()));
-        REQUIRE(mesh_element.sample_water_viscosity_at_barycentric_coordinate(bc) == Approx(
+        REQUIRE(mesh_element.sample_water_viscosity(bc) == Approx(
                 bc[0] * mesh_element.get_vertices()[0]->get_water_viscosity() +
                 bc[1] * mesh_element.get_vertices()[1]->get_water_viscosity() +
                 bc[2] * mesh_element.get_vertices()[2]->get_water_viscosity()));
@@ -41,7 +41,7 @@ TEST_CASE("Triangle Mesh Element Tests", "[triangle-mesh-element-tests]") {
                                bc[1] * mesh_element.get_vertices()[1]->get_velocity() +
                                bc[2] * mesh_element.get_vertices()[2]->get_velocity();
 
-        REQUIRE((mesh_element.sample_velocity_at_barycentric_coordinate(bc) - bc_velocity).norm() < 10e-6);
+        REQUIRE((mesh_element.sample_velocity(bc) - bc_velocity).norm() < 10e-6);
 
 
         REQUIRE(mesh_element.check_halfspace(p) == 1);
@@ -50,7 +50,7 @@ TEST_CASE("Triangle Mesh Element Tests", "[triangle-mesh-element-tests]") {
 
     SECTION("Cursor Checks") {
         TriangularMeshCursor3D cursor(&mesh_element);
-        InterpolatedValues interp;
+        InterpolatedValues<3> interp;
 
         REQUIRE(cursor.get_depth_at_point(p) == Approx(2.81808521));
         REQUIRE(cursor.check_halfspace(p) == 1);

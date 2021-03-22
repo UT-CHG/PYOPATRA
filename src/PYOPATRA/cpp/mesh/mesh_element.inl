@@ -6,7 +6,7 @@
 
 
 template <int num_vertices, int dimensions>
-typename MeshElementT<num_vertices, dimensions>::VectorTd MeshElementT<num_vertices, dimensions>::calculate_barycentric_coordinate(const Vector3d & point) const {
+typename MeshElementT<num_vertices, dimensions>::VectorTd MeshElementT<num_vertices, dimensions>::calculate_barycentric_coordinate(const Vector& point) const {
     // From Real Time Collision Detection by Christer Ericson
     if constexpr (num_vertices == 3) {
         Vector3d pq(0.0, 0.0, 1.0);
@@ -28,7 +28,7 @@ typename MeshElementT<num_vertices, dimensions>::VectorTd MeshElementT<num_verti
 
 
 template <int num_vertices, int dimensions>
-double MeshElementT<num_vertices, dimensions>::calculate_depth_at_point(const Vector3d& point) const {
+double MeshElementT<num_vertices, dimensions>::calculate_depth_at_point(const Vector& point) const {
     auto bc = calculate_barycentric_coordinate(point);
     return (vertices[0]->get_location() * bc[0] + vertices[1]->get_location() * bc[1] + vertices[2]->get_location() * bc[2])[2];
 }
@@ -54,7 +54,7 @@ int MeshElementT<num_vertices, dimensions>::check_halfspace(const Vector3d &poin
 
 
 template <int num_vertices, int dimensions>
-Vector3d MeshElementT<num_vertices, dimensions>::sample_velocity_at_barycentric_coordinate(const VectorTd& barycentric_coordinates) {
+typename MeshElementT<num_vertices, dimensions>::Vector MeshElementT<num_vertices, dimensions>::sample_velocity(const VectorTd& barycentric_coordinates) const {
     Vector3d velocity = Eigen::Vector3d::Zero();
 
     for (int i = 0; i < num_vertices; i++) {
@@ -66,7 +66,7 @@ Vector3d MeshElementT<num_vertices, dimensions>::sample_velocity_at_barycentric_
 
 
 template <int num_vertices, int dimensions>
-double MeshElementT<num_vertices, dimensions>::sample_viscosity_at_barycentric_coordinate(const VectorTd& barycentric_coordinates) {
+double MeshElementT<num_vertices, dimensions>::sample_viscosity(const VectorTd& barycentric_coordinates) const {
     double viscosity = 0.0;
 
     for (int i = 0; i < num_vertices; i++) {
@@ -78,7 +78,7 @@ double MeshElementT<num_vertices, dimensions>::sample_viscosity_at_barycentric_c
 
 
 template <int num_vertices, int dimensions>
-double MeshElementT<num_vertices, dimensions>::sample_density_at_barycentric_coordinate(const VectorTd& barycentric_coordinates) {
+double MeshElementT<num_vertices, dimensions>::sample_density(const VectorTd& barycentric_coordinates) const {
     double density = 0.0;
 
     for (int i = 0; i < num_vertices; i++) {
@@ -90,7 +90,18 @@ double MeshElementT<num_vertices, dimensions>::sample_density_at_barycentric_coo
 
 
 template <int num_vertices, int dimensions>
-double MeshElementT<num_vertices, dimensions>::sample_water_viscosity_at_barycentric_coordinate(const VectorTd& barycentric_coordinates) {
+double MeshElementT<num_vertices, dimensions>::sample_water_viscosity(const VectorTd& barycentric_coordinates) const {
+    double viscosity = 0.0;
+
+    for (int i = 0; i < num_vertices; i++) {
+        viscosity += vertices[i]->get_water_viscosity() * barycentric_coordinates[i];
+    }
+
+    return viscosity;
+}
+
+template <int num_vertices, int dimensions>
+double MeshElementT<num_vertices, dimensions>::sample_diffusion_coefficient(const VectorTd& barycentric_coordinates) const {
     double viscosity = 0.0;
 
     for (int i = 0; i < num_vertices; i++) {

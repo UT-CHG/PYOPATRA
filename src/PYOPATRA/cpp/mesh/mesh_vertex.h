@@ -18,16 +18,19 @@ public:
 protected:
     Vector location;
     Vector velocity;
+    Vector diffusion_coefficient;
 
 public:
     MeshVertexBase();
     MeshVertexBase(double latitude, double longitude);
     MeshVertexBase(double latitude, double longitude, Vector velocity);
+    MeshVertexBase(double latitude, double longitude, Vector velocity, Vector diffusion_coefficient);
 
     Vector get_location() const { return location; }
     double get_latitude() const { return location[0]; }
     double get_longitude() const { return location[1]; }
     Vector get_velocity() const { return velocity; }
+    Vector get_diffusion_coefficient() { return diffusion_coefficient; }
 };
 
 template<int dimension>
@@ -46,6 +49,7 @@ public:
     MeshVertex(double latitude, double longitude, double bathymetric_depth);
     MeshVertex(double latitude, double longitude, double bathymetric_depth, double density, double temperature);
     MeshVertex(double latitude, double longitude, double bathymetric_depth, double density, double temperature, Vector velocity);
+    MeshVertex(double latitude, double longitude, double bathymetric_depth, double density, double temperature, Vector velocity, Vector diffusion_coefficient);
 
     double get_density() const { return density; }
     double get_temperature() const { return temperature; }
@@ -61,8 +65,8 @@ public:
 };
 
 
-typedef MeshVertex<3> MeshVertex3D;
-typedef MeshVertex<2> MeshVertex2D;
+using MeshVertex3D = MeshVertex<3> ;
+using MeshVertex2D = MeshVertex<2> ;
 
 #include "mesh_vertex.inl"
 
