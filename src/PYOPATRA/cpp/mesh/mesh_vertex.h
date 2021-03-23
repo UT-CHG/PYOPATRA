@@ -30,7 +30,7 @@ public:
     double get_latitude() const { return location[0]; }
     double get_longitude() const { return location[1]; }
     Vector get_velocity() const { return velocity; }
-    Vector get_diffusion_coefficient() { return diffusion_coefficient; }
+    Vector get_diffusion_coefficient() const { return diffusion_coefficient; }
 };
 
 template<int dimension>
