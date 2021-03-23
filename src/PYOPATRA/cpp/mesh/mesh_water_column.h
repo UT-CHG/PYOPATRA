@@ -18,7 +18,7 @@ public:
 private:
     std::vector<MeshElementCursor<dimension>*> mesh_elements;
     int num_depths;
-    std::tuple<MeshElementCursor<dimension>*, MeshElementCursor<dimension>*> get_element_depth_bounds(const Vector3d &location);
+    std::tuple<MeshElementCursor<dimension>*, MeshElementCursor<dimension>*> get_element_depth_bounds(const Vector &location);
 
 public:
     Vector interpolate_velocity(const Particle<dimension>& particle);
@@ -26,5 +26,7 @@ public:
 
 using WaterColumn2D = WaterColumn<2>;
 using WaterColumn3D = WaterColumn<3>;
+
+#include "mesh_water_column.inl"
 
 #endif //PYOPATRA_MESH_WATER_COLUMN_H
