@@ -40,6 +40,12 @@ template <int dimension>
 class MeshVertex : MeshVertexBase<dimension> {};
 
 template <>
+class MeshVertex<2> : public MeshVertexBase<2> {
+public:
+    MeshVertex(double latitude, double longitude, Vector velocity) : MeshVertexBase<2>(latitude, longitude, velocity) {}
+};
+
+template <>
 class MeshVertex<3> : public MeshVertexBase<3> {
 private:
     double density, temperature, water_viscosity, viscosity;
@@ -64,6 +70,9 @@ public:
     static double calculate_pure_water_viscosity(double temperature);
 };
 
+
+using MeshVertexBase2D = MeshVertexBase<2>;
+using MeshVertexBase3D = MeshVertexBase<3>;
 
 using MeshVertex3D = MeshVertex<3> ;
 using MeshVertex2D = MeshVertex<2> ;
