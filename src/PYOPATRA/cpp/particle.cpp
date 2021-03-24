@@ -3,12 +3,9 @@
 //
 
 #include <cmath>
-#include <iostream>
 #include <stdexcept>
 #include <string>
-#include <iomanip>
 #include "particle.h"
-#include "mesh/mesh_base.h"
 
 // Acceleration due to gravity in m/s^2
 #define GRAVITY (-9.8)

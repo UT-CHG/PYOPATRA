@@ -2,8 +2,8 @@
 // Created by Georgia Stuart on 3/10/21.
 //
 
-#ifndef PYOPATRA_MESH_BASE_H
-#define PYOPATRA_MESH_BASE_H
+#ifndef PYOPATRA_MESH_H
+#define PYOPATRA_MESH_H
 
 #include <ctime>
 
@@ -13,7 +13,7 @@
 #include "../particle.h"
 
 template <int num_vertices_per_element, int dimension>
-class MeshBase {
+class Mesh {
 protected:
     time_t current_time;
     int current_time_step, total_time_steps, time_step_size;
@@ -24,7 +24,7 @@ protected:
 public:
     using Vector = Eigen::Matrix<double, dimension, 1>;
 
-    MeshBase()
+    Mesh()
         : current_time(0)
         , current_time_step(0)
         , total_time_steps(0)
@@ -34,7 +34,7 @@ public:
         , vertices()
     {}
 
-    MeshBase(int total_time_steps, int time_step_size, int num_water_columns, int total_vertices, std::vector<time_t>&& measured_times)
+    Mesh(int total_time_steps, int time_step_size, int num_water_columns, int total_vertices, std::vector<time_t>&& measured_times)
         : current_time(0)
         , current_time_step(0)
         , total_time_steps(total_time_steps)
@@ -44,14 +44,14 @@ public:
         , vertices(total_vertices, MeshVertex<dimension>())
     {}
 
-    virtual ~MeshBase() = default;
+    virtual ~Mesh() = default;
     virtual WaterColumn<num_vertices_per_element, dimension>* find_particle_location(ParticleBase<dimension> &particle) = 0;
     time_t get_current_time() { return current_time; }
 
-    void setup_vertices(std::vector<double>& latitude, std::vector<double>& longitude, std::vector<Vector>& velocity, std::vector<Vector>& diffusion_coefficient);
+    void set_vertices(std::vector<MeshVertex<dimension>> new_vertices) { vertices = new_vertices; }
 };
 
-using TriangularMesh2D = MeshBase<3, 2>;
-using TriangularMesh3D = MeshBase<3, 3>;
+using TriangularMesh2D = Mesh<3, 2>;
+using TriangularMesh3D = Mesh<3, 3>;
 
-#endif //PYOPATRA_MESH_BASE_H
+#endif //PYOPATRA_MESH_H
