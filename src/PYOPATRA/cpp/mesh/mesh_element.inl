@@ -22,7 +22,7 @@ typename MeshElementT<num_vertices, dimensions>::VectorTd MeshElementT<num_verti
 
         return {u * denom, v * denom, w * denom};
     } else {
-        throw std::logic_error(std::string("Barycentric coordinates are not implemented for polygons with ") + std::to_string(num_vertices) + std::string(" vertices."));
+        throw std::logic_error(std::string("Barycentric coordinates are not implemented for polygons with ") + std::to_string(num_vertices) + std::string(" num_vertices_per_element."));
     }
 }
 
@@ -48,7 +48,7 @@ int MeshElementT<num_vertices, dimensions>::check_halfspace(const Vector3d &poin
         }
 
     } else {
-        throw std::logic_error(std::string("Check halfspace is not implemented for polygons with ") + std::to_string(num_vertices) + std::string(" vertices."));
+        throw std::logic_error(std::string("Check halfspace is not implemented for polygons with ") + std::to_string(num_vertices) + std::string(" num_vertices_per_element."));
     }
 }
 

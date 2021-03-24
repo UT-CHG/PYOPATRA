@@ -6,8 +6,8 @@
 #include <exception>
 #include "mesh_water_column.h"
 
-template <int dimension>
-std::tuple<MeshElementCursor<dimension>*, MeshElementCursor<dimension>*> WaterColumn<dimension>::get_element_depth_bounds(const Vector& location) {
+template <int vertices, int dimension>
+std::tuple<MeshElementT<vertices, dimension>*, MeshElementT<vertices, dimension>*> WaterColumn<vertices, dimension>::get_element_depth_bounds(const Vector& location) {
     int above = 0;
     int below = num_depths - 1;
 
@@ -25,12 +25,12 @@ std::tuple<MeshElementCursor<dimension>*, MeshElementCursor<dimension>*> WaterCo
         }
     }
 
-    return {mesh_elements[above], mesh_elements[above + 1]};
+    return {&mesh_elements[above], &mesh_elements[above + 1]};
 }
 
 
-template <int dimension>
-typename WaterColumn<dimension>::Vector WaterColumn<dimension>::interpolate_velocity(const Particle<dimension> &particle) {
+template <int vertices, int dimension>
+typename WaterColumn<vertices, dimension>::Vector WaterColumn<vertices, dimension>::interpolate_velocity(const Particle<dimension> &particle) {
     if constexpr (dimension == 2) {
         return mesh_elements[0]->calculate_velocity(particle.get_location());
     } else {

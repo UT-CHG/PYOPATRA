@@ -26,14 +26,27 @@ private:
     int mesh_index;
 
 public:
+    MeshElementT()
+        : vertices()
+        , normals()
+        , mesh_index(0)
+    {}
+
     MeshElementT(MeshVertex<dimensions>* a, MeshVertex<dimensions>* b, MeshVertex<dimensions>* c, int mesh_index)
         : vertices{a, b, c}
         , normals{(a->get_location() - b->get_location()).cross(a->get_location() - c->get_location())}
-        , mesh_index(mesh_index) {}
+        , mesh_index(mesh_index)
+    {}
+
     MeshElementT(MeshVertex<dimensions>* a, MeshVertex<dimensions>* b, MeshVertex<dimensions>* c, MeshVertex<dimensions>* d, int mesh_index)
         : vertices{a, b, c, d}
         , normals{(a->get_location() - b->get_location()).cross(a->get_location() - c->get_location()), (a->get_location() - c->get_location()).cross(a->get_location() - d->get_location())}
-        , mesh_index(mesh_index) {}
+        , mesh_index(mesh_index)
+    {}
+
+    void set_vertices(MeshVertex<dimensions>* a, MeshVertex<dimensions>* b, MeshVertex<dimensions>* c) { vertices = {a, b, c}; }
+    void set_vertices(MeshVertex<dimensions>* a, MeshVertex<dimensions>* b, MeshVertex<dimensions>* c, MeshVertex<dimensions>* d) { vertices = {a, b, c, d}; }
+    void set_mesh_index(int new_mesh_index) { mesh_index = new_mesh_index; }
 
     VectorTd calculate_barycentric_coordinate(const Vector& point) const;
     double calculate_depth_at_point(const Vector& point) const;
