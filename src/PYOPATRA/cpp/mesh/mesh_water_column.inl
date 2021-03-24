@@ -30,10 +30,10 @@ std::tuple<MeshElementCursor<dimension>*, MeshElementCursor<dimension>*> WaterCo
 
 
 template <int dimension>
-Vector WaterColumn<dimension>::interpolate_velocity(const Particle<dimension> &particle) {
+typename WaterColumn<dimension>::Vector WaterColumn<dimension>::interpolate_velocity(const Particle<dimension> &particle) {
     if constexpr (dimension == 2) {
         return mesh_elements[0]->calculate_velocity(particle.get_location());
     } else {
-        throw std::logic_error("Velocity interpolation for this dimension is not implemented.\n")
+        throw std::logic_error("Velocity interpolation for this dimension is not implemented.\n");
     }
 }
