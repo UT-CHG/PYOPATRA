@@ -31,6 +31,10 @@ public:
     double get_longitude() const { return location[1]; }
     Vector get_velocity() const { return velocity; }
     Vector get_diffusion_coefficient() const { return diffusion_coefficient; }
+
+    void set_diffusion_coefficient(Vector new_diffusion_coefficient) { diffusion_coefficient = new_diffusion_coefficient; }
+    void set_velocity(Vector new_velocity) { velocity = new_velocity; }
+    void set_location(Vector new_location) { location = new_location; }
 };
 
 template<int dimension>

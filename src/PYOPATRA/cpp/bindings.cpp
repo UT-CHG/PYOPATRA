@@ -21,7 +21,10 @@ PYBIND11_MODULE(pyopatra_pybind, m) {
             .def("get_latitude", &MeshVertexBase2D::get_latitude)
             .def("get_longitude", &MeshVertexBase2D::get_longitude)
             .def("get_velocity", &MeshVertexBase2D::get_velocity)
-            .def("get_diffusion_coefficient", &MeshVertexBase2D::get_diffusion_coefficient);
+            .def("get_diffusion_coefficient", &MeshVertexBase2D::get_diffusion_coefficient)
+            .def("set_diffusion_coefficient", &MeshVertexBase2D::set_diffusion_coefficient)
+            .def("set_velocity", &MeshVertexBase2D::set_velocity)
+            .def("set_location", &MeshVertexBase2D::set_location);
 
     py::class_<MeshVertex2D, MeshVertexBase2D>(m, "MeshVertex2D")
             .def(py::init<double, double, Eigen::Matrix<double, 2, 1>>());
