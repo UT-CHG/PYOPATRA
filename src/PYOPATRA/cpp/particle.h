@@ -8,8 +8,6 @@
 #include "mesh/mesh_element.h"
 #include "illnode.h"
 
-class MeshBase;
-
 template <int dimension>
 class ParticleBase {
 public:
