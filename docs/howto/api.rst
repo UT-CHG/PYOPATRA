@@ -1,6 +1,11 @@
 PYOPATRA API
 ============
 
+Mesh
+----
+
+.. autoclass:: PYOPATRA.Vertex
+   :members:
 
 File Reading
 ------------
