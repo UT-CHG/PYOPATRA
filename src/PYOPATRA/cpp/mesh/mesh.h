@@ -14,7 +14,7 @@
 #include "mesh_water_column.h"
 #include "../particle.h"
 
-using py = pybind11;
+namespace py = pybind11;
 
 template <int num_vertices_per_element, int dimension>
 class Mesh {
