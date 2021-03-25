@@ -32,8 +32,8 @@ PYBIND11_MODULE(pyopatra_pybind, m) {
             .def(py::init<double, double, Eigen::Matrix<double, 2, 1>>());
 
     py::class_<TriangularMesh2D>(m, "TriangularMesh2D")
-            .def(py::init<int, int, int, int, std::vector<time_t>&&>())
-            .def()
+            .def(py::init<int, int, int, int, std::vector<time_t>&&>());
+//            .def()
 
 }
 
