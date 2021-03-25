@@ -4,15 +4,15 @@ PYOPATRA API
 Mesh
 ----
 
-.. autoclass:: PYOPATRA.Vertex
+.. autoapiclass:: PYOPATRA.Vertex
    :members:
 
 File Reading
 ------------
 
-.. autoclass:: PYOPATRA.FileParserBase
+.. autoapiclass:: PYOPATRA.FileParserBase
    :members:
 
-.. autoclass:: PYOPATRA.ADCIRCFileParser
+.. autoapiclass:: PYOPATRA.ADCIRCFileParser
    :members:
 
