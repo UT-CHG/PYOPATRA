@@ -23,8 +23,8 @@ private:
     std::tuple<MeshElementT<vertices, dimension>*, MeshElementT<vertices, dimension>*> get_element_depth_bounds(const Vector &location);
 
 public:
-    WaterColumn() : num_depths(0), mesh_elements() {}
-    explicit WaterColumn(int num_depths) : num_depths(num_depths), mesh_elements(num_depths, MeshElementT<vertices, dimension>()) {}
+    WaterColumn() : mesh_elements(0, MeshElementT<vertices, dimension>()), num_depths(0) {}
+    explicit WaterColumn(int num_depths) : mesh_elements(num_depths, MeshElementT<vertices, dimension>()), num_depths(num_depths) {}
 
     Vector interpolate_velocity(const Particle<dimension>& particle);
     void set_num_depths(int new_num_depths) { num_depths = new_num_depths; }

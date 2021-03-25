@@ -38,14 +38,14 @@ public:
         , vertices()
     {}
 
-    Mesh(int total_time_steps, int time_step_size, int num_water_columns, int total_vertices, std::vector<time_t>&& measured_times)
+    Mesh(int total_time_steps, int time_step_size, int num_water_columns, std::vector<time_t>&& measured_times)
         : current_time(0)
         , current_time_step(0)
         , total_time_steps(total_time_steps)
         , time_step_size(time_step_size)
         , measured_times(measured_times)
         , water_columns(num_water_columns, std::vector<WaterColumn<num_vertices_per_element, dimension>>(measured_times.size(), WaterColumn<num_vertices_per_element, dimension>()))
-        , vertices(total_vertices, MeshVertex<dimension>())
+        , vertices()
     {}
 
     WaterColumn<num_vertices_per_element, dimension>* find_particle_location(ParticleBase<dimension> &particle);
