@@ -1,12 +1,12 @@
 import pytest
-from PYOPATRA import Vertex
+from PYOPATRA import MeshVertex2D
 import numpy as np
 
 
 class TestMeshVertex:
     @pytest.fixture
     def vertex(self):
-        yield Vertex(10, -90, np.array((3, 4)), 2)
+        yield MeshVertex2D(10, -90, np.array((3, 4)), 2)
 
     def test_get_latitude(self, vertex):
         assert vertex.get_latitude() == 10

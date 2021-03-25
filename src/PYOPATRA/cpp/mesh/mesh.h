@@ -51,7 +51,7 @@ public:
     WaterColumn<num_vertices_per_element, dimension>* find_particle_location(ParticleBase<dimension> &particle);
     time_t get_current_time() { return current_time; }
 
-    void set_vertices(py::list new_vertices) { vertices = new_vertices; }
+    void set_vertices(const py::list& new_vertices) { vertices = new_vertices; }
 };
 
 using TriangularMesh2D = Mesh<3, 2>;
