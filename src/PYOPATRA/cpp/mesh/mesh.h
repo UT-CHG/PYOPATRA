@@ -6,11 +6,14 @@
 #define PYOPATRA_MESH_H
 
 #include <ctime>
+#include <pybind11/stl.h>
 
 #include "mesh_element.h"
 #include "mesh_vertex.h"
 #include "mesh_water_column.h"
 #include "../particle.h"
+
+using py = pybind11;
 
 template <int num_vertices_per_element, int dimension>
 class Mesh {
@@ -19,7 +22,7 @@ protected:
     int current_time_step, total_time_steps, time_step_size;
     std::vector<time_t> measured_times;
     std::vector<std::vector<WaterColumn<num_vertices_per_element, dimension>>> water_columns;
-    std::vector<MeshVertex<dimension>> vertices;
+    py::list vertices;
 
 public:
     using Vector = Eigen::Matrix<double, dimension, 1>;
@@ -44,11 +47,10 @@ public:
         , vertices(total_vertices, MeshVertex<dimension>())
     {}
 
-    virtual ~Mesh() = default;
-    virtual WaterColumn<num_vertices_per_element, dimension>* find_particle_location(ParticleBase<dimension> &particle) = 0;
+    WaterColumn<num_vertices_per_element, dimension>* find_particle_location(ParticleBase<dimension> &particle);
     time_t get_current_time() { return current_time; }
 
-    void set_vertices(std::vector<MeshVertex<dimension>> new_vertices) { vertices = new_vertices; }
+    void set_vertices(py::list new_vertices) { vertices = new_vertices; }
 };
 
 using TriangularMesh2D = Mesh<3, 2>;

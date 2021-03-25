@@ -11,10 +11,12 @@
 #include <pybind11/eigen.h>
 
 #include "mesh/mesh_vertex.h"
+#include "mesh/mesh.h"
 
 namespace py = pybind11;
 
 PYBIND11_MODULE(pyopatra_pybind, m) {
+    // Two dimensional MeshVertex and Mesh
     py::class_<MeshVertexBase2D>(m, "Mesh")
             .def(py::init<double, double, Eigen::Matrix<double, 2, 1>>())
             .def("get_location", &MeshVertexBase2D::get_location)
@@ -28,6 +30,10 @@ PYBIND11_MODULE(pyopatra_pybind, m) {
 
     py::class_<MeshVertex2D, MeshVertexBase2D>(m, "MeshVertex2D")
             .def(py::init<double, double, Eigen::Matrix<double, 2, 1>>());
+
+    py::class_<TriangularMesh2D>(m, "TriangularMesh2D")
+            .def(py::init<int, int, int, int, std::vector<time_t>&&>())
+            .def()
 
 }
 
