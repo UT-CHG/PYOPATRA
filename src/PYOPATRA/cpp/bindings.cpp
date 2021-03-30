@@ -31,6 +31,12 @@ PYBIND11_MODULE(pyopatra_pybind, m) {
     py::class_<MeshVertex2D, MeshVertexBase2D>(m, "CppMeshVertex2D")
             .def(py::init<double, double, Eigen::Matrix<double, 2, 1>>());
 
+    py::class_<TriangularMeshElement2D>(m, "TriangularMeshElement2D")
+            .def(py::init<MeshVertex<2>*, MeshVertex<2>*, MeshVertex<2>*>())
+            .def("calculate_barycentric_coordinate", &TriangularMeshElement2D::calculate_barycentric_coordinate)
+            .def("sample_velocity", &TriangularMeshElement2D::sample_velocity)
+            .def("sample_diffusion_coefficient", &TriangularMeshElement2D::sample_diffusion_coefficient)
+
     py::class_<TriangularMesh2D>(m, "CppTriangularMesh2D")
             .def(py::init<int, int, int, std::vector<time_t>&&>());
 //            .def()

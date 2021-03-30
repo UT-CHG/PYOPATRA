@@ -8,7 +8,7 @@
 template <int num_vertices, int dimensions>
 typename MeshElementT<num_vertices, dimensions>::VectorTd MeshElementT<num_vertices, dimensions>::calculate_barycentric_coordinate(const Vector& point) const {
     // From Real Time Collision Detection by Christer Ericson
-    if constexpr (num_vertices == 3) {
+    if constexpr ((num_vertices == 3) && (dimensions == 3)) {
         Vector3d pq(0.0, 0.0, 1.0);
         Vector3d pa = vertices[0]->get_location() - point;
         Vector3d pb = vertices[1]->get_location() - point;
@@ -21,8 +21,24 @@ typename MeshElementT<num_vertices, dimensions>::VectorTd MeshElementT<num_verti
         double denom = 1.0 / (u + v + w);
 
         return {u * denom, v * denom, w * denom};
+    } else if constexpr ((num_vertices == 3) && (dimensions == 2)) {
+        Vector2d v0 = vertices[1] - vertices[0];
+        Vector2d v1 = vertices[2] - vertices[0];
+        Vector2d v2 = point - vertices[0];
+
+        double d00 = v0.dot(v0);
+        double d01 = v0.dot(v1);
+        double d11 = v1.dot(v1);
+        double d20 = v2.dot(v0);
+        double d21 = v2.dot(v1);
+        double denom = 1.0 / (d00 * d11 - d01 * d01);
+
+        double v = (d11 * d20 - d01 * d21) * denom;
+        double w = (d00 * d21 - d01 * d20) * denom;
+
+        return {v, w, 1.0 - v - w};
     } else {
-        throw std::logic_error(std::string("Barycentric coordinates are not implemented for polygons with ") + std::to_string(num_vertices) + std::string(" num_vertices_per_element."));
+        throw std::logic_error(std::string("Barycentric coordinates are not implemented for polygons with ") + std::to_string(num_vertices) + std::string(" vertices."));
     }
 }
 
