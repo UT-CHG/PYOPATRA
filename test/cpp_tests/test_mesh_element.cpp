@@ -13,9 +13,9 @@ TEST_CASE("Triangle Mesh Element Tests", "[triangle-mesh-element-tests]") {
     MeshVertex3D v2(-89.4966660000, 30.0901150000, 3.9491493700, 1005, 275.15, {8, 9, 10});
     MeshVertex3D v3(-89.4889400000, 30.0744220000, 1.9666023300, 1010, 277.15, {11, 12, 13});
 
-    Coordinate3D p(-89.486445 , 30.0822685, 4.0);
-    Coordinate3D p2(-89.486445 , 30.0822685, 1.0);
-    Coordinate3D bc(0.27354909, 0.2869026 , 0.43954832);
+    Eigen::Matrix<double, 3, 1> p(-89.486445 , 30.0822685, 4.0);
+    Eigen::Matrix<double, 3, 1> p2(-89.486445 , 30.0822685, 1.0);
+    Eigen::Matrix<double, 3, 1> bc(0.27354909, 0.2869026 , 0.43954832);
 
     TriangularMeshElement3D mesh_element(&v1, &v2, &v3, 0);
 

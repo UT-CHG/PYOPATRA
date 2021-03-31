@@ -22,9 +22,9 @@ typename MeshElementT<num_vertices, dimensions>::VectorTd MeshElementT<num_verti
 
         return {u * denom, v * denom, w * denom};
     } else if constexpr ((num_vertices == 3) && (dimensions == 2)) {
-        Vector2d v0 = vertices[1] - vertices[0];
-        Vector2d v1 = vertices[2] - vertices[0];
-        Vector2d v2 = point - vertices[0];
+        Vector2d v0 = vertices[1]->get_location() - vertices[0]->get_location();
+        Vector2d v1 = vertices[2]->get_location() - vertices[0]->get_location();
+        Vector2d v2 = point - vertices[0]->get_location();
 
         double d00 = v0.dot(v0);
         double d01 = v0.dot(v1);
@@ -50,31 +50,41 @@ double MeshElementT<num_vertices, dimensions>::calculate_depth_at_point(const Ve
 }
 
 
+template <typename T>
+void ignore(T &&)
+{ }
+
 template <int num_vertices, int dimensions>
-int MeshElementT<num_vertices, dimensions>::check_halfspace(const Vector3d &point) {
-    if constexpr (num_vertices == 3) {
-        double dot = normals[0].dot(point - vertices[0]->get_location());
+int MeshElementT<num_vertices, dimensions>::check_halfspace(const typename MeshElementT<num_vertices, dimensions>::Vector& point) const {
+    ignore(point);
 
-        if (dot < 0) {
-            return -1;
-        } else if (dot > 0) {
-            return 1;
-        } else {
-            return 0;
-        }
-
+    if constexpr ((num_vertices == 3) or (num_vertices == 2)) {
+        return 0;
     } else {
         throw std::logic_error(std::string("Check halfspace is not implemented for polygons with ") + std::to_string(num_vertices) + std::string(" num_vertices_per_element."));
+    }
+}
+
+template <int num_vertices>
+int MeshElement3DT<num_vertices>::check_halfspace(const Vector3d &point) const {
+    double dot = normals[0].dot(point - this->vertices[0]->get_location());
+
+    if (dot < 0) {
+        return -1;
+    } else if (dot > 0) {
+        return 1;
+    } else {
+        return 0;
     }
 }
 
 
 template <int num_vertices, int dimensions>
 typename MeshElementT<num_vertices, dimensions>::Vector MeshElementT<num_vertices, dimensions>::sample_velocity(const VectorTd& barycentric_coordinates) const {
-    Vector3d velocity = Eigen::Vector3d::Zero();
+    MeshElementT<num_vertices, dimensions>::Vector velocity = MeshElementT<num_vertices, dimensions>::Vector::Zero();
 
     for (int i = 0; i < num_vertices; i++) {
-        velocity += vertices[i]->get_velocity() * barycentric_coordinates[i];
+        velocity += vertices[i]->get_velocity() * barycentric_coordinates(i);
     }
 
     return velocity;
@@ -83,46 +93,60 @@ typename MeshElementT<num_vertices, dimensions>::Vector MeshElementT<num_vertice
 
 template <int num_vertices, int dimensions>
 double MeshElementT<num_vertices, dimensions>::sample_viscosity(const VectorTd& barycentric_coordinates) const {
-    double viscosity = 0.0;
+    if constexpr (dimensions == 3) {
+        double viscosity = 0.0;
 
-    for (int i = 0; i < num_vertices; i++) {
-        viscosity += vertices[i]->get_viscosity() * barycentric_coordinates[i];
+        for (int i = 0; i < num_vertices; i++) {
+            viscosity += vertices[i]->get_viscosity() * barycentric_coordinates(i);
+        }
+
+        return viscosity;
+    } else {
+        return 0.0;
     }
-
-    return viscosity;
 }
 
 
 template <int num_vertices, int dimensions>
 double MeshElementT<num_vertices, dimensions>::sample_density(const VectorTd& barycentric_coordinates) const {
-    double density = 0.0;
+    if constexpr (dimensions == 3) {
+        double density = 0.0;
 
-    for (int i = 0; i < num_vertices; i++) {
-        density += vertices[i]->get_density() * barycentric_coordinates[i];
+        for (int i = 0; i < num_vertices; i++) {
+            density += vertices[i]->get_density() * barycentric_coordinates(i);
+        }
+
+        return density;
+    } else {
+        return 0.0;
     }
-
-    return density;
 }
 
 
 template <int num_vertices, int dimensions>
 double MeshElementT<num_vertices, dimensions>::sample_water_viscosity(const VectorTd& barycentric_coordinates) const {
-    double viscosity = 0.0;
+    if constexpr (dimensions == 3) {
+        double viscosity = 0.0;
 
-    for (int i = 0; i < num_vertices; i++) {
-        viscosity += vertices[i]->get_water_viscosity() * barycentric_coordinates[i];
+        for (int i = 0; i < num_vertices; i++) {
+            viscosity += vertices[i]->get_water_viscosity() * barycentric_coordinates(i);
+        }
+
+        return viscosity;
+    } else {
+        return 0.0;
     }
-
-    return viscosity;
 }
 
 template <int num_vertices, int dimensions>
-double MeshElementT<num_vertices, dimensions>::sample_diffusion_coefficient(const VectorTd& barycentric_coordinates) const {
-    double viscosity = 0.0;
+typename MeshElementT<num_vertices, dimensions>::Vector MeshElementT<num_vertices, dimensions>::sample_diffusion_coefficient(const VectorTd& barycentric_coordinates) const {
+    Vector diffusion = Vector::Zero();
 
     for (int i = 0; i < num_vertices; i++) {
-        viscosity += vertices[i]->get_water_viscosity() * barycentric_coordinates[i];
+        diffusion += vertices[i]->get_diffusion_coefficient() * barycentric_coordinates(i);
     }
 
-    return viscosity;
+    return diffusion;
 }
+
+

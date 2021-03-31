@@ -16,31 +16,26 @@ template <int num_vertices, int dimensions>
 class MeshElementT {
 public:
     using VertexArray = std::array<MeshVertex<dimensions>*, num_vertices>;
-    using PlaneNormalArray = std::array<Vector3d, num_vertices - 2>;
     using VectorTd = Eigen::Matrix<double, num_vertices, 1>;
     using Vector = Eigen::Matrix<double, dimensions, 1>;
 
-private:
+protected:
     VertexArray vertices;
-    PlaneNormalArray normals;
     int mesh_index;
 
 public:
     MeshElementT()
         : vertices()
-        , normals()
         , mesh_index(0)
     {}
 
     MeshElementT(MeshVertex<dimensions>* a, MeshVertex<dimensions>* b, MeshVertex<dimensions>* c, int mesh_index)
         : vertices{a, b, c}
-        , normals{(a->get_location() - b->get_location()).cross(a->get_location() - c->get_location())}
         , mesh_index(mesh_index)
     {}
 
     MeshElementT(MeshVertex<dimensions>* a, MeshVertex<dimensions>* b, MeshVertex<dimensions>* c, MeshVertex<dimensions>* d, int mesh_index)
         : vertices{a, b, c, d}
-        , normals{(a->get_location() - b->get_location()).cross(a->get_location() - c->get_location()), (a->get_location() - c->get_location()).cross(a->get_location() - d->get_location())}
         , mesh_index(mesh_index)
     {}
 
@@ -55,9 +50,35 @@ public:
     double sample_density(const VectorTd& barycentric_coordinates) const;
     double sample_viscosity(const VectorTd& barycentric_coordinates) const;
     double sample_water_viscosity(const VectorTd& barycentric_coordinates) const;
-    double sample_diffusion_coefficient(const VectorTd& barycentric_coordinates) const;
+    Vector sample_diffusion_coefficient(const VectorTd& barycentric_coordinates) const;
     // 1 if deeper, -1 if shallower, 0 if on the element
-    int check_halfspace(const Vector3d& point);
+    virtual int check_halfspace(const Vector& point) const;
+};
+
+template <int num_vertices>
+class MeshElement3DT : public MeshElementT<num_vertices, 3> {
+public:
+    using Vector = Eigen::Matrix<double, 3, 1>;
+    using PlaneNormalArray = std::array<Vector3d, num_vertices - 2>;
+private:
+    PlaneNormalArray normals;
+public:
+    MeshElement3DT()
+        : MeshElementT<num_vertices, 3>()
+        , normals()
+    {}
+
+    MeshElement3DT(MeshVertex<3>* a, MeshVertex<3>* b, MeshVertex<3>* c, int mesh_index)
+        : MeshElementT<num_vertices, 3>(a, b, c, mesh_index)
+        , normals{(a->get_location() - b->get_location()).cross(a->get_location() - c->get_location())}
+    {}
+
+    MeshElement3DT(MeshVertex<3>* a, MeshVertex<3>* b, MeshVertex<3>* c, MeshVertex<3>* d, int mesh_index)
+        : MeshElementT<num_vertices, 3>(a, b, c, d, mesh_index)
+        , normals{(a->get_location() - b->get_location()).cross(a->get_location() - c->get_location()), (a->get_location() - c->get_location()).cross(a->get_location() - d->get_location())}
+    {}
+
+    int check_halfspace(const Vector& point) const override;
 };
 
 template <int dimensions>
@@ -98,8 +119,12 @@ public:
         return p_impl->calculate_depth_at_point(point);
     }
 
-    int check_halfspace(const Vector3d& point) const override {
-        return p_impl->check_halfspace(point);
+    int check_halfspace(const Vector& point) const override {
+        if constexpr (num_dimensions == 3) {
+            return p_impl->check_halfspace(point);
+        } else {
+            return 0.0;
+        }
     }
 
     void get_interpolated_values(const Vector3d& point, InterpolatedValues<num_dimensions>& interpolated_values) const override {
@@ -115,7 +140,7 @@ public:
 };
 
 typedef MeshElementT<3, 2> TriangularMeshElement2D;
-typedef MeshElementT<3, 3> TriangularMeshElement3D;
+typedef MeshElement3DT<3> TriangularMeshElement3D;
 
 typedef MeshElementCursorT<3, 2> TriangularMeshCursor2D;
 typedef MeshElementCursorT<3, 3> TriangularMeshCursor3D;

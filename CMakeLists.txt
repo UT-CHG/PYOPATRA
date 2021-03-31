@@ -36,7 +36,7 @@ if (${BUILD_PYTHON})
 endif()
 
 if (${BUILD_CPP} OR ${BUILD_TEST})
-    add_library(pyopatra_lib src/PYOPATRA/cpp/particlesolver.cpp src/PYOPATRA/cpp/particlesolver.h src/PYOPATRA/cpp/particle.cpp src/PYOPATRA/cpp/particle.h src/PYOPATRA/cpp/mesh/mesh_element.h src/PYOPATRA/cpp/coordinate.h src/PYOPATRA/cpp/illnode.h src/PYOPATRA/cpp/list.h src/PYOPATRA/cpp/mesh/mesh.cpp src/PYOPATRA/cpp/mesh/mesh.h src/PYOPATRA/cpp/mesh/mesh_vertex.inl src/PYOPATRA/cpp/mesh/mesh_vertex.h src/PYOPATRA/cpp/mesh/mesh_water_column.inl src/PYOPATRA/cpp/mesh/mesh_water_column.h src/PYOPATRA/cpp/mesh/mesh_vertex.cpp)
+    add_library(pyopatra_lib src/PYOPATRA/cpp/particlesolver.cpp src/PYOPATRA/cpp/particlesolver.h src/PYOPATRA/cpp/particle.cpp src/PYOPATRA/cpp/particle.h src/PYOPATRA/cpp/mesh/mesh_element.h src/PYOPATRA/cpp/coordinate.h src/PYOPATRA/cpp/illnode.h src/PYOPATRA/cpp/list.h src/PYOPATRA/cpp/mesh/mesh.cpp src/PYOPATRA/cpp/mesh/mesh.h src/PYOPATRA/cpp/mesh/mesh_vertex.inl src/PYOPATRA/cpp/mesh/mesh_vertex.h src/PYOPATRA/cpp/mesh/mesh_water_column.inl src/PYOPATRA/cpp/mesh/mesh_water_column.h src/PYOPATRA/cpp/mesh/mesh_vertex.cpp src/PYOPATRA/cpp/mesh/mesh_element.cpp)
     target_include_directories(pyopatra_lib PUBLIC SYSTEM ${HDF5_INCLUDE_DIRS})
     target_link_libraries(pyopatra_lib PUBLIC ${MPI_CXX_LIBRARIES} ${HDF5_LIBRARIES} Eigen3::Eigen)
     target_compile_definitions(pyopatra_lib PUBLIC ${HDF5_DEFINITIONS})
