@@ -6,7 +6,7 @@ import numpy as np
 class TestMeshVertex:
     @pytest.fixture
     def vertex(self):
-        yield MeshVertex2D(10, -90, np.array((3, 4)), 2)
+        yield MeshVertex2D(10, -90, np.array((3, 4)), np.array((1.5, 2.5)), 2)
 
     def test_get_latitude(self, vertex):
         assert vertex.get_latitude() == 10
@@ -25,7 +25,7 @@ class TestMeshVertex:
         assert np.linalg.norm(vertex.get_velocity() - np.array((5, 10.5))) < 10e-6
 
     def test_diffusion_coefficient(self, vertex):
-        assert np.linalg.norm(vertex.get_diffusion_coefficient() - np.array((0, 0))) < 10e-6
+        assert np.linalg.norm(vertex.get_diffusion_coefficient() - np.array((1.5, 2.5))) < 10e-6
         vertex.set_diffusion_coefficient(np.array((10, 20)))
         assert np.linalg.norm(vertex.get_diffusion_coefficient() - np.array((10, 20))) < 10e-6
 

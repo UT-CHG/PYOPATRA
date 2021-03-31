@@ -3,9 +3,9 @@ from .pyopatra_pybind import CppMeshVertex2D
 
 
 class MeshVertex2D:
-    def __init__(self, latitude, longitude, velocity, dimensions):
+    def __init__(self, latitude, longitude, velocity, diffusion_coefficient, dimensions):
         if dimensions == 2:
-            self.vertex = CppMeshVertex2D(latitude, longitude, velocity)
+            self.vertex = CppMeshVertex2D(latitude, longitude, velocity, diffusion_coefficient)
         else:
             raise NotImplementedError('Dimensions other than 2 have not been implemented (yet)')
 

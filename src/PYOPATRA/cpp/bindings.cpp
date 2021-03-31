@@ -29,7 +29,7 @@ PYBIND11_MODULE(pyopatra_pybind, m) {
             .def("set_location", &MeshVertexBase2D::set_location);
 
     py::class_<MeshVertex2D, MeshVertexBase2D>(m, "CppMeshVertex2D")
-            .def(py::init<double, double, Eigen::Matrix<double, 2, 1>>());
+            .def(py::init<double, double, Eigen::Matrix<double, 2, 1>, Eigen::Matrix<double, 2, 1>>());
 
     py::class_<TriangularMeshElement2D>(m, "TriangularMeshElement2D")
             .def(py::init<MeshVertex<2>*, MeshVertex<2>*, MeshVertex<2>*, int>())

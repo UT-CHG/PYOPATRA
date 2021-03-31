@@ -48,6 +48,9 @@ class MeshVertex<2> : public MeshVertexBase<2> {
 public:
     MeshVertex() : MeshVertexBase<2>() {}
     MeshVertex(double latitude, double longitude, Vector velocity) : MeshVertexBase<2>(latitude, longitude, velocity) {}
+    MeshVertex(double latitude, double longitude, Vector velocity, Vector diffusion_coefficient)
+        : MeshVertexBase<2>(latitude, longitude, velocity, diffusion_coefficient)
+    {}
 };
 
 template <>
