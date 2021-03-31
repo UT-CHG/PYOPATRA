@@ -36,6 +36,7 @@ PYBIND11_MODULE(pyopatra_pybind, m) {
             .def("calculate_barycentric_coordinate", &TriangularMeshElement2D::calculate_barycentric_coordinate)
             .def("sample_velocity", &TriangularMeshElement2D::sample_velocity)
             .def("sample_diffusion_coefficient", &TriangularMeshElement2D::sample_diffusion_coefficient)
+            .def("set_vertices", &TriangularMeshElement2D::set_vertices);
 
     py::class_<TriangularMesh2D>(m, "CppTriangularMesh2D")
             .def(py::init<int, int, int, std::vector<time_t>&&>());
