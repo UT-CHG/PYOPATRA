@@ -3,7 +3,7 @@
 #
 
 import numpy as np
-
+import netCDF4 as nc
 
 class FileParserBase:
     """
@@ -36,6 +36,8 @@ class FileParserBase:
         """Raw density information"""
         self.turbulence = None
         """Raw turbulence information"""
+        self.times = None
+        """Time spacing"""
 
 
 class ADCIRCFileParser(FileParserBase):
@@ -125,7 +127,34 @@ class MITgcmFileParser(FileParserBase):
 
 
 class HYCOMFileParser(FileParserBase):
-    pass
+    def __init__(self):
+        super().__init__()
+
+    def read(self, list_of_hycom_files, dimensions=2, triangulate=True):
+        if triangulate:
+            self.vertices_per_polygon = 3
+        else:
+            raise NotImplementedError('Only triangulated HYCOM data is implemented at this time.')
+
+        self.times = np.zeros(len(list_of_hycom_files))
+
+        with nc.Dataset(list_of_hycom_files[0]) as ds:
+            self.num_vertices = ds['lat'].shape[0] * ds['lon'].shape[0]
+            self.num_elements = (ds['lat'].shape[0] - 1) * 2 * ds['lon'].shape[0]
+
+        if dimensions == 2:
+            self.velocity = np.zeros((2, self.num_vertices, len(list_of_hycom_files)))
+        else:
+            raise NotImplementedError('Dimensions other than 2 have not been implemented.')
+
+        for index, filename in enumerate(list_of_hycom_files):
+            with nc.Dataset(filename) as ds:
+                if dimensions == 2:
+                    self.velocity[0, :, index] = ds['water_u'][0, 0, :, :].flatten()
+                    self.velocity[1, :, index] = ds['water_v'][0, 0, :, :].flatten()
+                    self.times[index] = ds['time'][0]
+                else:
+                    raise NotImplementedError('Dimensions other than 2 have not been implemented.')
 
 
 class POMFileParser(FileParserBase):

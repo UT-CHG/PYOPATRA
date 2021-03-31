@@ -24,3 +24,25 @@ class TestAdcircParsing:
     #
     # def test_read_turbulence(self):
     #     assert False
+
+class TestHycomParsing:
+    def test_read(self):
+        file_prefix = os.path.dirname(os.path.realpath(__file__)) + '/hycom_data'
+        hycom_files = [
+            file_prefix + '/hycom_gomu_501_2010042000_t000.nc',
+            file_prefix + '/hycom_gomu_501_2010042000_t003.nc',
+            file_prefix + '/hycom_gomu_501_2010042000_t006.nc',
+            file_prefix + '/hycom_gomu_501_2010042000_t009.nc',
+            file_prefix + '/hycom_gomu_501_2010042000_t012.nc',
+        ]
+
+        hfp = pta.HYCOMFileParser()
+        hfp.read(hycom_files)
+        print(hfp.velocity)
+        assert hfp.velocity.shape == (2, 346 * 541, 5)
+        assert hfp.times.shape == (5,)
+        assert hfp.times[0] == 90288.0
+        assert hfp.times[1] == 90288.0 + 3
+        assert hfp.times[2] == 90288.0 + 6
+        assert hfp.times[3] == 90288.0 + 9
+        assert hfp.times[4] == 90288.0 + 12

@@ -149,6 +149,3 @@ _build
 
 # VS Code settings
 .vscode
-
-# Large Data Files
-*.nc
