@@ -41,6 +41,8 @@ using TriangularWaterColumn3D = WaterColumn<3, 3>;
 
 template <int vertices, int dimension>
 class WaterColumnOverTime {
+public:
+    using Vector = Eigen::Matrix<double, dimension, 1>;
 private:
     // Must be a python list composed of water columns
     py::list water_columns_over_time;
@@ -48,7 +50,7 @@ private:
 public:
     explicit WaterColumnOverTime(py::list& column_list) : water_columns_over_time(column_list) {}
 
-
+    double interpolate_velocity(Vector &point);
 };
 
 #include "mesh_water_column.inl"
