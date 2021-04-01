@@ -154,21 +154,21 @@ class HYCOMFileParser(FileParserBase):
             self.longitude = ds['lon'][:]
 
         if dimensions == 2:
-            self.velocity = np.zeros((2, self.num_vertices * len(list_of_hycom_files), len(list_of_hycom_files)))
+            self.velocity = np.zeros((2, self.num_vertices, len(list_of_hycom_files)))
         else:
             raise NotImplementedError('Dimensions other than 2 have not been implemented.')
 
         for index, filename in enumerate(list_of_hycom_files):
             with nc.Dataset(filename) as ds:
                 if dimensions == 2:
-                    self.velocity[0, index*self.num_vertices:(index + 1)*self.num_vertices, index] = ds['water_u'][0, 0, :, :].flatten()
-                    self.velocity[1, index*self.num_vertices:(index + 1)*self.num_vertices, index] = ds['water_v'][0, 0, :, :].flatten()
+                    self.velocity[0, :, index] = ds['water_u'][0, 0, :, :].flatten()
+                    self.velocity[1, :, index] = ds['water_v'][0, 0, :, :].flatten()
                     self.times[index] = ds['time'][0]
                 else:
                     raise NotImplementedError('Dimensions other than 2 have not been implemented.')
 
         # TODO: Make diffusion coefficient more flexible
-        self.diffusion_coefficient = np.ones((2, self.num_vertices * len(list_of_hycom_files))) * diffusion_coefficient
+        self.diffusion_coefficient = np.ones((2, self.num_vertices, len(list_of_hycom_files))) * diffusion_coefficient
 
 class POMFileParser(FileParserBase):
     pass

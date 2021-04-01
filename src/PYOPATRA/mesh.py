@@ -21,8 +21,8 @@ class TriangularMesh2D:
                         self.vertex_list.append(MeshVertex2D(
                             file_parser.latitude[i],
                             file_parser.longitude[j],
-                            file_parser.velocity[:, index, time],
-                            file_parser.diffusion_coefficient[:, index],
+                            file_parser.velocity[:, i * j, time],
+                            file_parser.diffusion_coefficient[:, i * j, time],
                             len(file_parser.regular_dimensions)
                         ))
 
