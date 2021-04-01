@@ -1,10 +1,29 @@
 import numpy as np
+
+from PYOPATRA import FileParserBase, MeshVertex2D
 from .pyopatra_pybind import CppTriangularMesh2D, TriangularMeshElement2D
 
 
 class TriangularMesh2D:
     def __init__(self):
         self.vertex_list = None
+        self._cpp_vertex_list = None
+
+    def setup_vertices(self, file_parser: FileParserBase):
+        self.vertex_list = []
+        self._cpp_vertex_list = []
+        index = 0
+
+        if file_parser.regular_dimensions is not None:
+            for i in range(file_parser.regular_dimensions[0]):
+                for j in range(file_parser.regular_dimensions[1]):
+                    # self.vertex_list.append(MeshVertex2D(
+                    #     file_parser.latitude[index],
+                    #     file_parser.longitude[index], file_parser))
+
+                    index += 1
+
+
 
     def setup_elements_and_adjacency_list(self, regular=None, depths_array=None):
         elements = []

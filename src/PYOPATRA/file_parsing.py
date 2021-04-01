@@ -38,6 +38,12 @@ class FileParserBase:
         """Raw turbulence information"""
         self.times = None
         """Time spacing"""
+        self.regular_dimensions = None
+        """Dimensions for regular grid spacing (e.g., HYCOM)"""
+        self.latitude = None
+        """Latitude Numpy Array"""
+        self.longitude = None
+        """Longitude Numpy Array"""
 
 
 class ADCIRCFileParser(FileParserBase):

@@ -7,9 +7,13 @@
 
 #include <vector>
 #include <tuple>
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 #include "mesh_element.h"
 #include "../coordinate.h"
 #include "../particle.h"
+
+namespace py = pybind11;
 
 template <int vertices, int dimension>
 class WaterColumn {
@@ -34,6 +38,18 @@ public:
 
 using TriangularWaterColumn2D = WaterColumn<3, 2>;
 using TriangularWaterColumn3D = WaterColumn<3, 3>;
+
+template <int vertices, int dimension>
+class WaterColumnOverTime {
+private:
+    // Must be a python list composed of water columns
+    py::list water_columns_over_time;
+
+public:
+    explicit WaterColumnOverTime(py::list& column_list) : water_columns_over_time(column_list) {}
+
+
+};
 
 #include "mesh_water_column.inl"
 
