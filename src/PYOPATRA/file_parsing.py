@@ -44,6 +44,8 @@ class FileParserBase:
         """Latitude Numpy Array"""
         self.longitude = None
         """Longitude Numpy Array"""
+        self.diffusion_coefficient = None
+        """Diffusion Coefficient Matrix"""
 
 
 class ADCIRCFileParser(FileParserBase):
@@ -136,7 +138,7 @@ class HYCOMFileParser(FileParserBase):
     def __init__(self):
         super().__init__()
 
-    def read(self, list_of_hycom_files, dimensions=2, triangulate=True):
+    def read(self, list_of_hycom_files, dimensions=2, triangulate=True, diffusion_coefficient=0.0):
         if triangulate:
             self.vertices_per_polygon = 3
         else:
@@ -145,23 +147,28 @@ class HYCOMFileParser(FileParserBase):
         self.times = np.zeros(len(list_of_hycom_files))
 
         with nc.Dataset(list_of_hycom_files[0]) as ds:
+            self.regular_dimensions = (ds['lat'].shape[0], ds['lon'].shape[0])
             self.num_vertices = ds['lat'].shape[0] * ds['lon'].shape[0]
             self.num_elements = (ds['lat'].shape[0] - 1) * 2 * ds['lon'].shape[0]
+            self.latitude = ds['lat'][:]
+            self.longitude = ds['lon'][:]
 
         if dimensions == 2:
-            self.velocity = np.zeros((2, self.num_vertices, len(list_of_hycom_files)))
+            self.velocity = np.zeros((2, self.num_vertices * len(list_of_hycom_files), len(list_of_hycom_files)))
         else:
             raise NotImplementedError('Dimensions other than 2 have not been implemented.')
 
         for index, filename in enumerate(list_of_hycom_files):
             with nc.Dataset(filename) as ds:
                 if dimensions == 2:
-                    self.velocity[0, :, index] = ds['water_u'][0, 0, :, :].flatten()
-                    self.velocity[1, :, index] = ds['water_v'][0, 0, :, :].flatten()
+                    self.velocity[0, index*self.num_vertices:(index + 1)*self.num_vertices, index] = ds['water_u'][0, 0, :, :].flatten()
+                    self.velocity[1, index*self.num_vertices:(index + 1)*self.num_vertices, index] = ds['water_v'][0, 0, :, :].flatten()
                     self.times[index] = ds['time'][0]
                 else:
                     raise NotImplementedError('Dimensions other than 2 have not been implemented.')
 
+        # TODO: Make diffusion coefficient more flexible
+        self.diffusion_coefficient = np.ones((2, self.num_vertices * len(list_of_hycom_files))) * diffusion_coefficient
 
 class POMFileParser(FileParserBase):
     pass

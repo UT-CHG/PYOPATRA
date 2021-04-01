@@ -17,13 +17,17 @@ class TriangularMesh2D:
         if file_parser.regular_dimensions is not None:
             for i in range(file_parser.regular_dimensions[0]):
                 for j in range(file_parser.regular_dimensions[1]):
-                    # self.vertex_list.append(MeshVertex2D(
-                    #     file_parser.latitude[index],
-                    #     file_parser.longitude[index], file_parser))
+                    for time in range(len(file_parser.times)):
+                        self.vertex_list.append(MeshVertex2D(
+                            file_parser.latitude[i],
+                            file_parser.longitude[j],
+                            file_parser.velocity[:, index, time],
+                            file_parser.diffusion_coefficient[:, index],
+                            len(file_parser.regular_dimensions)
+                        ))
 
-                    index += 1
-
-
+                        self._cpp_vertex_list.append(self.vertex_list[-1].vertex)
+                        index += 1
 
     def setup_elements_and_adjacency_list(self, regular=None, depths_array=None):
         elements = []
@@ -75,15 +79,17 @@ class TriangularMesh2D:
 
                         if index % 2 == 0:
                             elements.append(TriangularMeshElement2D(
-                                self.vertex_list[i * regular[0]],
-                                self.vertex_list[i * regular[0] + 1],
-                                self.vertex_list[(i + 1) * regular[0]]
+                                self._cpp_vertex_list[i * regular[0]],
+                                self._cpp_vertex_list[i * regular[0] + 1],
+                                self._cpp_vertex_list[(i + 1) * regular[0]],
+                                index
                             ))
                         else:
                             elements.append(TriangularMeshElement2D(
-                                self.vertex_list[i * regular[0]],
-                                self.vertex_list[(i + 1) * regular[0] + 1],
-                                self.vertex_list[(i + 1) * regular[0]]
+                                self._cpp_vertex_list[i * regular[0]],
+                                self._cpp_vertex_list[(i + 1) * regular[0] + 1],
+                                self._cpp_vertex_list[(i + 1) * regular[0]],
+                                index
                             ))
 
                         adjacency_list.append(adj)
