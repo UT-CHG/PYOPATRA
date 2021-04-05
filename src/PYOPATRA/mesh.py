@@ -9,15 +9,24 @@ class TriangularMesh2D:
         self.vertex_list = None
         self._cpp_vertex_list = None
 
+        self.adjacency_list = None
+        self.element_list = None
+
+        self.times = None
+        self.regular_dimensions = None
+
     def setup_vertices(self, file_parser: FileParserBase):
         self.vertex_list = []
         self._cpp_vertex_list = []
         index = 0
 
+        self.times = file_parser.times
+
         if file_parser.regular_dimensions is not None:
+            self.regular_dimensions = file_parser.regular_dimensions
             for i in range(file_parser.regular_dimensions[0]):
                 for j in range(file_parser.regular_dimensions[1]):
-                    for time in range(len(file_parser.times)):
+                    for time in range(len(self.times)):
                         self.vertex_list.append(MeshVertex2D(
                             file_parser.latitude[i],
                             file_parser.longitude[j],
@@ -42,60 +51,63 @@ class TriangularMesh2D:
             if len(regular) == 2:
                 for i in range(regular[0] - 1):
                     for j in range(regular[1] - 1):
-                        adj = []
+                        for k in range(2):
+                            for time in range(len(self.times)):
+                                adj = []
 
-                        # First Adjacency
-                        # Top row, even triangles
-                        if i == 0 and index % 2 == 0:
-                            adj.append(None)
-                        # Other even triangles
-                        elif index % 2 == 0:
-                            adj.append(((i - 1) * (regular[1] - 1) + j) * 2 + 1)
-                        # Right side, odd triangles
-                        elif j == regular[1] - 2:
-                            adj.append(None)
-                        # Other odd triangles
-                        else:
-                            adj.append(index + 1)
+                                # First Adjacency
+                                # Top row, even triangles
+                                if i == 0 and (index - time) % 2 == 0:
+                                    adj.append(None)
+                                # Other even triangles
+                                elif (index - time) % 2 == 0:
+                                    adj.append((((i - 1) * (regular[1] - 1) + j) * 2 + 1) * len(self.times) + time)
+                                # Right side, odd triangles
+                                elif j == regular[1] - 2:
+                                    adj.append(None)
+                                # Other odd triangles
+                                else:
+                                    adj.append(((index - time) // len(self.times) + 1) * len(self.times) + time)
 
-                        # Second Adjacency
-                        # Bottom row, odd triangles
-                        if i == regular[0] - 2 and index % 2 == 1:
-                            adj.append(None)
-                        # Other odd triangles
-                        elif index % 2 == 1:
-                            adj.append(((i + 1) * (regular[1] - 1) + j) * 2)
-                        # Even triangles
-                        else:
-                            adj.append(index + 1)
+                                # Second Adjacency
+                                # Bottom row, odd triangles
+                                if i == regular[0] - 2 and index % 2 == 1:
+                                    adj.append(None)
+                                # Other odd triangles
+                                elif (index - time) % 2 == 1:
+                                    adj.append((((i + 1) * (regular[1] - 1) + j) * 2) * len(self.times) + time)
+                                # Even triangles
+                                else:
+                                    adj.append(((index - time) // len(self.times) + 1) * len(self.times) + time)
 
-                        # Third Adjacency
-                        # Left side, even triangles
-                        if i == 0 and index % 2 == 0:
-                            adj.append(None)
-                        # All other triangles
-                        else:
-                            adj.append(index - 1)
+                                # Third Adjacency
+                                # Left side, even triangles
+                                if i == 0 and (index - time) % 2 == 0:
+                                    adj.append(None)
+                                # All other triangles
+                                else:
+                                    adj.append(((index - time) // len(self.times) - 1) * len(self.times) + time)
 
-                        if index % 2 == 0:
-                            elements.append(TriangularMeshElement2D(
-                                self._cpp_vertex_list[i * regular[0]],
-                                self._cpp_vertex_list[i * regular[0] + 1],
-                                self._cpp_vertex_list[(i + 1) * regular[0]],
-                                index
-                            ))
-                        else:
-                            elements.append(TriangularMeshElement2D(
-                                self._cpp_vertex_list[i * regular[0]],
-                                self._cpp_vertex_list[(i + 1) * regular[0] + 1],
-                                self._cpp_vertex_list[(i + 1) * regular[0]],
-                                index
-                            ))
+                                if (index - time) % 2 == 0:
+                                    elements.append(TriangularMeshElement2D(
+                                        self._cpp_vertex_list[(i * regular[1] + j) * len(self.times) + time],
+                                        self._cpp_vertex_list[(i * regular[1] + j + 1) * len(self.times) + time],
+                                        self._cpp_vertex_list[((i + 1) * regular[1] + j) * len(self.times) + time],
+                                        index
+                                    ))
+                                else:
+                                    elements.append(TriangularMeshElement2D(
+                                        self._cpp_vertex_list[(i * regular[1] + j + 1) * len(self.times) + time],
+                                        self._cpp_vertex_list[((i + 1) * regular[1] + j + 1) * len(self.times) + time],
+                                        self._cpp_vertex_list[((i + 1) * regular[1] + j) * len(self.times) + time],
+                                        index
+                                    ))
 
-                        adjacency_list.append(adj)
-                        index += 1
+                                adjacency_list.append(adj)
+                                index += 1
 
-        return elements, adjacency_list
+        self.element_list = elements
+        self.adjacency_list = adjacency_list
 
 
 
