@@ -30,27 +30,27 @@ class TriangularMesh2D:
                         self.vertex_list.append(MeshVertex2D(
                             file_parser.latitude[i],
                             file_parser.longitude[j],
-                            file_parser.velocity[:, i * j, time],
-                            file_parser.diffusion_coefficient[:, i * j, time],
+                            file_parser.velocity[:, i * self.regular_dimensions[1] + j, time],
+                            file_parser.diffusion_coefficient[:, i * self.regular_dimensions[1] + j, time],
                             len(file_parser.regular_dimensions)
                         ))
 
                         self._cpp_vertex_list.append(self.vertex_list[-1].vertex)
                         index += 1
 
-    def setup_elements_and_adjacency_list(self, regular=None, depths_array=None):
+    def setup_elements_and_adjacency_list(self, depths_array=None):
         elements = []
         adjacency_list = []
 
         if self.vertex_list is None:
             raise AttributeError('vertex_list must be set prior to setting up elements and adjacency.')
 
-        if regular is not None:
+        if self.regular_dimensions is not None:
             index = 0
 
-            if len(regular) == 2:
-                for i in range(regular[0] - 1):
-                    for j in range(regular[1] - 1):
+            if len(self.regular_dimensions) == 2:
+                for i in range(self.regular_dimensions[0] - 1):
+                    for j in range(self.regular_dimensions[1] - 1):
                         for k in range(2):
                             for time in range(len(self.times)):
                                 adj = []
@@ -61,9 +61,9 @@ class TriangularMesh2D:
                                     adj.append(None)
                                 # Other even triangles
                                 elif (index - time) % 2 == 0:
-                                    adj.append((((i - 1) * (regular[1] - 1) + j) * 2 + 1) * len(self.times) + time)
+                                    adj.append((((i - 1) * (self.regular_dimensions[1] - 1) + j) * 2 + 1) * len(self.times) + time)
                                 # Right side, odd triangles
-                                elif j == regular[1] - 2:
+                                elif j == self.regular_dimensions[1] - 2:
                                     adj.append(None)
                                 # Other odd triangles
                                 else:
@@ -71,11 +71,11 @@ class TriangularMesh2D:
 
                                 # Second Adjacency
                                 # Bottom row, odd triangles
-                                if i == regular[0] - 2 and index % 2 == 1:
+                                if i == self.regular_dimensions[0] - 2 and index % 2 == 1:
                                     adj.append(None)
                                 # Other odd triangles
                                 elif (index - time) % 2 == 1:
-                                    adj.append((((i + 1) * (regular[1] - 1) + j) * 2) * len(self.times) + time)
+                                    adj.append((((i + 1) * (self.regular_dimensions[1] - 1) + j) * 2) * len(self.times) + time)
                                 # Even triangles
                                 else:
                                     adj.append(((index - time) // len(self.times) + 1) * len(self.times) + time)
@@ -90,16 +90,16 @@ class TriangularMesh2D:
 
                                 if (index - time) % 2 == 0:
                                     elements.append(TriangularMeshElement2D(
-                                        self._cpp_vertex_list[(i * regular[1] + j) * len(self.times) + time],
-                                        self._cpp_vertex_list[(i * regular[1] + j + 1) * len(self.times) + time],
-                                        self._cpp_vertex_list[((i + 1) * regular[1] + j) * len(self.times) + time],
+                                        self._cpp_vertex_list[(i * self.regular_dimensions[1] + j) * len(self.times) + time],
+                                        self._cpp_vertex_list[(i * self.regular_dimensions[1] + j + 1) * len(self.times) + time],
+                                        self._cpp_vertex_list[((i + 1) * self.regular_dimensions[1] + j) * len(self.times) + time],
                                         index
                                     ))
                                 else:
                                     elements.append(TriangularMeshElement2D(
-                                        self._cpp_vertex_list[(i * regular[1] + j + 1) * len(self.times) + time],
-                                        self._cpp_vertex_list[((i + 1) * regular[1] + j + 1) * len(self.times) + time],
-                                        self._cpp_vertex_list[((i + 1) * regular[1] + j) * len(self.times) + time],
+                                        self._cpp_vertex_list[(i * self.regular_dimensions[1] + j + 1) * len(self.times) + time],
+                                        self._cpp_vertex_list[((i + 1) * self.regular_dimensions[1] + j + 1) * len(self.times) + time],
+                                        self._cpp_vertex_list[((i + 1) * self.regular_dimensions[1] + j) * len(self.times) + time],
                                         index
                                     ))
 
@@ -109,7 +109,17 @@ class TriangularMesh2D:
         self.element_list = elements
         self.adjacency_list = adjacency_list
 
+    def get_velocity_u(self):
+        if self.regular_dimensions is not None:
+            velocity = np.zeros((*self.regular_dimensions, len(self.times)))
 
+            if len(self.regular_dimensions) == 2:
+                for i in range(self.regular_dimensions[0]):
+                    for j in range(self.regular_dimensions[1]):
+                        for t in range(len(self.times)):
+                            velocity[i, j, t] = self.vertex_list[((i * self.regular_dimensions[1]) + j) * len(self.times) + t].get_velocity()[0]
+
+            return velocity
 
 
 

@@ -22,7 +22,7 @@ class TestMesh:
 
         tm2d = TriangularMesh2D()
         tm2d.setup_vertices(hfp)
-        tm2d.setup_elements_and_adjacency_list(regular=hfp.regular_dimensions)
+        tm2d.setup_elements_and_adjacency_list()
 
         yield tm2d
 
