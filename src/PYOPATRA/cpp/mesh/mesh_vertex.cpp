@@ -6,64 +6,60 @@
 
 #include <utility>
 
-MeshVertex3D::MeshVertex()
-        : MeshVertexBase<3>()
-        , density(0.0)
-        , temperature(0.0)
-        , water_viscosity(0.0)
-        , viscosity(0.0)
+MeshVertex3D::MeshVertex(int num_timesteps)
+        : MeshVertexBase<3>(num_timesteps)
+        , density(num_timesteps, 0.0)
+        , temperature(num_timesteps, 0.0)
+        , water_viscosity(num_timesteps, 0.0)
+        , viscosity(num_timesteps, 0.0)
 {}
 
 
-MeshVertex3D::MeshVertex(double latitude, double longitude, double bathymetric_depth)
-        : MeshVertexBase<3>()
-        , density(0.0)
-        , temperature(0.0)
-        , water_viscosity(0.0)
-        , viscosity(0.0)
+MeshVertex3D::MeshVertex(double latitude, double longitude, double bathymetric_depth, int num_timesteps)
+        : MeshVertex3D::MeshVertex(num_timesteps)
 {
     location(0) = latitude;
     location(1) = longitude;
     location(2) = bathymetric_depth;
 }
 
-MeshVertex3D::MeshVertex(double latitude, double longitude, double bathymetric_depth, double density, double temperature)
-        : MeshVertexBase<3>(latitude, longitude)
-        , density(density)
-        , temperature(temperature)
-        , water_viscosity(calculate_pure_water_viscosity(temperature))
-        , viscosity(calculate_fluid_viscosity(temperature, density))
-{
-    location(2) = bathymetric_depth;
-}
+//MeshVertex3D::MeshVertex(double latitude, double longitude, double bathymetric_depth, double density, double temperature, int num_timesteps)
+//        : MeshVertexBase<3>(latitude, longitude, num_timesteps)
+//        , density(density)
+//        , temperature(temperature)
+//        , water_viscosity(calculate_pure_water_viscosity(temperature))
+//        , viscosity(calculate_fluid_viscosity(temperature, density))
+//{
+//    location(2) = bathymetric_depth;
+//}
 
-MeshVertex3D::MeshVertex(double latitude, double longitude, double bathymetric_depth, double density, double temperature, Vector velocity)
-        : MeshVertexBase<3>(latitude, longitude, std::move(velocity))
-        , density(density)
-        , temperature(temperature)
-        , water_viscosity(calculate_pure_water_viscosity(temperature))
-        , viscosity(calculate_fluid_viscosity(temperature, density))
-{
-    location(2) = bathymetric_depth;
-}
+//MeshVertex3D::MeshVertex(double latitude, double longitude, double bathymetric_depth, double density, double temperature, Vector velocity)
+//        : MeshVertexBase<3>(latitude, longitude, std::move(velocity))
+//        , density(density)
+//        , temperature(temperature)
+//        , water_viscosity(calculate_pure_water_viscosity(temperature))
+//        , viscosity(calculate_fluid_viscosity(temperature, density))
+//{
+//    location(2) = bathymetric_depth;
+//}
+//
+//MeshVertex3D::MeshVertex(double latitude, double longitude, double bathymetric_depth, double density, double temperature, Vector velocity, Vector diffusion_coefficient)
+//        : MeshVertexBase<3>(latitude, longitude, std::move(velocity), std::move(diffusion_coefficient))
+//        , density(density)
+//        , temperature(temperature)
+//        , water_viscosity(calculate_pure_water_viscosity(temperature))
+//        , viscosity(calculate_fluid_viscosity(temperature, density))
+//{
+//    location(2) = bathymetric_depth;
+//}
 
-MeshVertex3D::MeshVertex(double latitude, double longitude, double bathymetric_depth, double density, double temperature, Vector velocity, Vector diffusion_coefficient)
-        : MeshVertexBase<3>(latitude, longitude, std::move(velocity), std::move(diffusion_coefficient))
-        , density(density)
-        , temperature(temperature)
-        , water_viscosity(calculate_pure_water_viscosity(temperature))
-        , viscosity(calculate_fluid_viscosity(temperature, density))
-{
-    location(2) = bathymetric_depth;
-}
-
-void MeshVertex3D::set_temperature(double new_temperature) {
-    temperature = new_temperature;
-}
-
-void MeshVertex3D::set_density(double new_density) {
-    density = new_density;
-}
+//void MeshVertex3D::set_temperature(double new_temperature) {
+//    temperature = new_temperature;
+//}
+//
+//void MeshVertex3D::set_density(double new_density) {
+//    density = new_density;
+//}
 
 // Water Viscosity
 // From Huber et al 2009

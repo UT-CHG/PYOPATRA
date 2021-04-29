@@ -17,7 +17,7 @@
 namespace py = pybind11;
 
 template <int num_vertices_per_element, int dimension>
-class Mesh {
+class MeshFrame {
 protected:
     time_t current_time;
     int current_time_step, total_time_steps, time_step_size;

@@ -41,6 +41,7 @@ class TriangularMesh2D:
     def setup_elements_and_adjacency_list(self, depths_array=None):
         elements = []
         adjacency_list = []
+        water_columns = []
 
         if self.vertex_list is None:
             raise AttributeError('vertex_list must be set prior to setting up elements and adjacency.')
@@ -53,40 +54,40 @@ class TriangularMesh2D:
                     for j in range(self.regular_dimensions[1] - 1):
                         for k in range(2):
                             for time in range(len(self.times)):
-                                adj = []
-
-                                # First Adjacency
-                                # Top row, even triangles
-                                if i == 0 and (index - time) % 2 == 0:
-                                    adj.append(None)
-                                # Other even triangles
-                                elif (index - time) % 2 == 0:
-                                    adj.append((((i - 1) * (self.regular_dimensions[1] - 1) + j) * 2 + 1) * len(self.times) + time)
-                                # Right side, odd triangles
-                                elif j == self.regular_dimensions[1] - 2:
-                                    adj.append(None)
-                                # Other odd triangles
-                                else:
-                                    adj.append(((index - time) // len(self.times) + 1) * len(self.times) + time)
-
-                                # Second Adjacency
-                                # Bottom row, odd triangles
-                                if i == self.regular_dimensions[0] - 2 and index % 2 == 1:
-                                    adj.append(None)
-                                # Other odd triangles
-                                elif (index - time) % 2 == 1:
-                                    adj.append((((i + 1) * (self.regular_dimensions[1] - 1) + j) * 2) * len(self.times) + time)
-                                # Even triangles
-                                else:
-                                    adj.append(((index - time) // len(self.times) + 1) * len(self.times) + time)
-
-                                # Third Adjacency
-                                # Left side, even triangles
-                                if i == 0 and (index - time) % 2 == 0:
-                                    adj.append(None)
-                                # All other triangles
-                                else:
-                                    adj.append(((index - time) // len(self.times) - 1) * len(self.times) + time)
+                                # adj = []
+                                #
+                                # # First Adjacency
+                                # # Top row, even triangles
+                                # if i == 0 and (index - time) % 2 == 0:
+                                #     adj.append(None)
+                                # # Other even triangles
+                                # elif (index - time) % 2 == 0:
+                                #     adj.append((((i - 1) * (self.regular_dimensions[1] - 1) + j) * 2 + 1) * len(self.times) + time)
+                                # # Right side, odd triangles
+                                # elif j == self.regular_dimensions[1] - 2:
+                                #     adj.append(None)
+                                # # Other odd triangles
+                                # else:
+                                #     adj.append(((index - time) // len(self.times) + 1) * len(self.times) + time)
+                                #
+                                # # Second Adjacency
+                                # # Bottom row, odd triangles
+                                # if i == self.regular_dimensions[0] - 2 and index % 2 == 1:
+                                #     adj.append(None)
+                                # # Other odd triangles
+                                # elif (index - time) % 2 == 1:
+                                #     adj.append((((i + 1) * (self.regular_dimensions[1] - 1) + j) * 2) * len(self.times) + time)
+                                # # Even triangles
+                                # else:
+                                #     adj.append(((index - time) // len(self.times) + 1) * len(self.times) + time)
+                                #
+                                # # Third Adjacency
+                                # # Left side, even triangles
+                                # if i == 0 and (index - time) % 2 == 0:
+                                #     adj.append(None)
+                                # # All other triangles
+                                # else:
+                                #     adj.append(((index - time) // len(self.times) - 1) * len(self.times) + time)
 
                                 if (index - time) % 2 == 0:
                                     elements.append(TriangularMeshElement2D(
@@ -103,11 +104,22 @@ class TriangularMesh2D:
                                         index
                                     ))
 
-                                adjacency_list.append(adj)
+                                # adjacency_list.append(adj)
                                 index += 1
 
         self.element_list = elements
         self.adjacency_list = adjacency_list
+
+    def setup_water_columns(self):
+        if self.element_list is None or self.vertex_list is None:
+            raise AttributeError('Vertex and elements must be set up prior to water columns.')
+        
+        if self.regular_dimensions is not None:
+            if len(self.regular_dimensions) == 2:
+                for i in range(self.regular_dimensions[0] - 1):
+                    for j in range(self.regular_dimensions[1] - 1):
+                        for k in range(2):
+                            pass
 
     def get_velocity_u(self):
         if self.regular_dimensions is not None:

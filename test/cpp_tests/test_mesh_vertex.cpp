@@ -30,50 +30,50 @@ TEST_CASE("Mesh Vertex Tests", "[mesh-vertex-tests]") {
     }
 
     SECTION("Mesh Vertex Constructor Test") {
-        MeshVertex3D node1(50, 25, 0.0);
+        MeshVertex3D node1(50, 25, 0.0, 1);
 
-        REQUIRE(node1.get_density() == 0.0);
-        REQUIRE(node1.get_temperature() == 0.0);
-        REQUIRE(node1.get_water_viscosity() == 0.0);
-        REQUIRE(node1.get_viscosity() == 0.0);
+        REQUIRE(node1.get_density()[0] == 0.0);
+        REQUIRE(node1.get_temperature()[0] == 0.0);
+        REQUIRE(node1.get_water_viscosity()[0] == 0.0);
+        REQUIRE(node1.get_viscosity()[0] == 0.0);
         REQUIRE(node1.get_latitude() == 50);
         REQUIRE(node1.get_longitude() == 25);
         REQUIRE(node1.get_depth() == 0.0);
 
-        MeshVertex3D node2;
+        MeshVertex3D node2(1);
 
-        REQUIRE(node2.get_density() == 0.0);
-        REQUIRE(node2.get_temperature() == 0.0);
-        REQUIRE(node2.get_water_viscosity() == 0.0);
-        REQUIRE(node2.get_viscosity() == 0.0);
+        REQUIRE(node2.get_density()[0] == 0.0);
+        REQUIRE(node2.get_temperature()[0] == 0.0);
+        REQUIRE(node2.get_water_viscosity()[0] == 0.0);
+        REQUIRE(node2.get_viscosity()[0] == 0.0);
         REQUIRE(node2.get_latitude() == 0.0);
         REQUIRE(node2.get_longitude() == 0.0);
         REQUIRE(node2.get_depth() == 0.0);
 
-        MeshVertex3D node3(-89.4960990000, 30.1932510000, -0.7478574510, 998.2071, 283.15);
+        MeshVertex3D node3(-89.4960990000, 30.1932510000, -0.7478574510, 1);
+        node3.set_temperature_and_density(283.15, 998.2071, 0);
 
-        REQUIRE(node3.get_density() == 998.2071);
-        REQUIRE(node3.get_temperature() == 283.15);
-        REQUIRE(node3.get_water_viscosity() == Approx(1305.90172775e-6));
-        REQUIRE(node3.get_viscosity() == Approx(0.00130877));
+        REQUIRE(node3.get_density()[0] == 998.2071);
+        REQUIRE(node3.get_temperature()[0] == 283.15);
+        REQUIRE(node3.get_water_viscosity()[0] == Approx(1305.90172775e-6));
+        REQUIRE(node3.get_viscosity()[0] == Approx(0.00130877));
         REQUIRE(node3.get_latitude() == -89.4960990000);
         REQUIRE(node3.get_longitude() == 30.1932510000);
         REQUIRE(node3.get_depth() == -0.7478574510);
 
-        MeshVertex3D node4(-89.4960990000, 30.1932510000, -0.7478574510);
+        MeshVertex3D node4(-89.4960990000, 30.1932510000, -0.7478574510, 1);
 
-        REQUIRE(node4.get_density() == 0.0);
-        REQUIRE(node4.get_temperature() == 0.0);
-        REQUIRE(node4.get_water_viscosity() == 0.0);
-        REQUIRE(node4.get_viscosity() == 0.0);
+        REQUIRE(node4.get_density()[0] == 0.0);
+        REQUIRE(node4.get_temperature()[0] == 0.0);
+        REQUIRE(node4.get_water_viscosity()[0] == 0.0);
+        REQUIRE(node4.get_viscosity()[0] == 0.0);
         REQUIRE(node4.get_latitude() == -89.4960990000);
         REQUIRE(node4.get_longitude() == 30.1932510000);
         REQUIRE(node4.get_depth() == -0.7478574510);
 
-        node4.set_temperature(283.15);
-        node4.set_density(998.2071);
+        node4.set_temperature_and_density(283.15, 998.2071, 0);
 
-        REQUIRE(node4.get_density() == 998.2071);
-        REQUIRE(node4.get_temperature() == 283.15);
+        REQUIRE(node4.get_density()[0] == 998.2071);
+        REQUIRE(node4.get_temperature()[0] == 283.15);
     }
 }

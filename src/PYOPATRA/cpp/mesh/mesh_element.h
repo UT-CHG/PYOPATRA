@@ -46,11 +46,11 @@ public:
     VectorTd calculate_barycentric_coordinate(const Vector& point) const;
     double calculate_depth_at_point(const Vector& point) const;
     const VertexArray& get_vertices() const { return vertices; }
-    Vector sample_velocity(const VectorTd& barycentric_coordinates) const;
-    double sample_density(const VectorTd& barycentric_coordinates) const;
-    double sample_viscosity(const VectorTd& barycentric_coordinates) const;
-    double sample_water_viscosity(const VectorTd& barycentric_coordinates) const;
-    Vector sample_diffusion_coefficient(const VectorTd& barycentric_coordinates) const;
+    Vector sample_velocity(const VectorTd& barycentric_coordinates, int time_index) const;
+    double sample_density(const VectorTd& barycentric_coordinates, int time_index) const;
+    double sample_viscosity(const VectorTd& barycentric_coordinates, int time_index) const;
+    double sample_water_viscosity(const VectorTd& barycentric_coordinates, int time_index) const;
+    Vector sample_diffusion_coefficient(const VectorTd& barycentric_coordinates, int time_index) const;
     // 1 if deeper, -1 if shallower, 0 if on the element
     virtual int check_halfspace(const Vector& point) const;
 };
@@ -98,7 +98,7 @@ public:
     virtual Vector calculate_velocity(const Vector& point) const = 0;
     virtual double get_depth_at_point(const Vector& point) const = 0;
     virtual int check_halfspace(const Vector& point) const = 0;
-    virtual void get_interpolated_values(const Vector& point, InterpolatedValues<dimensions>& interpolated_values) const = 0;
+    virtual void get_interpolated_values(const Vector& point, InterpolatedValues<dimensions>& interpolated_values, int time_index) const = 0;
 };
 
 template <int num_vertices, int num_dimensions>
@@ -112,7 +112,7 @@ public:
     explicit MeshElementCursorT(MeshElementImpl* mesh_element) : p_impl(mesh_element) {}
 
     Vector calculate_velocity(const Vector3d& point) const override {
-        return p_impl->sample_velocity(p_impl->calculate_barycentric_coordinate(point));
+        return p_impl->sample_velocity(p_impl->calculate_barycentric_coordinate(point), 0);
     }
 
     double get_depth_at_point(const Vector3d& point) const override {
@@ -127,12 +127,12 @@ public:
         }
     }
 
-    void get_interpolated_values(const Vector3d& point, InterpolatedValues<num_dimensions>& interpolated_values) const override {
+    void get_interpolated_values(const Vector3d& point, InterpolatedValues<num_dimensions>& interpolated_values, int time_index) const override {
         auto bc = p_impl->calculate_barycentric_coordinate(point);
-        interpolated_values.velocity = p_impl->sample_velocity(bc);
-        interpolated_values.density = p_impl->sample_density(bc);
-        interpolated_values.viscosity = p_impl->sample_viscosity(bc);
-        interpolated_values.water_viscosity = p_impl->sample_water_viscosity(bc);
+        interpolated_values.velocity = p_impl->sample_velocity(bc, time_index);
+        interpolated_values.density = p_impl->sample_density(bc, time_index);
+        interpolated_values.viscosity = p_impl->sample_viscosity(bc, time_index);
+        interpolated_values.water_viscosity = p_impl->sample_water_viscosity(bc, time_index);
     }
 
 
