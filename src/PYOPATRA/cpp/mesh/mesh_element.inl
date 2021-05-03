@@ -143,7 +143,7 @@ typename MeshElementT<num_vertices, dimensions>::Vector MeshElementT<num_vertice
     Vector diffusion = Vector::Zero();
 
     for (int i = 0; i < num_vertices; i++) {
-        diffusion += vertices[i]->get_diffusion_coefficient() * barycentric_coordinates(i);
+        diffusion += vertices[i]->get_diffusion_coefficient()[time_index] * barycentric_coordinates(i);
     }
 
     return diffusion;

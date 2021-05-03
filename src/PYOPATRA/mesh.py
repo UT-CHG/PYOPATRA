@@ -15,7 +15,12 @@ class TriangularMesh2D:
         self.times = None
         self.regular_dimensions = None
 
-    def setup_vertices(self, file_parser: FileParserBase):
+        self._cpp_mesh = None
+
+    def _setup_mesh(self, file_parser: FileParserBase):
+        pass
+
+    def _setup_vertices(self, file_parser: FileParserBase):
         self.vertex_list = []
         self._cpp_vertex_list = []
         index = 0
@@ -26,19 +31,25 @@ class TriangularMesh2D:
             self.regular_dimensions = file_parser.regular_dimensions
             for i in range(file_parser.regular_dimensions[0]):
                 for j in range(file_parser.regular_dimensions[1]):
+                    self._cpp_mesh.get_vertices()[i * file_parser.regular_dimensions[1] + j]\
+                        .set_location([file_parser.latitude[i], file_parser.longitude[j]])
                     for time in range(len(self.times)):
-                        self.vertex_list.append(MeshVertex2D(
-                            file_parser.latitude[i],
-                            file_parser.longitude[j],
-                            file_parser.velocity[:, i * self.regular_dimensions[1] + j, time],
-                            file_parser.diffusion_coefficient[:, i * self.regular_dimensions[1] + j, time],
-                            len(file_parser.regular_dimensions)
-                        ))
+                        self._cpp_mesh.get_vertices()[i * file_parser.regular_dimensions[1] + j]\
+                            .set_velocity(file_parser.velocity[:, i * self.regular_dimensions[1] + j, time], time)
+                        self._cpp_mesh.get_vertices()[i * file_parser.regular_dimensions[1] + j] \
+                            .set_diffusion_coefficient(file_parser.velocity[:, i * self.regular_dimensions[1] + j, time], time)
+                    #     self.vertex_list.append(MeshVertex2D(
+                    #         file_parser.latitude[i],
+                    #         file_parser.longitude[j],
+                    #         file_parser.velocity[:, i * self.regular_dimensions[1] + j, time],
+                    #         file_parser.diffusion_coefficient[:, i * self.regular_dimensions[1] + j, time],
+                    #         len(file_parser.regular_dimensions)
+                    #     ))
+                    #
+                    #     self._cpp_vertex_list.append(self.vertex_list[-1].vertex)
+                    #     index += 1
 
-                        self._cpp_vertex_list.append(self.vertex_list[-1].vertex)
-                        index += 1
-
-    def setup_elements_and_adjacency_list(self, depths_array=None):
+    def _setup_elements_and_adjacency_list(self, depths_array=None):
         elements = []
         adjacency_list = []
         water_columns = []
@@ -110,7 +121,7 @@ class TriangularMesh2D:
         self.element_list = elements
         self.adjacency_list = adjacency_list
 
-    def setup_water_columns(self):
+    def _setup_water_columns(self):
         if self.element_list is None or self.vertex_list is None:
             raise AttributeError('Vertex and elements must be set up prior to water columns.')
         

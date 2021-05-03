@@ -18,7 +18,7 @@ namespace py = pybind11;
 PYBIND11_MODULE(pyopatra_pybind, m) {
     // Two dimensional MeshVertex and Mesh
     py::class_<MeshVertexBase2D>(m, "CppMeshVertexBase2D")
-            .def(py::init<double, double, Eigen::Matrix<double, 2, 1>>())
+            .def(py::init<int>())
             .def("get_location", &MeshVertexBase2D::get_location)
             .def("get_latitude", &MeshVertexBase2D::get_latitude)
             .def("get_longitude", &MeshVertexBase2D::get_longitude)
@@ -29,7 +29,7 @@ PYBIND11_MODULE(pyopatra_pybind, m) {
             .def("set_location", &MeshVertexBase2D::set_location);
 
     py::class_<MeshVertex2D, MeshVertexBase2D>(m, "CppMeshVertex2D")
-            .def(py::init<double, double, Eigen::Matrix<double, 2, 1>, Eigen::Matrix<double, 2, 1>>());
+            .def(py::init<int>());
 
     py::class_<TriangularMeshElement2D>(m, "TriangularMeshElement2D")
             .def(py::init<MeshVertex<2>*, MeshVertex<2>*, MeshVertex<2>*, int>())
@@ -40,7 +40,8 @@ PYBIND11_MODULE(pyopatra_pybind, m) {
             .def("get_vertices", &TriangularMeshElement2D::get_vertices);
 
     py::class_<TriangularMesh2D>(m, "CppTriangularMesh2D")
-            .def(py::init<int, int, int, std::vector<time_t>&&>());
+            .def(py::init<int, int, int, int, std::vector<time_t>&&>())
+            .def("set_vertex_location", &TriangularMesh2D::set_vertex_location);
 //            .def()
 
 }

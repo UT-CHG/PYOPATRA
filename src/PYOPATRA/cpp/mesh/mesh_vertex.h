@@ -32,7 +32,7 @@ public:
     const std::vector<Vector>& get_velocity() const { return velocity; }
     const std::vector<Vector>& get_diffusion_coefficient() const { return diffusion_coefficient; }
 
-    void set_diffusion_coefficient(Vector new_diffusion_coefficient) { diffusion_coefficient = new_diffusion_coefficient; }
+    void set_diffusion_coefficient(Vector new_diffusion_coefficient, int time_index) { diffusion_coefficient[time_index] = new_diffusion_coefficient; }
     void set_velocity(Vector new_velocity, int time_index) { velocity[time_index] = new_velocity; }
     void set_location(Vector new_location) { location = new_location; }
 };

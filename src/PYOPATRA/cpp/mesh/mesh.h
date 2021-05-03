@@ -17,7 +17,7 @@
 namespace py = pybind11;
 
 template <int num_vertices_per_element, int dimension>
-class MeshFrame {
+class Mesh {
 protected:
     time_t current_time;
     int current_time_step, total_time_steps, time_step_size;
@@ -51,8 +51,7 @@ public:
     WaterColumn<num_vertices_per_element, dimension>* find_particle_location(ParticleBase<dimension> &particle);
     time_t get_current_time() { return current_time; }
     std::vector<MeshVertexBase<dimension>>& get_vertices() { return vertices; }
-
-    void set_vertices(const py::list& new_vertices) { vertices = new_vertices; }
+    void set_vertex_location(int vertex_index, Vector new_location) { vertices[vertex_index].set_location(new_location); }
 };
 
 using TriangularMesh2D = Mesh<3, 2>;
