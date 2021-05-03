@@ -22,8 +22,8 @@ protected:
     time_t current_time;
     int current_time_step, total_time_steps, time_step_size;
     std::vector<time_t> measured_times;
-    std::vector<std::vector<WaterColumn<num_vertices_per_element, dimension>>> water_columns;
-    py::list vertices;
+    std::vector<WaterColumn<num_vertices_per_element, dimension>> water_columns;
+    std::vector<MeshVertexBase<dimension>> vertices;
 
 public:
     using Vector = Eigen::Matrix<double, dimension, 1>;
@@ -38,14 +38,14 @@ public:
         , vertices()
     {}
 
-    Mesh(int total_time_steps, int time_step_size, int num_water_columns, std::vector<time_t>&& measured_times)
+    Mesh(int total_time_steps, int time_step_size, int num_water_columns, int num_vertices, std::vector<time_t>&& measured_times)
         : current_time(0)
         , current_time_step(0)
         , total_time_steps(total_time_steps)
         , time_step_size(time_step_size)
         , measured_times(measured_times)
-        , water_columns(num_water_columns, std::vector<WaterColumn<num_vertices_per_element, dimension>>(measured_times.size(), WaterColumn<num_vertices_per_element, dimension>()))
-        , vertices()
+        , water_columns(num_water_columns, WaterColumn<num_vertices_per_element, dimension>())
+        , vertices(num_vertices, MeshVertexBase<dimension>(measured_times.size()))
     {}
 
     WaterColumn<num_vertices_per_element, dimension>* find_particle_location(ParticleBase<dimension> &particle);

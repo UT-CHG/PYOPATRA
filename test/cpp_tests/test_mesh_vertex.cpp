@@ -40,6 +40,16 @@ TEST_CASE("Mesh Vertex Tests", "[mesh-vertex-tests]") {
         REQUIRE(node1.get_longitude() == 25);
         REQUIRE(node1.get_depth() == 0.0);
 
+        node1.set_location({-70, 30, 20.0});
+        node1.set_velocity({-0.5, 0.5, 0.25}, 0);
+        REQUIRE(node1.get_latitude() == -70);
+        REQUIRE(node1.get_longitude() == 30);
+        REQUIRE(node1.get_depth() == 20.0);
+
+        MeshVertex3D::Vector v = {-0.5, 0.5, 0.25};
+
+        REQUIRE(node1.get_velocity()[0].isApprox(v));
+
         MeshVertex3D node2(1);
 
         REQUIRE(node2.get_density()[0] == 0.0);
