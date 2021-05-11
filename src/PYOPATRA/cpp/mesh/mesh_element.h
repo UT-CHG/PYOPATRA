@@ -41,6 +41,7 @@ public:
 
     void set_vertices(MeshVertex<dimensions>* a, MeshVertex<dimensions>* b, MeshVertex<dimensions>* c) { vertices = {a, b, c}; }
 //    void set_vertices(MeshVertex<dimensions>* a, MeshVertex<dimensions>* b, MeshVertex<dimensions>* c, MeshVertex<dimensions>* d) { vertices = {a, b, c, d}; }
+    void set_vertex(MeshVertex<dimensions>* vert, int position) { vertices[position] = vert; }
     void set_mesh_index(int new_mesh_index) { mesh_index = new_mesh_index; }
 
     VectorTd calculate_barycentric_coordinate(const Vector& point) const;

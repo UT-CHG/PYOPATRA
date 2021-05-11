@@ -17,8 +17,19 @@ class TriangularMesh2D:
 
         self._cpp_mesh = None
 
-    def _setup_mesh(self, file_parser: FileParserBase):
-        pass
+    def setup_mesh(self, file_parser: FileParserBase, dimensions: int):
+        self._setup_mesh(file_parser, dimensions)
+        self._setup_vertices(file_parser)
+        self._setup_water_columns(file_parser)
+        self._setup_elements_vertices()
+
+    def _setup_mesh(self, file_parser: FileParserBase, dimensions: int):
+        if dimensions == 2:
+            self._cpp_mesh = CppTriangularMesh2D(file_parser.num_elements, file_parser.num_vertices, file_parser.times)
+        elif dimensions == 3:
+            raise NotImplementedError('3D Meshes are not yet implemented.')
+        else:
+            raise NotImplementedError('Meshes must be 2D or 3D.')
 
     def _setup_vertices(self, file_parser: FileParserBase):
         self.vertex_list = []
@@ -31,13 +42,13 @@ class TriangularMesh2D:
             self.regular_dimensions = file_parser.regular_dimensions
             for i in range(file_parser.regular_dimensions[0]):
                 for j in range(file_parser.regular_dimensions[1]):
-                    self._cpp_mesh.get_vertices()[i * file_parser.regular_dimensions[1] + j]\
-                        .set_location([file_parser.latitude[i], file_parser.longitude[j]])
+                    self._cpp_mesh.set_vertex_location(i * file_parser.regular_dimensions[1] + j,
+                                                       [file_parser.latitude[i], file_parser.longitude[j]])
                     for time in range(len(self.times)):
-                        self._cpp_mesh.get_vertices()[i * file_parser.regular_dimensions[1] + j]\
-                            .set_velocity(file_parser.velocity[:, i * self.regular_dimensions[1] + j, time], time)
-                        self._cpp_mesh.get_vertices()[i * file_parser.regular_dimensions[1] + j] \
-                            .set_diffusion_coefficient(file_parser.velocity[:, i * self.regular_dimensions[1] + j, time], time)
+                        self._cpp_mesh.set_vertex_velocity(i * file_parser.regular_dimensions[1] + j, time,
+                                                           file_parser.velocity[:, i * self.regular_dimensions[1] + j, time])
+                        self._cpp_mesh.set_vertex_diffusion(i * file_parser.regular_dimensions[1] + j, time,
+                                                           file_parser.diffusion_coefficient[:, i * self.regular_dimensions[1] + j, time])
                     #     self.vertex_list.append(MeshVertex2D(
                     #         file_parser.latitude[i],
                     #         file_parser.longitude[j],
@@ -49,14 +60,7 @@ class TriangularMesh2D:
                     #     self._cpp_vertex_list.append(self.vertex_list[-1].vertex)
                     #     index += 1
 
-    def _setup_elements_and_adjacency_list(self, depths_array=None):
-        elements = []
-        adjacency_list = []
-        water_columns = []
-
-        if self.vertex_list is None:
-            raise AttributeError('vertex_list must be set prior to setting up elements and adjacency.')
-
+    def _setup_elements_vertices(self, depths_array=None):
         if self.regular_dimensions is not None:
             index = 0
 
@@ -64,73 +68,105 @@ class TriangularMesh2D:
                 for i in range(self.regular_dimensions[0] - 1):
                     for j in range(self.regular_dimensions[1] - 1):
                         for k in range(2):
-                            for time in range(len(self.times)):
-                                # adj = []
-                                #
-                                # # First Adjacency
-                                # # Top row, even triangles
-                                # if i == 0 and (index - time) % 2 == 0:
-                                #     adj.append(None)
-                                # # Other even triangles
-                                # elif (index - time) % 2 == 0:
-                                #     adj.append((((i - 1) * (self.regular_dimensions[1] - 1) + j) * 2 + 1) * len(self.times) + time)
-                                # # Right side, odd triangles
-                                # elif j == self.regular_dimensions[1] - 2:
-                                #     adj.append(None)
-                                # # Other odd triangles
-                                # else:
-                                #     adj.append(((index - time) // len(self.times) + 1) * len(self.times) + time)
-                                #
-                                # # Second Adjacency
-                                # # Bottom row, odd triangles
-                                # if i == self.regular_dimensions[0] - 2 and index % 2 == 1:
-                                #     adj.append(None)
-                                # # Other odd triangles
-                                # elif (index - time) % 2 == 1:
-                                #     adj.append((((i + 1) * (self.regular_dimensions[1] - 1) + j) * 2) * len(self.times) + time)
-                                # # Even triangles
-                                # else:
-                                #     adj.append(((index - time) // len(self.times) + 1) * len(self.times) + time)
-                                #
-                                # # Third Adjacency
-                                # # Left side, even triangles
-                                # if i == 0 and (index - time) % 2 == 0:
-                                #     adj.append(None)
-                                # # All other triangles
-                                # else:
-                                #     adj.append(((index - time) // len(self.times) - 1) * len(self.times) + time)
+                            if k == 0:
+                                self._cpp_mesh.set_element_vertex((i * (self.regular_dimensions[1] - 1) + j) * 2,
+                                                                  0, 0,
+                                                                  i * self.regular_dimensions[1] + j)
 
-                                if (index - time) % 2 == 0:
-                                    elements.append(TriangularMeshElement2D(
-                                        self._cpp_vertex_list[(i * self.regular_dimensions[1] + j) * len(self.times) + time],
-                                        self._cpp_vertex_list[(i * self.regular_dimensions[1] + j + 1) * len(self.times) + time],
-                                        self._cpp_vertex_list[((i + 1) * self.regular_dimensions[1] + j) * len(self.times) + time],
-                                        index
-                                    ))
-                                else:
-                                    elements.append(TriangularMeshElement2D(
-                                        self._cpp_vertex_list[(i * self.regular_dimensions[1] + j + 1) * len(self.times) + time],
-                                        self._cpp_vertex_list[((i + 1) * self.regular_dimensions[1] + j + 1) * len(self.times) + time],
-                                        self._cpp_vertex_list[((i + 1) * self.regular_dimensions[1] + j) * len(self.times) + time],
-                                        index
-                                    ))
+                                self._cpp_mesh.set_element_vertex((i * (self.regular_dimensions[1] - 1) + j) * 2,
+                                                                  0, 1,
+                                                                  i * self.regular_dimensions[1] + j + 1)
 
-                                # adjacency_list.append(adj)
-                                index += 1
+                                self._cpp_mesh.set_element_vertex((i * (self.regular_dimensions[1] - 1) + j) * 2,
+                                                                  0, 2,
+                                                                  (i + 1) * self.regular_dimensions[1] + j)
 
-        self.element_list = elements
-        self.adjacency_list = adjacency_list
+                            else:
+                                self._cpp_mesh.set_element_vertex((i * (self.regular_dimensions[1] - 1) + j) * 2 + 1,
+                                                                  0, 0,
+                                                                  i * self.regular_dimensions[1] + j + 1)
 
-    def _setup_water_columns(self):
-        if self.element_list is None or self.vertex_list is None:
-            raise AttributeError('Vertex and elements must be set up prior to water columns.')
-        
+                                self._cpp_mesh.set_element_vertex((i * (self.regular_dimensions[1] - 1) + j) * 2 + 1,
+                                                                  0, 1,
+                                                                  (i + 1) * self.regular_dimensions[1] + j + 1)
+
+                                self._cpp_mesh.set_element_vertex((i * (self.regular_dimensions[1] - 1) + j) * 2 + 1,
+                                                                  0, 2,
+                                                                  (i + 1) * self.regular_dimensions[1] + j)
+
+    def _setup_water_columns(self, file_parser: FileParserBase):
         if self.regular_dimensions is not None:
             if len(self.regular_dimensions) == 2:
                 for i in range(self.regular_dimensions[0] - 1):
                     for j in range(self.regular_dimensions[1] - 1):
                         for k in range(2):
-                            pass
+                            # First Adjacency
+                            # Top row, even triangles
+                            if k == 0 and i == 0:
+                                # No adjacency, should stay a nullptr
+                                pass
+
+                            # Other even triangles
+                            elif k == 0:
+                                self._cpp_mesh.set_water_column_adjacency((i * (self.regular_dimensions[1] - 1) + j) * 2,
+                                                                          ((i - 1) * (self.regular_dimensions[1] - 1) + j) * 2 + 1,
+                                                                          0)
+                            # Right side, odd triangles
+                            elif j == self.regular_dimensions[1] - 2:
+                                # No adjancency, should stay a nullptr
+                                pass
+
+                            # Other odd triangles
+                            else:
+                                self._cpp_mesh.set_water_column_adjacency((i * (self.regular_dimensions[1] - 1) + j) * 2 + 1,
+                                                                          (i * self.regular_dimensions[1] + j) * 2 + 1,
+                                                                          0)
+
+                            # Second Adjacency
+                            # Bottom row, odd triangles
+                            if i == self.regular_dimensions[0] - 2 and k == 1:
+                                # No adjancency
+                                pass
+
+                            # Other odd triangles
+                            elif k == 1:
+                                self._cpp_mesh.set_water_column_adjacency((i * (self.regular_dimensions[1] - 1) + j) * 2 + 1,
+                                                                          ((i + 1) * (self.regular_dimensions[1] - 1) + j) * 2,
+                                                                          1)
+
+                            # Even triangles
+                            else:
+                                self._cpp_mesh.set_water_column_adjacency((i * (self.regular_dimensions[1] - 1) + j) * 2,
+                                                                          (i * (self.regular_dimensions[1] - 1) + j) * 2 + 1,
+                                                                          1)
+
+                            # Third Adjacency
+                            # Left side, even triangles
+                            if j == 0 and k == 0:
+                                # No adjacency
+                                pass
+
+                            # All other triangles
+                            else:
+                                self._cpp_mesh.set_water_column_adjacency((i * (self.regular_dimensions[1] - 1) + j) * 2,
+                                                                          (i * (self.regular_dimensions[1] - 1) + j) * 2 - 1 + k,
+                                                                          1)
+
+                    # for time in range(len(self.times)):
+                    #     if (index - time) % 2 == 0:
+                    #         elements.append(TriangularMeshElement2D(
+                    #             self._cpp_vertex_list[(i * self.regular_dimensions[1] + j) * len(self.times) + time],
+                    #             self._cpp_vertex_list[(i * self.regular_dimensions[1] + j + 1) * len(self.times) + time],
+                    #             self._cpp_vertex_list[((i + 1) * self.regular_dimensions[1] + j) * len(self.times) + time],
+                    #             index
+                    #         ))
+                    #     else:
+                    #         elements.append(TriangularMeshElement2D(
+                    #             self._cpp_vertex_list[(i * self.regular_dimensions[1] + j + 1) * len(self.times) + time],
+                    #             self._cpp_vertex_list[((i + 1) * self.regular_dimensions[1] + j + 1) * len(self.times) + time],
+                    #             self._cpp_vertex_list[((i + 1) * self.regular_dimensions[1] + j) * len(self.times) + time],
+                    #             index
+                    #         ))
 
     def get_velocity_u(self):
         if self.regular_dimensions is not None:

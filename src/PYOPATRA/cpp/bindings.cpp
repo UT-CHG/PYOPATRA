@@ -11,6 +11,7 @@
 #include <pybind11/eigen.h>
 
 #include "mesh/mesh_vertex.h"
+#include "mesh/mesh_water_column.h"
 #include "mesh/mesh.h"
 
 namespace py = pybind11;
@@ -40,9 +41,19 @@ PYBIND11_MODULE(pyopatra_pybind, m) {
             .def("get_vertices", &TriangularMeshElement2D::get_vertices);
 
     py::class_<TriangularMesh2D>(m, "CppTriangularMesh2D")
-            .def(py::init<int, int, int, int, std::vector<time_t>&&>())
-            .def("set_vertex_location", &TriangularMesh2D::set_vertex_location);
+            .def(py::init<int, int, std::vector<time_t>&&>())
+            .def("set_vertex_location", &TriangularMesh2D::set_vertex_location)
+            .def("set_vertex_velocity", &TriangularMesh2D::set_vertex_velocity)
+            .def("set_vertex_diffusion", &TriangularMesh2D::set_vertex_diffusion)
+            .def("get_vertex_pointer", &TriangularMesh2D::get_vertex_pointer)
+            .def("set_water_column_adjacency", &TriangularMesh2D::set_water_column_adjacency)
+            .def("get_water_column_pointer", &TriangularMesh2D::get_water_column_pointer)
+            .def("set_element_vertex", &TriangularMesh2D::set_element_vertex)
+            .def("get_water_columns_size", &TriangularMesh2D::get_water_columns_size);
 //            .def()
+
+    py::class_<TriangularWaterColumn2D>(m, "CppTriangleWaterColumn2D")
+            .def("set_adjacent_columns", &TriangularWaterColumn2D::set_adjacent_columns);
 
 }
 

@@ -7,13 +7,10 @@
 
 #include <vector>
 #include <tuple>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+
 #include "mesh_element.h"
 #include "../coordinate.h"
 #include "../particle.h"
-
-namespace py = pybind11;
 
 template <int vertices, int dimension>
 class WaterColumn {
@@ -27,13 +24,15 @@ private:
     std::tuple<MeshElementT<vertices, dimension>*, MeshElementT<vertices, dimension>*> get_element_depth_bounds(const Vector &location);
 
 public:
-    WaterColumn() : mesh_elements(0, MeshElementT<vertices, dimension>()), num_depths(0) {}
+    WaterColumn() : mesh_elements(1, MeshElementT<vertices, dimension>()), num_depths(1) {}
     explicit WaterColumn(int num_depths) : mesh_elements(num_depths, MeshElementT<vertices, dimension>()), num_depths(num_depths) {}
 
     Vector interpolate_velocity(const Particle<dimension>& particle);
     void set_num_depths(int new_num_depths) { num_depths = new_num_depths; }
     void set_adjacent_columns(WaterColumn<vertices, dimension>* a, WaterColumn<vertices, dimension>* b, WaterColumn<vertices, dimension>* c) { adjacent_columns = {a, b, c}; }
-    void set_adjacent_columns(WaterColumn<vertices, dimension>* a, WaterColumn<vertices, dimension>* b, WaterColumn<vertices, dimension>* c, WaterColumn<vertices, dimension>* d) { adjacent_columns = {a, b, c, d}; }
+    void set_adjacent_column(WaterColumn<vertices, dimension>* col, int position) { adjacent_columns[position] = col; }
+    void set_element_vertex(int depth_index, int position, MeshVertex<dimension>* vert) { mesh_elements[depth_index].set_vertex(vert, position); }
+    //    void set_adjacent_columns(WaterColumn<vertices, dimension>* a, WaterColumn<vertices, dimension>* b, WaterColumn<vertices, dimension>* c, WaterColumn<vertices, dimension>* d) { adjacent_columns = {a, b, c, d}; }
 };
 
 using TriangularWaterColumn2D = WaterColumn<3, 2>;

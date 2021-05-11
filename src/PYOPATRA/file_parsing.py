@@ -144,12 +144,12 @@ class HYCOMFileParser(FileParserBase):
         else:
             raise NotImplementedError('Only triangulated HYCOM data is implemented at this time.')
 
-        self.times = np.zeros(len(list_of_hycom_files))
+        self.times = np.zeros(len(list_of_hycom_files), dtype=int)
 
         with nc.Dataset(list_of_hycom_files[0]) as ds:
             self.regular_dimensions = (ds['lat'].shape[0], ds['lon'].shape[0])
             self.num_vertices = ds['lat'].shape[0] * ds['lon'].shape[0]
-            self.num_elements = (ds['lat'].shape[0] - 1) * 2 * ds['lon'].shape[0]
+            self.num_elements = (ds['lon'].shape[0] - 1) * 2 * (ds['lat'].shape[0] - 1)
             self.latitude = ds['lat'][:]
             self.longitude = ds['lon'][:]
 
