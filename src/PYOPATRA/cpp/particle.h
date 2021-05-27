@@ -5,7 +5,7 @@
 #ifndef PYOPATRA_PARTICLE_H
 #define PYOPATRA_PARTICLE_H
 
-#include "mesh/mesh_element.h"
+#include <Eigen/Dense>
 #include "illnode.h"
 
 template <int dimension>
@@ -15,13 +15,12 @@ public:
 
 protected:
     Vector location;
-    MeshElementCursor<dimension> *current_mesh_node;
 
     // Enable Intrusive Linked List Structure
     ILLNode<ParticleBase<dimension>> node;
 
 public:
-    ParticleBase() : location(Vector::Zero()), current_mesh_node(nullptr), node(this) {}
+    ParticleBase() : location(Vector::Zero()), node(this) {}
     const Vector get_location() const { return location; }
     [[nodiscard]] ILLNode<ParticleBase<dimension>>& get_node() { return node; }
 };

@@ -10,7 +10,6 @@
 #include "mesh_element.h"
 #include "mesh_vertex.h"
 #include "mesh_water_column.h"
-#include "../particle.h"
 
 template <int num_vertices_per_element, int dimension>
 class Mesh {
@@ -50,7 +49,6 @@ public:
         std::cout << water_columns.size() << std::endl;
     }
 
-    int find_particle_location(ParticleBase<dimension> &particle);
     time_t get_current_time() { return current_time; }
     std::vector<Vertex>& get_vertices() { return vertices; }
     std::vector<WaterCol>& get_water_columns() { return water_columns; }
