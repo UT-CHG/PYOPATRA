@@ -23,6 +23,7 @@ public:
     ParticleBase() : location(Vector::Zero()), node(this) {}
     const Vector get_location() const { return location; }
     [[nodiscard]] ILLNode<ParticleBase<dimension>>& get_node() { return node; }
+    void update_location(Vector& velocity, double time) { location += velocity * time; }
 };
 
 template <int dimension>
