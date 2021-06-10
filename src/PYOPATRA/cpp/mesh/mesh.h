@@ -10,6 +10,7 @@
 #include "mesh_element.h"
 #include "mesh_vertex.h"
 #include "mesh_water_column.h"
+#include "../particle_list.h"
 
 template <int num_vertices_per_element, int dimension>
 class Mesh {
@@ -23,6 +24,7 @@ protected:
     std::vector<time_t> measured_times;
     std::vector<WaterCol> water_columns;
     std::vector<Vertex> vertices;
+    ParticleList<dimension> particles;
 
 public:
     using Vector = Eigen::Matrix<double, dimension, 1>;
@@ -63,6 +65,7 @@ public:
     size_t get_water_columns_size() { return water_columns.size(); }
     Vertex* get_vertex_pointer(int vertex_index) { return &vertices[vertex_index]; }
     WaterCol* get_water_column_pointer(int water_column_index) { return &water_columns[water_column_index]; }
+    void add_particle() { particles.push(); }
 };
 
 using TriangularMesh2D = Mesh<3, 2>;
