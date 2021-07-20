@@ -19,3 +19,13 @@ if __name__ == '__main__':
 
     tm2d = TriangularMesh2D()
     tm2d.setup_mesh(hfp, 2)
+
+    particle_locations = np.array(
+        [[10.5, -80.1],
+         [3.14, -90.16],
+         [5.5, -89.0]],
+        order='F'
+    )
+
+    for row_index in range(particle_locations.shape[0]):
+        tm2d.append_particle(particle_locations[row_index, :])

@@ -10,7 +10,7 @@
 // Acceleration due to gravity in m/s^2
 #define GRAVITY (-9.8)
 
-Particle3D::Particle3D()
+Particle<3>::Particle()
     : ParticleBase<3>()
     , diameter(0.0)
     , density(0.0)
@@ -18,7 +18,7 @@ Particle3D::Particle3D()
     , depth_index(0)
 { }
 
-Particle3D::Particle3D(double latitude, double longitude, double diameter, double density, double depth, double interfacial_tension)
+Particle<3>::Particle(double latitude, double longitude, double diameter, double density, double depth, double interfacial_tension)
     : ParticleBase<3>()
     , diameter(diameter)
     , density(density)
@@ -30,7 +30,7 @@ Particle3D::Particle3D(double latitude, double longitude, double diameter, doubl
     location(2) = depth;
 }
 
-double Particle3D::terminal_buoyancy_velocity(double fluid_density, double fluid_viscosity, double water_viscosity) const {
+double Particle<3>::terminal_buoyancy_velocity(double fluid_density, double fluid_viscosity, double water_viscosity) const {
     //  Buoyancy method from Zheng and Yapa (2000)
     //  Diameter assumed to be in meters
 
@@ -66,12 +66,12 @@ double Particle3D::terminal_buoyancy_velocity(double fluid_density, double fluid
     }
 }
 
-double Particle3D::calculate_nd(double fluid_density, double fluid_viscosity) const {
+double Particle<3>::calculate_nd(double fluid_density, double fluid_viscosity) const {
     return (4.0 * fluid_density * (density - fluid_density)
             * GRAVITY * pow(diameter, 3)) / (3 * pow(fluid_viscosity, 2));
 }
 
-/* static */ double Particle3D::calculate_reynolds(double Nd) {
+/* static */ double Particle<3>::calculate_reynolds(double Nd) {
     if (Nd <= 73) {
         return Nd / 24.0 - 1.7569e-4 * pow(Nd, 2)
                    + 6.9252e-7 * pow(Nd, 3) - 2.3027e-10 * pow(Nd, 4);
@@ -88,8 +88,7 @@ double Particle3D::calculate_nd(double fluid_density, double fluid_viscosity) co
     }
 }
 
-
-double Particle3D::calculate_critical_diameter(double fluid_density, double fluid_viscosity, double water_viscosity) const {
+double Particle<3>::calculate_critical_diameter(double fluid_density, double fluid_viscosity, double water_viscosity) const {
     // Calculate x1, y1
     double H = 59.3;
     double J = 0.94 * pow(H, 0.757);
@@ -121,18 +120,18 @@ double Particle3D::calculate_critical_diameter(double fluid_density, double flui
 }
 
 // Diameter from a give H, needed for computing critical diameter
-double Particle3D::calculate_diameter_from_H(double H, double M, double fluid_density, double fluid_viscosity, double water_viscosity) const {
+double Particle<3>::calculate_diameter_from_H(double H, double M, double fluid_density, double fluid_viscosity, double water_viscosity) const {
     double E0 = 3.0/4.0 * H * pow(M, 0.149) * pow(fluid_viscosity
                                                   / water_viscosity, 0.14);
     return sqrt(E0 * interfacial_tension / (GRAVITY * (density - fluid_density)));
 }
 
 // Morton + Eotvos Characterize shape of bubbles in a continuous phase
-double Particle3D::calculate_morton_number(double fluid_density, double fluid_viscosity) const {
+double Particle<3>::calculate_morton_number(double fluid_density, double fluid_viscosity) const {
     return (GRAVITY * pow(fluid_viscosity, 4) * (density - fluid_density))
            / (pow(fluid_density, 2) * pow(interfacial_tension, 3));
 }
 
-double Particle3D::calculate_eotvos_number(double diameter_effective, double fluid_density) const {
+double Particle<3>::calculate_eotvos_number(double diameter_effective, double fluid_density) const {
     return GRAVITY * (density - fluid_density) * pow(diameter_effective, 2) / interfacial_tension;
 }

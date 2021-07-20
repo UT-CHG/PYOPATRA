@@ -25,6 +25,21 @@ class TestMesh:
 
         yield tm2d
 
+    def test_particle_list_setup(self, triangular_2d_hycom_mesh):
+        particle_locations = np.array(
+            [[10.5, -80.1],
+             [3.14, -90.16],
+             [5.5, -89.0]],
+            order='F'
+        )
+
+        for row_index in range(particle_locations.shape[0]):
+            triangular_2d_hycom_mesh.append_particle(particle_locations[row_index, :])
+
+        retrieved_particle_locations = triangular_2d_hycom_mesh.get_all_particle_locations()
+        print(retrieved_particle_locations)
+        assert np.linalg.norm(particle_locations - retrieved_particle_locations) < 10e-6
+
     def test_hycom_mesh_setup(self, triangular_2d_hycom_mesh):
         pass
         # assert len(triangular_2d_hycom_mesh.vertex_list) == 187186 * 5

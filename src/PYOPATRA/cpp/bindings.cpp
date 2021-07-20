@@ -49,11 +49,16 @@ PYBIND11_MODULE(pyopatra_pybind, m) {
             .def("set_water_column_adjacency", &TriangularMesh2D::set_water_column_adjacency)
             .def("get_water_column_pointer", &TriangularMesh2D::get_water_column_pointer)
             .def("set_element_vertex", &TriangularMesh2D::set_element_vertex)
-            .def("get_water_columns_size", &TriangularMesh2D::get_water_columns_size);
+            .def("get_water_columns_size", &TriangularMesh2D::get_water_columns_size)
+            .def("add_particle", &TriangularMesh2D::add_particle)
+            .def("get_all_particle_locations", &TriangularMesh2D::get_all_particle_locations);
 //            .def()
 
     py::class_<TriangularWaterColumn2D>(m, "CppTriangleWaterColumn2D")
             .def("set_adjacent_columns", &TriangularWaterColumn2D::set_adjacent_columns);
+
+    py::class_<ParticleList2D>(m, "CppParticleList2D")
+            .def("create_particle", &ParticleList2D::create_particle);
 
 }
 

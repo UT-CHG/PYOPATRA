@@ -2,26 +2,31 @@
 
 template <class T>
 void List<T>::push(ILLNode<T> &node) {
-    node.insert_after(*tail);
+    if (tail) {
+        node.insert_after(*tail);
+        tail = &node;
+    } else {
+        head = &node;
+        tail = &node;
+    }
     length++;
 }
 
 template <class T>
 void List<T>::remove(ILLNode<T> &node) {
-    current = node->prev;
     node.remove();
     length--;
 }
 
-template <class T>
-ILLNode<T>* List<T>::pop_current() {
-    ILLNode<T>* temp = current;
-    current = temp->prev;
-    temp->remove();
-    return temp;
-}
+//template <class T>
+//ILLNode<T>* List<T>::pop_current() {
+//    ILLNode<T>* temp = current;
+//    current = temp->prev;
+//    temp->remove();
+//    return temp;
+//}
 
-template <class T>
-void List<T>::advance() {
-    current = current->next;
-}
+//template <class T>
+//void List<T>::advance() {
+//    current = current->next;
+//}

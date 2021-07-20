@@ -10,16 +10,22 @@
 template <class T>
 class List {
 public:
-    ILLNode<T> *head, *tail, *current;
     size_t length{};
 
-    List() : head(nullptr), tail(nullptr), current(nullptr), length(0) {};
+    List() : length(0), head(nullptr), tail(nullptr){};
 
 
     void push(ILLNode<T> &node);
     void remove(ILLNode<T> &node);
-    ILLNode<T>* pop_current();
-    void advance();
+//    ILLNode<T>* pop_current();
+//    void advance();
+    ILLNode<T>* get_head() { return head; }
+    ILLNode<T>* get_tail() { return tail; }
+    const ILLNode<T>* get_head() const { return head; }
+    const ILLNode<T>* get_tail() const { return tail; }
+
+private:
+    ILLNode<T> *head, *tail;
 
 };
 

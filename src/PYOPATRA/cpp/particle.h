@@ -22,6 +22,7 @@ protected:
 public:
     ParticleBase() : location(Vector::Zero()), node(this) {}
     const Vector get_location() const { return location; }
+    void set_location(const Vector& new_location) { location = new_location; }
     [[nodiscard]] ILLNode<ParticleBase<dimension>>& get_node() { return node; }
     void update_location(Vector& velocity, double time) { location += velocity * time; }
 };
@@ -29,13 +30,14 @@ public:
 template <int dimension>
 class Particle: public ParticleBase<dimension> {};
 
-class Particle3D: public ParticleBase<3> {
+template<>
+class Particle<3> :  public ParticleBase<3> {
 private:
     double diameter, density, interfacial_tension;
     int depth_index;
 public:
-    Particle3D();
-    Particle3D(double latitude, double longitude, double diameter, double density, double depth, double interfacial_tension);
+    Particle();
+    Particle(double latitude, double longitude, double diameter, double density, double depth, double interfacial_tension);
 
     double get_diameter() const { return diameter; }
     double get_density() const { return density; }
@@ -52,5 +54,6 @@ public:
 };
 
 using Particle2D = Particle<2>;
+using Particle3D = Particle<3>;
 
 #endif //PYOPATRA_PARTICLE_H

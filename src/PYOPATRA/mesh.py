@@ -4,7 +4,7 @@ from PYOPATRA import FileParserBase, MeshVertex2D
 from .pyopatra_pybind import CppTriangularMesh2D, TriangularMeshElement2D
 
 
-class TriangularMesh2D:
+class MeshBase:
     def __init__(self):
         self.vertex_list = None
         self._cpp_vertex_list = None
@@ -16,6 +16,37 @@ class TriangularMesh2D:
         self.regular_dimensions = None
 
         self._cpp_mesh = None
+
+        self.dimensions = None
+
+    def time_step(self, time_delta=None):
+        pass
+
+    def append_particle(self, location):
+        print('Adding particle at location', location)
+        if self.dimensions == 2:
+            self._cpp_mesh.add_particle(location)
+        else:
+            raise NotImplementedError('Only 2D currently implemented')
+
+    # Not efficient! Only use for testing purposes or infrequently
+    def get_all_particle_locations(self):
+        return self._cpp_mesh.get_all_particle_locations()
+
+    def save_particle_locations_hdf5(self, filename):
+        pass
+
+
+class TriangularMesh(MeshBase):
+    def __init__(self):
+        super().__init__()
+
+
+class TriangularMesh2D(TriangularMesh):
+    def __init__(self):
+        super().__init__()
+
+        self.dimensions = 2
 
     def setup_mesh(self, file_parser: FileParserBase, dimensions: int):
         self._setup_mesh(file_parser, dimensions)
@@ -49,16 +80,6 @@ class TriangularMesh2D:
                                                            file_parser.velocity[:, i * self.regular_dimensions[1] + j, time])
                         self._cpp_mesh.set_vertex_diffusion(i * file_parser.regular_dimensions[1] + j, time,
                                                            file_parser.diffusion_coefficient[:, i * self.regular_dimensions[1] + j, time])
-                    #     self.vertex_list.append(MeshVertex2D(
-                    #         file_parser.latitude[i],
-                    #         file_parser.longitude[j],
-                    #         file_parser.velocity[:, i * self.regular_dimensions[1] + j, time],
-                    #         file_parser.diffusion_coefficient[:, i * self.regular_dimensions[1] + j, time],
-                    #         len(file_parser.regular_dimensions)
-                    #     ))
-                    #
-                    #     self._cpp_vertex_list.append(self.vertex_list[-1].vertex)
-                    #     index += 1
 
     def _setup_elements_vertices(self, depths_array=None):
         if self.regular_dimensions is not None:
@@ -152,22 +173,6 @@ class TriangularMesh2D:
                                                                           (i * (self.regular_dimensions[1] - 1) + j) * 2 - 1 + k,
                                                                           1)
 
-                    # for time in range(len(self.times)):
-                    #     if (index - time) % 2 == 0:
-                    #         elements.append(TriangularMeshElement2D(
-                    #             self._cpp_vertex_list[(i * self.regular_dimensions[1] + j) * len(self.times) + time],
-                    #             self._cpp_vertex_list[(i * self.regular_dimensions[1] + j + 1) * len(self.times) + time],
-                    #             self._cpp_vertex_list[((i + 1) * self.regular_dimensions[1] + j) * len(self.times) + time],
-                    #             index
-                    #         ))
-                    #     else:
-                    #         elements.append(TriangularMeshElement2D(
-                    #             self._cpp_vertex_list[(i * self.regular_dimensions[1] + j + 1) * len(self.times) + time],
-                    #             self._cpp_vertex_list[((i + 1) * self.regular_dimensions[1] + j + 1) * len(self.times) + time],
-                    #             self._cpp_vertex_list[((i + 1) * self.regular_dimensions[1] + j) * len(self.times) + time],
-                    #             index
-                    #         ))
-
     def get_velocity_u(self):
         if self.regular_dimensions is not None:
             velocity = np.zeros((*self.regular_dimensions, len(self.times)))
@@ -179,7 +184,4 @@ class TriangularMesh2D:
                             velocity[i, j, t] = self.vertex_list[((i * self.regular_dimensions[1]) + j) * len(self.times) + t].get_velocity()[0]
 
             return velocity
-
-
-
 

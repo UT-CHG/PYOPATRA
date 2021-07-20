@@ -65,7 +65,9 @@ public:
     size_t get_water_columns_size() { return water_columns.size(); }
     Vertex* get_vertex_pointer(int vertex_index) { return &vertices[vertex_index]; }
     WaterCol* get_water_column_pointer(int water_column_index) { return &water_columns[water_column_index]; }
-    void add_particle() { particles.push(); }
+//    void add_empty_particle() { particles.push(); }
+    void add_particle(Vector& location) { particles.create_particle(location); }
+    Eigen::MatrixXd get_all_particle_locations() const { return particles.get_all_particle_locations(); };
 };
 
 using TriangularMesh2D = Mesh<3, 2>;
