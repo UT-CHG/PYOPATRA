@@ -53,6 +53,14 @@ public:
 
     time_t get_current_time() { return current_time; }
     std::vector<Vertex>& get_vertices() { return vertices; }
+    Eigen::MatrixXd get_vertex_locations() {
+        Eigen::MatrixXd temp = Eigen::MatrixXd::Zero(vertices.size(), dimension);
+
+        for (size_t index = 0; index < vertices.size(); index++) {
+            temp.row(index) = vertices[index].get_location();
+        }
+        return temp;
+    }
     std::vector<WaterCol>& get_water_columns() { return water_columns; }
     void set_vertex_location(int vertex_index, Vector new_location) { vertices[vertex_index].set_location(new_location); }
     void set_vertex_velocity(int vertex_index, int time_index, Vector new_velocity) { vertices[vertex_index].set_velocity(new_velocity, time_index); }

@@ -46,6 +46,7 @@ PYBIND11_MODULE(pyopatra_pybind, m) {
             .def("set_vertex_velocity", &TriangularMesh2D::set_vertex_velocity)
             .def("set_vertex_diffusion", &TriangularMesh2D::set_vertex_diffusion)
             .def("get_vertex_pointer", &TriangularMesh2D::get_vertex_pointer)
+            .def("get_vertex_locations", &TriangularMesh2D::get_vertex_locations)
             .def("set_water_column_adjacency", &TriangularMesh2D::set_water_column_adjacency)
             .def("get_water_column_pointer", &TriangularMesh2D::get_water_column_pointer)
             .def("set_element_vertex", &TriangularMesh2D::set_element_vertex)

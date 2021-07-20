@@ -19,6 +19,9 @@ class MeshBase:
 
         self.dimensions = None
 
+    def get_vertex_locations(self):
+        return self._cpp_mesh.get_vertex_locations()
+
     def time_step(self, time_delta=None):
         pass
 

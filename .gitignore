@@ -149,3 +149,7 @@ _build
 
 # VS Code settings
 .vscode
+
+# Misc Testing Stuff
+*.npy
+*.gif
