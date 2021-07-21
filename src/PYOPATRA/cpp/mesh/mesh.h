@@ -81,6 +81,9 @@ public:
     bool check_water_column_adjacency(int origin_index, int destination_index, int side) {
         return water_columns[origin_index].get_adjacencies()[side] == &water_columns[destination_index];
     }
+    bool check_mesh_element_vertex(int water_column_index, int element_index, int vertex_index, int position) {
+        return water_columns[water_column_index].get_mesh_elements()[element_index].get_vertices()[position] == &vertices[vertex_index];
+    }
     size_t get_water_columns_size() { return water_columns.size(); }
     Vertex* get_vertex_pointer(int vertex_index) { return &vertices[vertex_index]; }
     const WaterCol* get_water_column_pointer(int water_column_index) const { return &water_columns[water_column_index]; }

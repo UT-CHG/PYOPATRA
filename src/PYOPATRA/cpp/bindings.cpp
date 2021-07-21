@@ -51,6 +51,7 @@ PYBIND11_MODULE(pyopatra_pybind, m) {
             .def("set_water_column_adjacency", &TriangularMesh2D::set_water_column_adjacency)
             .def("get_water_column_adjacencies", &TriangularMesh2D::get_water_column_adjacencies, py::return_value_policy::reference)
             .def("check_water_column_adjacency", &TriangularMesh2D::check_water_column_adjacency)
+            .def("check_mesh_element_vertex", &TriangularMesh2D::check_mesh_element_vertex)
             .def("get_water_column_pointer", &TriangularMesh2D::get_water_column_pointer, py::return_value_policy::reference)
             .def("set_element_vertex", &TriangularMesh2D::set_element_vertex)
             .def("get_water_columns_size", &TriangularMesh2D::get_water_columns_size)

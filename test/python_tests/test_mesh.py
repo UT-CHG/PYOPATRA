@@ -132,6 +132,18 @@ class TestMesh:
         assert mesh.check_water_column_adjacency(19, 20, 0)
         assert mesh.check_water_column_adjacency(19, 18, 2)
 
+        assert mesh._cpp_mesh.check_mesh_element_vertex(0, 0, 0, 0)
+        assert mesh._cpp_mesh.check_mesh_element_vertex(0, 0, 1, 1)
+        assert mesh._cpp_mesh.check_mesh_element_vertex(0, 0, 5, 2)
+        assert mesh._cpp_mesh.check_mesh_element_vertex(10, 0, 6, 0)
+        assert mesh._cpp_mesh.check_mesh_element_vertex(10, 0, 7, 1)
+        assert mesh._cpp_mesh.check_mesh_element_vertex(10, 0, 11, 2)
+        assert mesh._cpp_mesh.check_mesh_element_vertex(11, 0, 7, 0)
+        assert mesh._cpp_mesh.check_mesh_element_vertex(11, 0, 12, 1)
+        assert mesh._cpp_mesh.check_mesh_element_vertex(11, 0, 11, 2)
+
+
+
 
 
 
