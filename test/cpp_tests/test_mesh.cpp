@@ -11,4 +11,8 @@ TEST_CASE("Mesh Tests", "[mesh-tests]") {
     REQUIRE(mesh.get_vertices().size() == 12);
     REQUIRE(mesh.get_water_columns().size() == 12);
     REQUIRE(mesh.get_water_column_pointer(1) != nullptr);
+
+    mesh.set_water_column_adjacency(0, 1, 1);
+    mesh.set_water_column_adjacency(0, 1, 1);
+
 }

@@ -70,7 +70,7 @@ if (${BUILD_CPP} OR ${BUILD_TEST})
     target_include_directories(pyopatra_lib PUBLIC SYSTEM ${HDF5_INCLUDE_DIRS})
     target_link_libraries(pyopatra_lib PUBLIC ${MPI_CXX_LIBRARIES} ${HDF5_LIBRARIES} Eigen3::Eigen)
     target_compile_definitions(pyopatra_lib PUBLIC ${HDF5_DEFINITIONS})
-    target_compile_options(pyopatra_lib PUBLIC -O3 -Wall -Wextra -pedantic -Werror)
+    target_compile_options(pyopatra_lib PUBLIC -g -Wall -Wextra -pedantic -Werror)
 endif ()
 
 if (${BUILD_TEST})

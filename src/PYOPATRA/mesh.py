@@ -19,8 +19,22 @@ class MeshBase:
 
         self.dimensions = None
 
+    # Not efficient! For testing purposes only
     def get_vertex_locations(self):
         return self._cpp_mesh.get_vertex_locations()
+
+    # Not efficient! For testing purposes only
+    def get_velocities(self, time_index):
+        return self._cpp_mesh.get_velocities(time_index)
+
+    def get_water_column_pointer(self, index):
+        return self._cpp_mesh.get_water_column_pointer(index)
+
+    def get_water_column_adjacencies(self, index):
+        return self._cpp_mesh.get_water_column_adjacencies(index)
+
+    def check_water_column_adjacency(self, origin_index, destination_index, side):
+        return self._cpp_mesh.check_water_column_adjacency(origin_index, destination_index, side)
 
     def time_step(self, time_delta=None):
         pass
@@ -59,6 +73,7 @@ class TriangularMesh2D(TriangularMesh):
 
     def _setup_mesh(self, file_parser: FileParserBase, dimensions: int):
         if dimensions == 2:
+            print(file_parser.num_elements, file_parser.num_vertices, file_parser.times)
             self._cpp_mesh = CppTriangularMesh2D(file_parser.num_elements, file_parser.num_vertices, file_parser.times)
         elif dimensions == 3:
             raise NotImplementedError('3D Meshes are not yet implemented.')
@@ -143,7 +158,7 @@ class TriangularMesh2D(TriangularMesh):
                             # Other odd triangles
                             else:
                                 self._cpp_mesh.set_water_column_adjacency((i * (self.regular_dimensions[1] - 1) + j) * 2 + 1,
-                                                                          (i * self.regular_dimensions[1] + j) * 2 + 1,
+                                                                          (i * (self.regular_dimensions[1] - 1) + j) * 2 + 2,
                                                                           0)
 
                             # Second Adjacency
@@ -172,9 +187,9 @@ class TriangularMesh2D(TriangularMesh):
 
                             # All other triangles
                             else:
-                                self._cpp_mesh.set_water_column_adjacency((i * (self.regular_dimensions[1] - 1) + j) * 2,
+                                self._cpp_mesh.set_water_column_adjacency((i * (self.regular_dimensions[1] - 1) + j) * 2 + k,
                                                                           (i * (self.regular_dimensions[1] - 1) + j) * 2 - 1 + k,
-                                                                          1)
+                                                                          2)
 
     def get_velocity_u(self):
         if self.regular_dimensions is not None:

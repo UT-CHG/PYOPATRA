@@ -61,19 +61,31 @@ public:
         }
         return temp;
     }
+    Eigen::MatrixXd get_velocities(int time_index) {
+        Eigen::MatrixXd temp = Eigen::MatrixXd::Zero(vertices.size(), dimension);
+        for (size_t index = 0; index < vertices.size(); index++) {
+            temp.row(index) = vertices[index].get_velocity()[time_index];
+        }
+        return temp;
+    }
     std::vector<WaterCol>& get_water_columns() { return water_columns; }
     void set_vertex_location(int vertex_index, Vector new_location) { vertices[vertex_index].set_location(new_location); }
     void set_vertex_velocity(int vertex_index, int time_index, Vector new_velocity) { vertices[vertex_index].set_velocity(new_velocity, time_index); }
     void set_vertex_diffusion(int vertex_index, int time_index, Vector new_diffusion) { vertices[vertex_index].set_diffusion_coefficient(new_diffusion, time_index); }
-    void set_water_column_adjacency(int water_column_index, int adjacent_index, int position) { water_columns[water_column_index].set_adjacent_column(&water_columns[adjacent_index], position); }
+    void set_water_column_adjacency(int water_column_index, int adjacent_index, int position) {
+        water_columns[water_column_index].set_adjacent_column(&water_columns[adjacent_index], position);
+    }
     void set_element_vertex(int water_column_index, int element_depth_index, int position, int vertex_index) {
         water_columns[water_column_index].set_element_vertex(element_depth_index, position, &vertices[vertex_index]);
     }
-
+    bool check_water_column_adjacency(int origin_index, int destination_index, int side) {
+        return water_columns[origin_index].get_adjacencies()[side] == &water_columns[destination_index];
+    }
     size_t get_water_columns_size() { return water_columns.size(); }
     Vertex* get_vertex_pointer(int vertex_index) { return &vertices[vertex_index]; }
-    WaterCol* get_water_column_pointer(int water_column_index) { return &water_columns[water_column_index]; }
-//    void add_empty_particle() { particles.push(); }
+    const WaterCol* get_water_column_pointer(int water_column_index) const { return &water_columns[water_column_index]; }
+    std::array<WaterCol*, num_vertices_per_element>& get_water_column_adjacencies(int water_column_index) { return  water_columns[water_column_index].get_adjacencies(); }
+    //    void add_empty_particle() { particles.push(); }
     void add_particle(Vector& location) { particles.create_particle(location); }
     Eigen::MatrixXd get_all_particle_locations() const { return particles.get_all_particle_locations(); };
 };

@@ -32,6 +32,7 @@ public:
     void set_adjacent_columns(WaterColumn<vertices, dimension>* a, WaterColumn<vertices, dimension>* b, WaterColumn<vertices, dimension>* c) { adjacent_columns = {a, b, c}; }
     void set_adjacent_column(WaterColumn<vertices, dimension>* col, int position) { adjacent_columns[position] = col; }
     void set_element_vertex(int depth_index, int position, MeshVertex<dimension>* vert) { mesh_elements[depth_index].set_vertex(vert, position); }
+    std::array<WaterColumn<vertices, dimension>*, vertices>& get_adjacencies() { return adjacent_columns; }
 };
 
 using TriangularWaterColumn2D = WaterColumn<3, 2>;
