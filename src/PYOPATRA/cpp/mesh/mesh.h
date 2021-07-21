@@ -6,8 +6,6 @@
 #define PYOPATRA_MESH_H
 
 #include <ctime>
-#include "Eigen/Geometry"
-
 #include "mesh_element.h"
 #include "mesh_vertex.h"
 #include "mesh_water_column.h"
@@ -21,7 +19,9 @@ public:
 
 protected:
     time_t current_time;
-    int current_time_step, total_time_steps, time_step_size;
+    size_t current_time_step;
+    int total_time_steps, time_step_size;
+    double time;
     std::vector<time_t> measured_times;
     std::vector<WaterCol> water_columns;
     std::vector<Vertex> vertices;
@@ -35,6 +35,7 @@ public:
         , current_time_step(0)
         , total_time_steps(0)
         , time_step_size(0)
+        , time(0)
         , measured_times()
         , water_columns()
         , vertices()
@@ -45,6 +46,7 @@ public:
         , current_time_step(0)
         , total_time_steps(0)
         , time_step_size(0)
+        , time(0)
         , measured_times(measured_times)
         , water_columns(num_water_columns, WaterCol())
         , vertices(num_vertices, Vertex(measured_times.size()))
@@ -98,7 +100,30 @@ public:
     Eigen::MatrixXd get_all_particle_locations() const { return particles.get_all_particle_locations(); };
     Eigen::VectorXi get_all_particle_column_indices() const { return particles.get_all_particle_column_indices(); }
 
-    void update_particle_locations() {
+    void update_particle_locations(double time_delta) {
+        auto current = particles.get_head();
+        size_t lower_bound = current_time_step;
+
+        time += time_delta;
+
+        while (time >= measured_times[lower_bound + 1]) {
+            lower_bound++;
+        }
+
+        current_time_step = lower_bound;
+
+        while (current) {
+            Vector lb = water_columns[current->get_last_known_water_column_index()].interpolate_velocity(current->get_location(), lower_bound);
+            Vector ub = water_columns[current->get_last_known_water_column_index()].interpolate_velocity(current->get_location(), lower_bound + 1);
+            Vector interpolated = (1 - ((time - measured_times[current_time_step]) / (measured_times[current_time_step + 1] - measured_times[current_time_step]))) * lb +
+                    ((time - measured_times[current_time_step]) / (measured_times[current_time_step + 1] - measured_times[current_time_step])) * ub;
+            current->update_location(interpolated, time_delta);
+            update_particle_mesh_location(*current);
+            current = current->get_next();
+        }
+    }
+
+    void update_particle_location_indices() {
         auto current = particles.get_head();
 
         while (current) {
@@ -126,11 +151,8 @@ public:
             Vector C = starting_water_col.get_mesh_elements()[0].get_vertices()[2]->get_location();
 
             int side_1 = sgn((B[0] - A[0]) * (location[1] - A[1]) - (B[1] - A[1]) * (location[0] - A[0]));
-            std::cout << side_1 << std::endl;
             int side_2 = sgn((C[0] - B[0]) * (location[1] - B[1]) - (C[1] - B[1]) * (location[0] - B[0]));
-            std::cout << side_2 << std::endl;
             int side_3 = sgn((A[0] - C[0]) * (location[1] - C[1]) - (A[1] - C[1]) * (location[0] - C[0]));
-            std::cout << side_3 << std::endl;
 
             if (side_1 <= 0 && side_2 <= 0 && side_3 <=0) {
                 return starting_water_col.get_index();
@@ -144,6 +166,10 @@ public:
         }
 
         return 0;
+    }
+
+    void time_step(double time_delta) {
+        update_particle_locations(time_delta);
     }
 
 };

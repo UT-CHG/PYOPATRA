@@ -22,7 +22,7 @@ class TestMesh:
 
         dummy_file = FileParserBase()
         dummy_file.vertices_per_polygon = 3
-        dummy_file.times = np.array([3, 6, 9], dtype=int)
+        dummy_file.times = np.array([0, 3, 6], dtype=int)
         dummy_file.regular_dimensions = (4, 5)
         dummy_file.num_vertices = 5 * 4
         dummy_file.num_elements = (5 - 1) * 2 * (4 - 1)
@@ -95,6 +95,14 @@ class TestMesh:
         retrieved_particle_indices = mesh._cpp_mesh.get_all_particle_column_indices()
         assert np.linalg.norm(particle_locations - retrieved_particle_locations) < 10e-6
         assert np.linalg.norm(retrieved_particle_indices - particle_indices) < 10e-6
+
+        mesh.time_step(0.05)
+        updated_locations = mesh.get_all_particle_locations()
+
+        assert np.isclose(updated_locations[0, 0], 1.33208333333)
+        assert np.isclose(updated_locations[0, 1], 11.3820833333333333)
+
+
 
     def test_hycom_mesh_setup(self, triangular_2d_hycom_mesh):
         mesh = triangular_2d_hycom_mesh[0]

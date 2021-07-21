@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <tuple>
+#include <iostream>
 
 #include "mesh_element.h"
 #include "../coordinate.h"
@@ -27,7 +28,12 @@ public:
     WaterColumn() : mesh_elements(1, MeshElementT<vertices, dimension>()), num_depths(1) {}
     explicit WaterColumn(int num_depths) : mesh_elements(num_depths, MeshElementT<vertices, dimension>()), num_depths(num_depths) {}
 
-//    Vector interpolate_velocity(const Particle<dimension>& particle);
+    Vector interpolate_velocity(const Vector location, size_t time_index) {
+        if constexpr (dimension == 2) {
+            auto barycentric = mesh_elements[0].calculate_barycentric_coordinate(location);
+            return mesh_elements[0].sample_velocity(barycentric, time_index);
+        }
+    }
     void set_num_depths(int new_num_depths) { num_depths = new_num_depths; }
     void set_adjacent_columns(WaterColumn<vertices, dimension>* a, WaterColumn<vertices, dimension>* b, WaterColumn<vertices, dimension>* c) { adjacent_columns = {a, b, c}; }
     void set_adjacent_column(WaterColumn<vertices, dimension>* col, int position) { adjacent_columns[position] = col; }

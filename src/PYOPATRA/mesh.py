@@ -39,11 +39,7 @@ class MeshBase:
     def check_water_column_adjacency(self, origin_index, destination_index, side):
         return self._cpp_mesh.check_water_column_adjacency(origin_index, destination_index, side)
 
-    def time_step(self, time_delta=None):
-        pass
-
     def append_particle(self, location):
-        print('Adding particle at location', location)
         if self.dimensions == 2:
             self._cpp_mesh.add_particle(location)
         else:
@@ -55,6 +51,9 @@ class MeshBase:
 
     def save_particle_locations_hdf5(self, filename):
         pass
+
+    def time_step(self, time_delta):
+        self._cpp_mesh.time_step(time_delta)
 
 
 class TriangularMesh(MeshBase):
