@@ -10,10 +10,9 @@
 template <class T>
 class List {
 public:
-    size_t length{};
+    size_t length;
 
     List() : length(0), head(nullptr), tail(nullptr){};
-
 
     void push(ILLNode<T> &node);
     void remove(ILLNode<T> &node);
@@ -26,7 +25,6 @@ public:
 
 private:
     ILLNode<T> *head, *tail;
-
 };
 
 #include "list.inl"

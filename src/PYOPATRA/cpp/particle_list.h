@@ -30,6 +30,31 @@ public:
         }
         return temp;
     }
+    Eigen::VectorXi get_all_particle_column_indices() const {
+        Eigen::VectorXi temp = Eigen::VectorXi::Zero(list.length);
+        auto current = list.get_head();
+        size_t index = 0;
+        while (current) {
+            temp(index++) = current->owner->get_last_known_water_column_index();
+            current = current->next;
+        }
+        return temp;
+    }
+    ParticleN* get_head() {
+        if (list.get_head()) {
+            return list.get_head()->owner;
+        } else {
+            return nullptr;
+        }
+    }
+    ParticleN* get_tail() {
+        if (list.get_tail()) {
+            return list.get_tail()->owner;
+        } else {
+            return nullptr;
+        }
+    }
+
 
 private:
     List<ParticleN> list;

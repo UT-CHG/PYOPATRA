@@ -29,11 +29,11 @@ std::tuple<MeshElementT<vertices, dimension>*, MeshElementT<vertices, dimension>
 }
 
 
-template <int vertices, int dimension>
-typename WaterColumn<vertices, dimension>::Vector WaterColumn<vertices, dimension>::interpolate_velocity(const Particle<dimension> &particle) {
-    if constexpr (dimension == 2) {
-        return mesh_elements[0]->calculate_velocity(particle.get_location());
-    } else {
-        throw std::logic_error("Velocity interpolation for this dimension is not implemented.\n");
-    }
-}
+//template <int vertices, int dimension>
+//typename WaterColumn<vertices, dimension>::Vector WaterColumn<vertices, dimension>::interpolate_velocity(const Particle<dimension> &particle) {
+//    if constexpr (dimension == 2) {
+//        return mesh_elements[0]->calculate_velocity(particle.get_location());
+//    } else {
+//        throw std::logic_error("Velocity interpolation for this dimension is not implemented.\n");
+//    }
+//}

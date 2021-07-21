@@ -6,6 +6,7 @@
 #define PYOPATRA_MESH_H
 
 #include <ctime>
+#include "Eigen/Geometry"
 
 #include "mesh_element.h"
 #include "mesh_vertex.h"
@@ -48,7 +49,9 @@ public:
         , water_columns(num_water_columns, WaterCol())
         , vertices(num_vertices, Vertex(measured_times.size()))
     {
-        std::cout << water_columns.size() << std::endl;
+        for (size_t i = 0; i < water_columns.size(); i++) {
+            water_columns[i].set_index(i);
+        }
     }
 
     time_t get_current_time() { return current_time; }
@@ -87,10 +90,62 @@ public:
     size_t get_water_columns_size() { return water_columns.size(); }
     Vertex* get_vertex_pointer(int vertex_index) { return &vertices[vertex_index]; }
     const WaterCol* get_water_column_pointer(int water_column_index) const { return &water_columns[water_column_index]; }
-    std::array<WaterCol*, num_vertices_per_element>& get_water_column_adjacencies(int water_column_index) { return  water_columns[water_column_index].get_adjacencies(); }
-    //    void add_empty_particle() { particles.push(); }
-    void add_particle(Vector& location) { particles.create_particle(location); }
+    const std::array<WaterCol*, num_vertices_per_element>& get_water_column_adjacencies(int water_column_index) const { return  water_columns[water_column_index].get_adjacencies(); }
+    void add_particle(Vector& location) {
+        particles.create_particle(location);
+        update_particle_mesh_location(*particles.get_tail());
+    }
     Eigen::MatrixXd get_all_particle_locations() const { return particles.get_all_particle_locations(); };
+    Eigen::VectorXi get_all_particle_column_indices() const { return particles.get_all_particle_column_indices(); }
+
+    void update_particle_locations() {
+        auto current = particles.get_head();
+
+        while (current) {
+            update_particle_mesh_location(*current);
+            current = current->get_next();
+        }
+    }
+
+    void update_particle_mesh_location(typename ParticleList<dimension>::ParticleN& particle) {
+        auto last_known_water_column = water_columns[particle.get_last_known_water_column_index()];
+
+        particle.set_water_column_index(locate_new_water_column(last_known_water_column, particle.get_location()));
+    }
+
+    // From https://stackoverflow.com/questions/1903954/is-there-a-standard-sign-function-signum-sgn-in-c-c
+    template <typename T>
+    int sgn(T val) {
+        return (T(0) < val) - (val < T(0));
+    }
+
+    size_t locate_new_water_column(const WaterCol& starting_water_col, const Vector& location) {
+        if constexpr (dimension == 2 && num_vertices_per_element == 3) {
+            Vector A = starting_water_col.get_mesh_elements()[0].get_vertices()[0]->get_location();
+            Vector B = starting_water_col.get_mesh_elements()[0].get_vertices()[1]->get_location();
+            Vector C = starting_water_col.get_mesh_elements()[0].get_vertices()[2]->get_location();
+
+            int side_1 = sgn((B[0] - A[0]) * (location[1] - A[1]) - (B[1] - A[1]) * (location[0] - A[0]));
+            std::cout << side_1 << std::endl;
+            int side_2 = sgn((C[0] - B[0]) * (location[1] - B[1]) - (C[1] - B[1]) * (location[0] - B[0]));
+            std::cout << side_2 << std::endl;
+            int side_3 = sgn((A[0] - C[0]) * (location[1] - C[1]) - (A[1] - C[1]) * (location[0] - C[0]));
+            std::cout << side_3 << std::endl;
+
+            if (side_1 <= 0 && side_2 <= 0 && side_3 <=0) {
+                return starting_water_col.get_index();
+            } else if (side_1 > 0) {
+                return locate_new_water_column(*starting_water_col.get_adjacencies()[0], location);
+            } else if (side_2 > 0) {
+                return locate_new_water_column(*starting_water_col.get_adjacencies()[1], location);
+            } else {
+                return locate_new_water_column(*starting_water_col.get_adjacencies()[2], location);
+            }
+        }
+
+        return 0;
+    }
+
 };
 
 using TriangularMesh2D = Mesh<3, 2>;

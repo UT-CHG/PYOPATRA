@@ -27,6 +27,9 @@ class MeshBase:
     def get_velocities(self, time_index):
         return self._cpp_mesh.get_velocities(time_index)
 
+    def update_particle_locations(self):
+        self._cpp_mesh.update_particle_locations()
+
     def get_water_column_pointer(self, index):
         return self._cpp_mesh.get_water_column_pointer(index)
 

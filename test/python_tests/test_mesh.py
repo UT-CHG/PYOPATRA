@@ -78,18 +78,23 @@ class TestMesh:
         dummy_file = triangular_2d_hycom_mesh[1]
 
         particle_locations = np.array(
-            [[1.5, 11.5],
-             [2.5, 11.5],
-             [4.5, 13.5]],
+            [[1.25, 11.25],
+             [2.25, 11.25],
+             [3.25, 13.25],
+             [3.75, 13.75]
+             ],
             order='F'
         )
+
+        particle_indices = np.array([0, 8, 20, 21], dtype=int)
 
         for row_index in range(particle_locations.shape[0]):
             mesh.append_particle(particle_locations[row_index, :])
 
         retrieved_particle_locations = mesh.get_all_particle_locations()
-        print(retrieved_particle_locations)
+        retrieved_particle_indices = mesh._cpp_mesh.get_all_particle_column_indices()
         assert np.linalg.norm(particle_locations - retrieved_particle_locations) < 10e-6
+        assert np.linalg.norm(retrieved_particle_indices - particle_indices) < 10e-6
 
     def test_hycom_mesh_setup(self, triangular_2d_hycom_mesh):
         mesh = triangular_2d_hycom_mesh[0]
@@ -141,11 +146,3 @@ class TestMesh:
         assert mesh._cpp_mesh.check_mesh_element_vertex(11, 0, 7, 0)
         assert mesh._cpp_mesh.check_mesh_element_vertex(11, 0, 12, 1)
         assert mesh._cpp_mesh.check_mesh_element_vertex(11, 0, 11, 2)
-
-
-
-
-
-
-
-

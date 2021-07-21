@@ -15,16 +15,26 @@ public:
 
 protected:
     Vector location;
+    size_t last_known_water_column_index;
 
     // Enable Intrusive Linked List Structure
     ILLNode<ParticleBase<dimension>> node;
 
 public:
-    ParticleBase() : location(Vector::Zero()), node(this) {}
+    ParticleBase() : location(Vector::Zero()), last_known_water_column_index(0), node(this) {}
     const Vector get_location() const { return location; }
     void set_location(const Vector& new_location) { location = new_location; }
     [[nodiscard]] ILLNode<ParticleBase<dimension>>& get_node() { return node; }
     void update_location(Vector& velocity, double time) { location += velocity * time; }
+    size_t get_last_known_water_column_index() { return last_known_water_column_index; }
+    void set_water_column_index(size_t wc_index) { last_known_water_column_index = wc_index; }
+    ParticleBase<dimension>* get_next() {
+        if (node.next) {
+            return node.next->owner;
+        } else {
+            return nullptr;
+        }
+    }
 };
 
 template <int dimension>
