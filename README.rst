@@ -3,7 +3,7 @@ PYOPATRA
 
 *PYthon Ocean PArticle TRAcking*
 
-.. image:: https://travis-ci.com/georgiastuart/PYOPATRA.svg?branch=main
+.. image:: https://travis-ci.com/georgiastuart/PYOPATRA.svg?token=FkVfxc1EjLgxwETbDbF1&branch=main
     :target: https://travis-ci.com/georgiastuart/PYOPATRA
     :alt: Travis CI Status
 
