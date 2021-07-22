@@ -154,3 +154,8 @@ _build
 *.npy
 *.gif
 *.hdf5
+*.html
+*.png
+*.mp4
+
+shapefiles
