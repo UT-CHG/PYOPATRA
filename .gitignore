@@ -153,3 +153,4 @@ _build
 # Misc Testing Stuff
 *.npy
 *.gif
+*.hdf5
