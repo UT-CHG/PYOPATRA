@@ -26,7 +26,7 @@ public:
     void set_location(const Vector& new_location) { location = new_location; }
     [[nodiscard]] ILLNode<ParticleBase<dimension>>& get_node() { return node; }
     void update_location(Vector& velocity, double time_delta) {
-        location += velocity * time_delta;
+        location += velocity * 6.0 / 185.0 * time_delta;
     }
     size_t get_last_known_water_column_index() { return last_known_water_column_index; }
     void set_water_column_index(size_t wc_index) { last_known_water_column_index = wc_index; }

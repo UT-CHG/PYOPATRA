@@ -144,7 +144,7 @@ class HYCOMFileParser(FileParserBase):
         else:
             raise NotImplementedError('Only triangulated HYCOM data is implemented at this time.')
 
-        self.times = np.zeros(len(list_of_hycom_files), dtype=int)
+        self.times = np.zeros(len(list_of_hycom_files))
 
         with nc.Dataset(list_of_hycom_files[0]) as ds:
             self.regular_dimensions = (ds['lat'].shape[0], ds['lon'].shape[0])
@@ -161,8 +161,14 @@ class HYCOMFileParser(FileParserBase):
         for index, filename in enumerate(list_of_hycom_files):
             with nc.Dataset(filename) as ds:
                 if dimensions == 2:
-                    self.velocity[0, :, index] = ds['water_u'][0, 0, :, :].flatten()
-                    self.velocity[1, :, index] = ds['water_v'][0, 0, :, :].flatten()
+                    water_v = ds['water_v'][0, 0, :, :].flatten()
+                    self.velocity[0, :, index] = water_v[:]
+                    self.velocity[0, :, index][self.velocity[0, :, index] == float(ds['water_v'].missing_value)] = 0.0
+
+                    water_u = ds['water_u'][0, 0, :, :].flatten()
+                    self.velocity[1, :, index] = water_u[:]
+                    self.velocity[1, :, index][self.velocity[1, :, index] == float(ds['water_u'].missing_value)] = 0.0
+
                     self.times[index] = ds['time'][0]
                 else:
                     raise NotImplementedError('Dimensions other than 2 have not been implemented.')

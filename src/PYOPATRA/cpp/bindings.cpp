@@ -41,7 +41,7 @@ PYBIND11_MODULE(pyopatra_pybind, m) {
             .def("get_vertices", &TriangularMeshElement2D::get_vertices);
 
     py::class_<TriangularMesh2D>(m, "CppTriangularMesh2D")
-            .def(py::init<int, int, std::vector<time_t>&&>())
+            .def(py::init<int, int, std::vector<double>&&>())
             .def("set_vertex_location", &TriangularMesh2D::set_vertex_location)
             .def("set_vertex_velocity", &TriangularMesh2D::set_vertex_velocity)
             .def("set_vertex_diffusion", &TriangularMesh2D::set_vertex_diffusion)

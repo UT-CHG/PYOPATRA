@@ -18,11 +18,11 @@ public:
     using Vertex = MeshVertex<dimension>;
 
 protected:
-    time_t current_time;
+//    time_t current_time;
     size_t current_time_step;
     int total_time_steps, time_step_size;
     double time;
-    std::vector<time_t> measured_times;
+    std::vector<double> measured_times;
     std::vector<WaterCol> water_columns;
     std::vector<Vertex> vertices;
     ParticleList<dimension> particles;
@@ -31,8 +31,8 @@ public:
     using Vector = Eigen::Matrix<double, dimension, 1>;
 
     Mesh()
-        : current_time(0)
-        , current_time_step(0)
+//        : current_time(0)
+        : current_time_step(0)
         , total_time_steps(0)
         , time_step_size(0)
         , time(0)
@@ -41,12 +41,12 @@ public:
         , vertices()
     {}
 
-    Mesh(int num_water_columns, int num_vertices, std::vector<time_t>&& measured_times)
-        : current_time(0)
-        , current_time_step(0)
+    Mesh(int num_water_columns, int num_vertices, std::vector<double>&& measured_times)
+//        : current_time(0)
+        : current_time_step(0)
         , total_time_steps(0)
         , time_step_size(0)
-        , time(0)
+        , time(measured_times[0])
         , measured_times(measured_times)
         , water_columns(num_water_columns, WaterCol())
         , vertices(num_vertices, Vertex(measured_times.size()))
@@ -56,7 +56,7 @@ public:
         }
     }
 
-    time_t get_current_time() { return current_time; }
+    double get_current_time() { return time; }
     std::vector<Vertex>& get_vertices() { return vertices; }
     Eigen::MatrixXd get_vertex_locations() {
         Eigen::MatrixXd temp = Eigen::MatrixXd::Zero(vertices.size(), dimension);
