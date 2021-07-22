@@ -18,12 +18,16 @@ if __name__ == '__main__':
     particle_lat = 28.736628
     release_loc = np.array((particle_lat, particle_lon))
     # Time elapsed
-    total_days = 8 * 7
+    total_days = 2 * 7
     total_time_steps = int(24 / time_delta * total_days) - 4
     # When to add particles (time steps, not hours)
     add_particles_time_step_interval = 3
     # How frequently to save particles (time steps, not hours)
     particle_save_interval = 3
+    # Number of Particles at the end
+    total_particles = total_time_steps // add_particles_time_step_interval * num_particles
+    # Frame interval
+    frame_interval = 3
 
     # Read in config file
     config = ConfigParser()
@@ -55,19 +59,32 @@ if __name__ == '__main__':
     tm2d = TriangularMesh2D()
     tm2d.setup_mesh(hfp, 2)
 
+    # Set up snapshot particle saving file
+    with h5py.File('{}/data/snapshots.hdf5'.format(file_prefix), 'w') as fp:
+        fp.create_dataset('snapshots', (total_particles, 2, total_time_steps // frame_interval))
+
     print('Time stepping...')
+    current_num_particles = 0
+    frame = 0
     # Time stepping
     for i in range(total_time_steps):
         print('Time step {}'.format(i))
+
         # Inject more particles
         if i % add_particles_time_step_interval == 0:
             for j in range(num_particles):
                 print('Appending particle at ({}, {})'.format(particle_lon, particle_lat))
                 tm2d.append_particle(release_loc)
+                current_num_particles += 1
 
         print('Taking time step...')
         # Time stepping
         tm2d.time_step(time_delta)
+
+        if i % frame_interval == 0:
+            with h5py.File('{}/data/snapshots.hdf5'.format(file_prefix), 'a') as fp:
+                fp['snapshots'][:current_num_particles, :, frame] = tm2d.get_all_particle_locations()[:, :]
+            frame += 1
 
     print('Saving particle locations...')
     particle_locations = tm2d.get_all_particle_locations()

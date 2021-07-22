@@ -3,8 +3,9 @@ from datetime import date, timedelta
 from time import time
 
 if __name__ == '__main__':
-    total_days = 8 * 7
+    total_days = 2 * 7
     start_date = date(2010, 4, 20)
+    pull_start_date = start_date
     end_date = start_date + timedelta(days=total_days)
 
     print("Fetching HYCOM data from {} to {}".format(start_date, end_date))
@@ -15,8 +16,8 @@ if __name__ == '__main__':
         ftp.login()
         ftp.cwd('datasets/GOMu0.04/expt_50.1/data/netcdf/2010/')
 
-        for day_since_start in range(total_days):
-            date = start_date + timedelta(days=day_since_start)
+        for day_since_start in range((end_date - pull_start_date).days):
+            date = pull_start_date + timedelta(days=day_since_start)
 
             for time_str in times:
                 file = 'hycom_gomu_501_{}{:02d}{:02d}00_t{}.nc'.format(date.year, date.month, date.day, time_str)
