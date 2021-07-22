@@ -1,6 +1,8 @@
 import os
 from datetime import date, timedelta
 from configparser import ConfigParser
+import h5py
+import numpy as np
 
 from PYOPATRA import *
 
@@ -8,17 +10,18 @@ from PYOPATRA import *
 if __name__ == '__main__':
     # Configuration settings
     # In hours
-    timestep = 1
+    time_delta = 1
     # Particle release per timedelta
-    num_particles = 10
+    num_particles = 1
     # Particle release location
     particle_lon = -88.365997
     particle_lat = 28.736628
+    release_loc = np.array((particle_lat, particle_lon))
     # Time elapsed
-    total_days = 7
-    total_time_steps = int(24 / timestep * total_days)
+    total_days = 8 * 7
+    total_time_steps = int(24 / time_delta * total_days) - 4
     # When to add particles (time steps, not hours)
-    add_particles_time_step_interval = 1
+    add_particles_time_step_interval = 3
     # How frequently to save particles (time steps, not hours)
     particle_save_interval = 3
 
@@ -40,35 +43,45 @@ if __name__ == '__main__':
             file = '{}/data/hycom_gomu_501_{}{:02d}{:02d}00_t{}.nc'.format(file_prefix, date.year, date.month, date.day, time_str)
             hycom_files.append(file)
 
-    print(hycom_files)
+    # print(hycom_files)
 
+    print('Reading HYCOM files....')
     # Read HYCOM files
     hfp = HYCOMFileParser()
     hfp.read(hycom_files, diffusion_coefficient=10.0)
 
+    print('Setting up mesh...')
     # Set up 2D Triangular Mesh
     tm2d = TriangularMesh2D()
     tm2d.setup_mesh(hfp, 2)
 
-    # Set Up ParticleList
-    particles = ParticleList()
-
+    print('Time stepping...')
     # Time stepping
     for i in range(total_time_steps):
+        print('Time step {}'.format(i))
         # Inject more particles
         if i % add_particles_time_step_interval == 0:
             for j in range(num_particles):
-                particles.append_particle(particle_lat, particle_lon)
+                print('Appending particle at ({}, {})'.format(particle_lon, particle_lat))
+                tm2d.append_particle(release_loc)
 
+        print('Taking time step...')
         # Time stepping
-        particles.time_step(time_delta=timestep)
+        tm2d.time_step(time_delta)
 
-        # Save particle snapshot (not to disk)
-        if i % particle_save_interval == 0:
-            particles.snapshot()
+    print('Saving particle locations...')
+    particle_locations = tm2d.get_all_particle_locations()
+    with h5py.File('{}/data/final_particles.hdf5'.format(file_prefix), 'w') as fp:
+        fp.create_dataset('particles', particle_locations.shape, data=particle_locations)
 
-    # Save particle snapshots to disk
-    particles.save_hdf5('{}/data/hycom_particles.hdf5'.format(file_prefix))
+
+
+    #     # Save particle snapshot (not to disk)
+    #     if i % particle_save_interval == 0:
+    #         particles.snapshot()
+    #
+    # # Save particle snapshots to disk
+    # particles.save_hdf5('{}/data/hycom_particles.hdf5'.format(file_prefix))
 
 
 
