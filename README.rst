@@ -11,6 +11,6 @@ PYOPATRA
     :target: https://codecov.io/gh/georgiastuart/PYOPATRA
     :alt: Code Coverage Percentage
 
-.. image:: https://readthedocs.org/projects/pip/badge/?version=stable
-    :target: https://pip.pypa.io/en/stable/?badge=stable
+.. image:: https://readthedocs.org/projects/pyopatra/badge/?version=latest
+    :target: https://pyopatra.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
