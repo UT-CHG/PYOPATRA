@@ -25,7 +25,7 @@ if __name__ == '__main__':
     # How frequently to save particles (time steps, not hours)
     particle_save_interval = 3
     # Number of Particles at the end
-    total_particles = total_time_steps // add_particles_time_step_interval * num_particles
+    total_particles = (total_time_steps // add_particles_time_step_interval + 1) * num_particles
     # Frame interval
     frame_interval = 3
 
@@ -47,8 +47,6 @@ if __name__ == '__main__':
             file = '{}/data/hycom_gomu_501_{}{:02d}{:02d}00_t{}.nc'.format(file_prefix, date.year, date.month, date.day, time_str)
             hycom_files.append(file)
 
-    # print(hycom_files)
-
     print('Reading HYCOM files....')
     # Read HYCOM files
     hfp = HYCOMFileParser()
@@ -61,7 +59,7 @@ if __name__ == '__main__':
 
     # Set up snapshot particle saving file
     with h5py.File('{}/data/snapshots.hdf5'.format(file_prefix), 'w') as fp:
-        fp.create_dataset('snapshots', (total_particles, 2, total_time_steps // frame_interval))
+        fp.create_dataset('snapshots', (total_particles, 2, total_time_steps // frame_interval + 1))
 
     print('Time stepping...')
     current_num_particles = 0
@@ -90,15 +88,4 @@ if __name__ == '__main__':
     particle_locations = tm2d.get_all_particle_locations()
     with h5py.File('{}/data/final_particles.hdf5'.format(file_prefix), 'w') as fp:
         fp.create_dataset('particles', particle_locations.shape, data=particle_locations)
-
-
-
-    #     # Save particle snapshot (not to disk)
-    #     if i % particle_save_interval == 0:
-    #         particles.snapshot()
-    #
-    # # Save particle snapshots to disk
-    # particles.save_hdf5('{}/data/hycom_particles.hdf5'.format(file_prefix))
-
-
 
