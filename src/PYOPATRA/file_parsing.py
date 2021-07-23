@@ -158,23 +158,29 @@ class HYCOMFileParser(FileParserBase):
         else:
             raise NotImplementedError('Dimensions other than 2 have not been implemented.')
 
+        # TODO: Make diffusion coefficient more flexible
+        self.diffusion_coefficient = np.ones((2, self.num_vertices, len(list_of_hycom_files))) * diffusion_coefficient
+
         for index, filename in enumerate(list_of_hycom_files):
             with nc.Dataset(filename) as ds:
                 if dimensions == 2:
                     water_v = ds['water_v'][0, 0, :, :].flatten()
                     self.velocity[0, :, index] = water_v[:]
-                    self.velocity[0, :, index][self.velocity[0, :, index] == float(ds['water_v'].missing_value)] = 0.0
+                    mv = self.velocity[0, :, index] == float(ds['water_v'].missing_value)
+                    self.velocity[0, :, index][mv] = 0.0
+                    self.diffusion_coefficient[0, :, index][mv] = 0.0
 
                     water_u = ds['water_u'][0, 0, :, :].flatten()
                     self.velocity[1, :, index] = water_u[:]
-                    self.velocity[1, :, index][self.velocity[1, :, index] == float(ds['water_u'].missing_value)] = 0.0
+                    mv = self.velocity[1, :, index] == float(ds['water_u'].missing_value)
+                    self.velocity[1, :, index][mv] = 0.0
+                    self.diffusion_coefficient[0, :, index][mv] = 0.0
 
                     self.times[index] = ds['time'][0]
                 else:
                     raise NotImplementedError('Dimensions other than 2 have not been implemented.')
 
-        # TODO: Make diffusion coefficient more flexible
-        self.diffusion_coefficient = np.ones((2, self.num_vertices, len(list_of_hycom_files))) * diffusion_coefficient
+
 
 class POMFileParser(FileParserBase):
     pass

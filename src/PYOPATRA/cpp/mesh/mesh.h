@@ -113,11 +113,12 @@ public:
         current_time_step = lower_bound;
 
         while (current) {
-            Vector lb = water_columns[current->get_last_known_water_column_index()].interpolate_velocity(current->get_location(), lower_bound);
-            Vector ub = water_columns[current->get_last_known_water_column_index()].interpolate_velocity(current->get_location(), lower_bound + 1);
-            Vector interpolated = (1 - ((time - measured_times[current_time_step]) / (measured_times[current_time_step + 1] - measured_times[current_time_step]))) * lb +
-                    ((time - measured_times[current_time_step]) / (measured_times[current_time_step + 1] - measured_times[current_time_step])) * ub;
-            current->update_location(interpolated, time_delta);
+            Vector velocity_update = water_columns[current->get_last_known_water_column_index()]
+                    .interpolate_velocity(current->get_location(), lower_bound, time_delta, time, measured_times[current_time_step], measured_times[current_time_step + 1]);
+//            Vector ub = water_columns[current->get_last_known_water_column_index()].interpolate_velocity(current->get_location(), lower_bound + 1);
+//            Vector interpolated = (1 - ((time - measured_times[current_time_step]) / (measured_times[current_time_step + 1] - measured_times[current_time_step]))) * lb +
+//                    ((time - measured_times[current_time_step]) / (measured_times[current_time_step + 1] - measured_times[current_time_step])) * ub;
+            current->update_location(velocity_update, time_delta);
             update_particle_mesh_location(*current);
             current = current->get_next();
         }
@@ -133,9 +134,7 @@ public:
     }
 
     void update_particle_mesh_location(typename ParticleList<dimension>::ParticleN& particle) {
-        auto last_known_water_column = water_columns[particle.get_last_known_water_column_index()];
-
-        particle.set_water_column_index(locate_new_water_column(last_known_water_column, particle.get_location()));
+        particle.set_water_column_index(locate_new_water_column(water_columns[particle.get_last_known_water_column_index()], particle.get_location()));
     }
 
     // From https://stackoverflow.com/questions/1903954/is-there-a-standard-sign-function-signum-sgn-in-c-c
