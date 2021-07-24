@@ -21,6 +21,7 @@ protected:
 //    time_t current_time;
     size_t current_time_step;
     int total_time_steps, time_step_size;
+    double starting_time;
     double time;
     std::vector<double> measured_times;
     std::vector<WaterCol> water_columns;
@@ -35,6 +36,7 @@ public:
         : current_time_step(0)
         , total_time_steps(0)
         , time_step_size(0)
+        , starting_time(0)
         , time(0)
         , measured_times()
         , water_columns()
@@ -46,6 +48,7 @@ public:
         : current_time_step(0)
         , total_time_steps(0)
         , time_step_size(0)
+        , starting_time(measured_times[0])
         , time(measured_times[0])
         , measured_times(measured_times)
         , water_columns(num_water_columns, WaterCol())
@@ -169,6 +172,16 @@ public:
 
     void time_step(double time_delta) {
         update_particle_locations(time_delta);
+    }
+
+    void reset_mesh() {
+        time = starting_time;
+        current_time_step = 0;
+        particles.delete_all_particles();
+    }
+
+    int get_num_particles() {
+        return particles.get_num_particles();
     }
 
 };

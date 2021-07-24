@@ -54,6 +54,18 @@ public:
             return nullptr;
         }
     }
+    void delete_all_particles() {
+        list.length = 0;
+
+        ParticleN* current = get_head();
+        ParticleN* prev;
+
+        while (current) {
+            prev = current;
+            current = prev->get_next();
+            delete prev;
+        }
+    }
 
 
 private:

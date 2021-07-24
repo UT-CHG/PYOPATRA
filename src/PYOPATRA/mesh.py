@@ -55,6 +55,9 @@ class MeshBase:
     def time_step(self, time_delta):
         self._cpp_mesh.time_step(time_delta)
 
+    def reset_mesh(self):
+        self._cpp_mesh.reset_mesh()
+
 
 class TriangularMesh(MeshBase):
     def __init__(self):
