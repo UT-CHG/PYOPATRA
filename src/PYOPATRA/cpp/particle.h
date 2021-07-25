@@ -7,6 +7,7 @@
 
 #include <Eigen/Dense>
 #include "illnode.h"
+#include "coordinate.h"
 
 template <int dimension>
 class ParticleBase {
@@ -26,7 +27,9 @@ public:
     void set_location(const Vector& new_location) { location = new_location; }
     [[nodiscard]] ILLNode<ParticleBase<dimension>>& get_node() { return node; }
     void update_location(Vector& velocity, double time_delta) {
-        location += velocity * 6.0 / 185.0 * time_delta;
+        location(1) += meters_to_longitude(velocity(1), location(0)) * 3600.0 * time_delta;
+        location(0) += meters_to_latitude(velocity(0)) * 3600.0 * time_delta;
+//        location += velocity * 6.0 / 185.0 * time_delta;
     }
     size_t get_last_known_water_column_index() { return last_known_water_column_index; }
     void set_water_column_index(size_t wc_index) { last_known_water_column_index = wc_index; }

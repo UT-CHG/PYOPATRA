@@ -16,6 +16,7 @@
 //#include "../particle.h"
 
 static std::normal_distribution<double> normal(0, 1);
+static std::uniform_real_distribution<double> unif(0, M_PI);
 static std::default_random_engine generator;
 
 template <int vertices, int dimension>
@@ -55,11 +56,11 @@ public:
             Vector interpolated_diffusion = (1 - t) * lb + t * ub;
 
             Vector new_velocity = interpolated_velocity;
-            double ra = ((double) rand() / (double) RAND_MAX) * EIGEN_PI;
+            double ra = unif(generator);
             double rn = normal(generator);
 
-            new_velocity(0) += rn * sqrt(4.0 * interpolated_diffusion(0) / (delta_t * 60.0 * 60.0)) * cos(ra);
-            new_velocity(1) += rn * sqrt(4.0 * interpolated_diffusion(1) / (delta_t * 60.0 * 60.0)) * sin(ra);
+            new_velocity(0) += rn * sqrt(4.0 * interpolated_diffusion(0) / (delta_t * 3600.0)) * sin(ra);
+            new_velocity(1) += rn * sqrt(4.0 * interpolated_diffusion(1) / (delta_t * 3600.0)) * cos(ra);
 
             return new_velocity;
         }
