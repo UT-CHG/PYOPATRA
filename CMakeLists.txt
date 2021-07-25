@@ -6,11 +6,12 @@ option(BUILD_PYTHON "Build the Python Library" OFF)
 option(BUILD_TEST "Build the test suite" OFF)
 option(CODE_COVERAGE "Enable code coverage report" OFF)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 find_package(MPI REQUIRED COMPONENTS CXX)
 find_package(HDF5 REQUIRED COMPONENTS CXX)
 find_package(Eigen3 REQUIRED NO_MODULE)
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Python REQUIRED COMPONENTS Interpreter Development)
 set(PYTHON_EXECUTABLE ${Python_EXECUTABLE})
