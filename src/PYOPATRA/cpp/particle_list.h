@@ -40,20 +40,25 @@ public:
         }
         return temp;
     }
-    ParticleN* get_head() {
+    const ParticleN* get_head() const {
         if (list.get_head()) {
             return list.get_head()->owner;
         } else {
             return nullptr;
         }
     }
-    ParticleN* get_tail() {
+    const ParticleN* get_tail() const {
         if (list.get_tail()) {
             return list.get_tail()->owner;
         } else {
             return nullptr;
         }
     }
+
+    size_t get_length() const {
+        return list.length;
+    }
+
     void delete_all_particles() {
         list.length = 0;
 
