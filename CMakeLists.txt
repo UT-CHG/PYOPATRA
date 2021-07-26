@@ -30,6 +30,7 @@ set(CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER})
 if (${BUILD_PYTHON})
     message(STATUS "Building Python library...")
     pybind11_add_module(pyopatra_pybind
+            src/PYOPATRA/cpp/bindings.cpp
             src/PYOPATRA/cpp/particle.h
             src/PYOPATRA/cpp/particle.cpp
             src/PYOPATRA/cpp/mesh/mesh_element.h
