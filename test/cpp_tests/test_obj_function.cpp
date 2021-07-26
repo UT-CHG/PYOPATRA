@@ -7,7 +7,7 @@
 #include "PYOPATRA/cpp/particle_list.h"
 
 TEST_CASE("Objective Tests", "[objective-tests]") {
-    SlicedWassersteinDistance2D obj(5, 10, {20, 25, -90, -80});
+    SlicedWassersteinDistance2D obj(5, 10, {20, 25, -90, -80}, 20);
 
     Eigen::VectorXd lat_bins(5), lon_bins(10);
     lat_bins << 20, 21, 22, 23, 24;
@@ -22,6 +22,13 @@ TEST_CASE("Objective Tests", "[objective-tests]") {
     p_list.create_particle({24.5, -80.5});
     p_list.create_particle({20.5, -90});
     p_list.create_particle({25, -88.5});
+
+    ParticleList2D p_list2;
+
+    p_list2.create_particle({21.5, -88.5});
+    p_list2.create_particle({24.5, -80.5});
+    p_list2.create_particle({20.5, -90});
+    p_list2.create_particle({23.5, -88.5});
 
     obj.set_observed_values(p_list);
 
@@ -38,5 +45,7 @@ TEST_CASE("Objective Tests", "[objective-tests]") {
            0, 0, 0, 0, 0.25;
 
     REQUIRE((bin - obj.get_observed_bins()).norm() < 10e-6);
+    REQUIRE(obj.calculate_value(p_list) == Approx(0.0));
+    REQUIRE(obj.calculate_value(p_list2) > 0.0);
 
 }

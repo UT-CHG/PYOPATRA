@@ -7,6 +7,7 @@
 
 #include "Eigen/Dense"
 #include "../particle_list.h"
+#include "../pyopatra_random.h"
 
 // At this time, only rectangular domains are implemented
 
@@ -109,19 +110,61 @@ protected:
     }
 };
 
+
+// https://github.com/PythonOT/POT/blob/master/ot/sliced.py
+// https://stats.stackexchange.com/questions/404775/calculate-earth-movers-distance-for-two-grayscale-images
+// http://robotics.stanford.edu/~rubner/emd/default.htm
+// https://stackoverflow.com/questions/5101004/python-code-for-earth-movers-distance
+// https://github.com/scipy/scipy/blob/v1.7.0/scipy/stats/stats.py#L8245-L8319
+// https://stackoverflow.com/questions/45740677/earth-mover-distance-between-numpy-1-d-histograms
+// https://home.ttic.edu/~ssameer/Research/Papers/WEMD_CVPR08.pdf
+// https://en.wikipedia.org/wiki/Earth_mover%27s_distance#Computing_the_EMD
 template <int dimension>
 class SlicedWassersteinDistance : public BinObjectiveFunctionBase<dimension> {
 private:
     using Parent = BinObjectiveFunctionBase<dimension>;
+    Eigen::VectorXd proj, sample_proj, observed_proj, emd_vec;
+    int num_proj;
 
 public:
-    SlicedWassersteinDistance(int num_bins_lat, int num_bins_lon, const Eigen::Vector4d& bounds)
+    SlicedWassersteinDistance(int num_bins_lat, int num_bins_lon, const Eigen::Vector4d& bounds, int num_proj)
         : Parent(num_bins_lat, num_bins_lon, bounds)
+        , proj(num_bins_lat)
+        , sample_proj(num_bins_lon)
+        , observed_proj(num_bins_lon)
+        , emd_vec(num_bins_lon)
+        , num_proj(num_proj)
     {}
 
 private:
     double calculate_value_impl() {
-        return 0.0;
+        double sum = 0.0;
+
+        for (int i = 0; i < num_proj; i++) {
+            for (int j = 0; j < proj.size(); j++) {
+                proj(j) = unif(generator);
+            }
+
+            proj.normalize();
+
+            sample_proj = Parent::get_bins() * proj;
+            observed_proj = Parent::get_observed_bins() * proj;
+
+            sum += wasserstein_distance_1d(sample_proj, observed_proj);
+        }
+
+        return sum / num_proj;
+    }
+
+    // https://en.wikipedia.org/wiki/Earth_mover%27s_distance#Computing_the_EMD
+    double wasserstein_distance_1d(Eigen::VectorXd& dist1, Eigen::VectorXd& dist2) {
+        emd_vec.setZero();
+
+        for (int i = 0; i < emd_vec.size() - 1; i ++) {
+            emd_vec(i + 1) = dist1(i) + emd_vec(i) - dist2(i);
+        }
+
+        return emd_vec.cwiseAbs().sum();
     }
 };
 

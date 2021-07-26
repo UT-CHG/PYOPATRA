@@ -13,6 +13,7 @@
 #include "mesh/mesh_vertex.h"
 #include "mesh/mesh_water_column.h"
 #include "mesh/mesh.h"
+#include "inversion_tools/objective_functions.h"
 
 namespace py = pybind11;
 
@@ -69,6 +70,10 @@ PYBIND11_MODULE(pyopatra_pybind, m) {
 
     py::class_<ParticleList2D>(m, "CppParticleList2D")
             .def("create_particle", &ParticleList2D::create_particle);
+
+    py::class_<SlicedWassersteinDistance2D>(m, "CppSlicedWassersteinDistance2D")
+            .def(py::init<int, int, const Eigen::Vector4d&, int>())
+            .def("calculate_value", &SlicedWassersteinDistance2D::calculate_value);
 
 }
 

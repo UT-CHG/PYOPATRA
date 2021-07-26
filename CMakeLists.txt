@@ -67,7 +67,7 @@ if (${BUILD_CPP} OR ${BUILD_TEST})
             src/PYOPATRA/cpp/mesh/mesh_vertex.cpp
             src/PYOPATRA/cpp/mesh/mesh_element.cpp
             src/PYOPATRA/cpp/particle_list.h
-            src/PYOPATRA/cpp/inversion_tools/objective_functions.h)
+            src/PYOPATRA/cpp/inversion_tools/objective_functions.h src/PYOPATRA/cpp/pyopatra_random.h)
     target_include_directories(pyopatra_lib PUBLIC SYSTEM ${HDF5_INCLUDE_DIRS})
     target_link_libraries(pyopatra_lib PUBLIC ${MPI_CXX_LIBRARIES} ${HDF5_LIBRARIES} Eigen3::Eigen)
     target_compile_definitions(pyopatra_lib PUBLIC ${HDF5_DEFINITIONS})

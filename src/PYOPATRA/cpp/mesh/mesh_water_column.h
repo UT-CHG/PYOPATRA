@@ -8,16 +8,14 @@
 #include <vector>
 #include <tuple>
 #include <iostream>
-#include <random>
 #include <cmath>
 
 #include "mesh_element.h"
 #include "../coordinate.h"
+#include "../pyopatra_random.h"
 //#include "../particle.h"
 
-static std::normal_distribution<double> normal(0, 1);
-static std::uniform_real_distribution<double> unif(0, M_PI);
-static std::default_random_engine generator;
+
 
 template <int vertices, int dimension>
 class WaterColumn {
@@ -56,7 +54,7 @@ public:
             Vector interpolated_diffusion = (1 - t) * lb + t * ub;
 
             Vector new_velocity = interpolated_velocity;
-            double ra = unif(generator);
+            double ra = unif_pi(generator);
             double rn = normal(generator);
 
             new_velocity(0) += rn * sqrt(4.0 * interpolated_diffusion(0) / (delta_t * 3600.0)) * sin(ra);
