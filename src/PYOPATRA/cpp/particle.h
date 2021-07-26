@@ -33,7 +33,7 @@ public:
     }
     size_t get_last_known_water_column_index() { return last_known_water_column_index; }
     void set_water_column_index(size_t wc_index) { last_known_water_column_index = wc_index; }
-    ParticleBase<dimension>* get_next() {
+    const ParticleBase<dimension>* get_next() const {
         if (node.next) {
             return node.next->owner;
         } else {
