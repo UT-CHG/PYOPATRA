@@ -1,0 +1,42 @@
+//
+// Created by Georgia Stuart on 7/26/21.
+//
+
+#include <catch2/catch.hpp>
+#include "PYOPATRA/cpp/inversion_tools/objective_functions.h"
+#include "PYOPATRA/cpp/particle_list.h"
+
+TEST_CASE("Objective Tests", "[objective-tests]") {
+    SlicedWassersteinDistance2D obj(5, 10, {20, 25, -90, -80});
+
+    Eigen::VectorXd lat_bins(5), lon_bins(10);
+    lat_bins << 20, 21, 22, 23, 24;
+    lon_bins << -90, -89, -88, -87, -86, -85, -84, -83, -82, -81;
+
+    REQUIRE((lat_bins - obj.get_latitude_bounds()).norm() < 10e-6);
+    REQUIRE((lon_bins - obj.get_longitude_bounds()).norm() < 10e-6);
+
+    ParticleList2D p_list;
+
+    p_list.create_particle({21.5, -88.5});
+    p_list.create_particle({24.5, -80.5});
+    p_list.create_particle({20.5, -90});
+    p_list.create_particle({25, -88.5});
+
+    obj.set_observed_values(p_list);
+
+    Eigen::MatrixXd bin(10, 5);
+    bin << 0.25, 0, 0, 0, 0,
+           0, 0.25, 0, 0, 0.25,
+           0, 0, 0, 0, 0,
+           0, 0, 0, 0, 0,
+           0, 0, 0, 0, 0,
+           0, 0, 0, 0, 0,
+           0, 0, 0, 0, 0,
+           0, 0, 0, 0, 0,
+           0, 0, 0, 0, 0,
+           0, 0, 0, 0, 0.25;
+
+    REQUIRE((bin - obj.get_observed_bins()).norm() < 10e-6);
+
+}

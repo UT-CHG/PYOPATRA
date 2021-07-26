@@ -67,7 +67,7 @@ if (${BUILD_CPP} OR ${BUILD_TEST})
             src/PYOPATRA/cpp/mesh/mesh_vertex.cpp
             src/PYOPATRA/cpp/mesh/mesh_element.cpp
             src/PYOPATRA/cpp/particle_list.h
-            )
+            src/PYOPATRA/cpp/inversion_tools/objective_functions.h)
     target_include_directories(pyopatra_lib PUBLIC SYSTEM ${HDF5_INCLUDE_DIRS})
     target_link_libraries(pyopatra_lib PUBLIC ${MPI_CXX_LIBRARIES} ${HDF5_LIBRARIES} Eigen3::Eigen)
     target_compile_definitions(pyopatra_lib PUBLIC ${HDF5_DEFINITIONS})
@@ -79,7 +79,7 @@ if (${BUILD_TEST})
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage")
         set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
     endif ()
-    add_executable(pyopatra_test test/cpp_tests/test_base.cpp test/cpp_tests/test_particle.cpp test/cpp_tests/test_mesh_vertex.cpp test/cpp_tests/test_mesh.cpp test/cpp_tests/test_ill.cpp test/cpp_tests/test_mesh_element.cpp test/cpp_tests/test_coordinate.cpp)
+    add_executable(pyopatra_test test/cpp_tests/test_base.cpp test/cpp_tests/test_particle.cpp test/cpp_tests/test_mesh_vertex.cpp test/cpp_tests/test_mesh.cpp test/cpp_tests/test_ill.cpp test/cpp_tests/test_mesh_element.cpp test/cpp_tests/test_coordinate.cpp test/cpp_tests/test_obj_function.cpp)
     target_link_libraries(pyopatra_test pyopatra_lib Catch2::Catch2)
     target_include_directories(pyopatra_test PUBLIC src )
 endif ()
