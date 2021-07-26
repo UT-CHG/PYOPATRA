@@ -137,7 +137,15 @@ public:
     }
 
     void update_particle_mesh_location(typename ParticleList<dimension>::ParticleN& particle) {
-        particle.set_water_column_index(locate_new_water_column(water_columns[particle.get_last_known_water_column_index()], particle.get_location()));
+        int new_col = locate_new_water_column(&water_columns[particle.get_last_known_water_column_index()], particle.get_location());
+
+        if (new_col >=0) {
+            particle.set_water_column_index(new_col);
+        } else {
+            // Particle has gone off the mesh, remove it
+            particle.get_node().remove();
+            particles.decrement_length();
+        }
     }
 
     // From https://stackoverflow.com/questions/1903954/is-there-a-standard-sign-function-signum-sgn-in-c-c
@@ -146,28 +154,32 @@ public:
         return (T(0) < val) - (val < T(0));
     }
 
-    size_t locate_new_water_column(const WaterCol& starting_water_col, const Vector& location) {
+    int locate_new_water_column(const WaterCol* starting_water_col, const Vector& location) {
         if constexpr (dimension == 2 && num_vertices_per_element == 3) {
-            Vector A = starting_water_col.get_mesh_elements()[0].get_vertices()[0]->get_location();
-            Vector B = starting_water_col.get_mesh_elements()[0].get_vertices()[1]->get_location();
-            Vector C = starting_water_col.get_mesh_elements()[0].get_vertices()[2]->get_location();
+            if (starting_water_col) {
+                Vector A = starting_water_col->get_mesh_elements()[0].get_vertices()[0]->get_location();
+                Vector B = starting_water_col->get_mesh_elements()[0].get_vertices()[1]->get_location();
+                Vector C = starting_water_col->get_mesh_elements()[0].get_vertices()[2]->get_location();
 
-            int side_1 = sgn((B[0] - A[0]) * (location[1] - A[1]) - (B[1] - A[1]) * (location[0] - A[0]));
-            int side_2 = sgn((C[0] - B[0]) * (location[1] - B[1]) - (C[1] - B[1]) * (location[0] - B[0]));
-            int side_3 = sgn((A[0] - C[0]) * (location[1] - C[1]) - (A[1] - C[1]) * (location[0] - C[0]));
+                int side_1 = sgn((B[0] - A[0]) * (location[1] - A[1]) - (B[1] - A[1]) * (location[0] - A[0]));
+                int side_2 = sgn((C[0] - B[0]) * (location[1] - B[1]) - (C[1] - B[1]) * (location[0] - B[0]));
+                int side_3 = sgn((A[0] - C[0]) * (location[1] - C[1]) - (A[1] - C[1]) * (location[0] - C[0]));
 
-            if (side_1 <= 0 && side_2 <= 0 && side_3 <=0) {
-                return starting_water_col.get_index();
-            } else if (side_1 > 0) {
-                return locate_new_water_column(*starting_water_col.get_adjacencies()[0], location);
-            } else if (side_2 > 0) {
-                return locate_new_water_column(*starting_water_col.get_adjacencies()[1], location);
-            } else {
-                return locate_new_water_column(*starting_water_col.get_adjacencies()[2], location);
+                if (side_1 <= 0 && side_2 <= 0 && side_3 <= 0) {
+                    return starting_water_col->get_index();
+                } else if (side_1 > 0) {
+                    return locate_new_water_column(starting_water_col->get_adjacencies()[0], location);
+                } else if (side_2 > 0) {
+                    return locate_new_water_column(starting_water_col->get_adjacencies()[1], location);
+                } else {
+                    return locate_new_water_column(starting_water_col->get_adjacencies()[2], location);
+                }
             }
+        } else {
+            return -1;
         }
 
-        return 0;
+        return -1;
     }
 
     void time_step(double time_delta) {

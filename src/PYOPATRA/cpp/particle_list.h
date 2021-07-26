@@ -40,14 +40,14 @@ public:
         }
         return temp;
     }
-    const ParticleN* get_head() const {
+    ParticleN* get_head() const {
         if (list.get_head()) {
             return list.get_head()->owner;
         } else {
             return nullptr;
         }
     }
-    const ParticleN* get_tail() const {
+    ParticleN* get_tail() const {
         if (list.get_tail()) {
             return list.get_tail()->owner;
         } else {
@@ -72,6 +72,13 @@ public:
         }
     }
 
+    void increment_length() {
+        list.length++;
+    }
+
+    void decrement_length() {
+        list.length--;
+    }
 
 private:
     List<ParticleN> list;
