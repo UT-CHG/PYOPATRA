@@ -62,7 +62,9 @@ PYBIND11_MODULE(pyopatra_pybind, m) {
             .def("get_all_particle_column_indices", &TriangularMesh2D::get_all_particle_column_indices)
             .def("get_num_particles", &TriangularMesh2D::get_num_particles)
             .def("time_step", &TriangularMesh2D::time_step)
-            .def("reset_mesh", &TriangularMesh2D::reset_mesh);
+            .def("reset_mesh", &TriangularMesh2D::reset_mesh)
+            .def("create_sliced_wasserstein_distance", &TriangularMesh2D::create_sliced_wasserstein_distance)
+            .def("calculate_objective_function", &TriangularMesh2D::calculate_objective_function);
 //            .def()
 
     py::class_<TriangularWaterColumn2D>(m, "CppTriangleWaterColumn2D")

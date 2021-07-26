@@ -5,11 +5,13 @@
 #ifndef PYOPATRA_MESH_H
 #define PYOPATRA_MESH_H
 
+#include <string>
 #include <ctime>
 #include "mesh_element.h"
 #include "mesh_vertex.h"
 #include "mesh_water_column.h"
 #include "../particle_list.h"
+#include "../inversion_tools/objective_functions.h"
 
 template <int num_vertices_per_element, int dimension>
 class Mesh {
@@ -27,12 +29,12 @@ protected:
     std::vector<WaterCol> water_columns;
     std::vector<Vertex> vertices;
     ParticleList<dimension> particles;
+    ObjectiveFunctionBase<dimension> *obj;
 
 public:
     using Vector = Eigen::Matrix<double, dimension, 1>;
 
     Mesh()
-//        : current_time(0)
         : current_time_step(0)
         , total_time_steps(0)
         , time_step_size(0)
@@ -41,10 +43,10 @@ public:
         , measured_times()
         , water_columns()
         , vertices()
+        , obj(nullptr)
     {}
 
     Mesh(int num_water_columns, int num_vertices, std::vector<double>&& measured_times)
-//        : current_time(0)
         : current_time_step(0)
         , total_time_steps(0)
         , time_step_size(0)
@@ -53,9 +55,18 @@ public:
         , measured_times(measured_times)
         , water_columns(num_water_columns, WaterCol())
         , vertices(num_vertices, Vertex(measured_times.size()))
+        , obj(nullptr)
     {
         for (size_t i = 0; i < water_columns.size(); i++) {
             water_columns[i].set_index(i);
+        }
+    }
+
+    ~Mesh() {
+        particles.delete_all_particles();
+
+        if (obj) {
+            delete obj;
         }
     }
 
@@ -194,6 +205,28 @@ public:
 
     int get_num_particles() {
         return particles.get_num_particles();
+    }
+
+    // One particle per row
+    // bounds are {min latitude, max latitude, min longitude, max longitude}
+    void create_sliced_wasserstein_distance(Eigen::Ref<Eigen::MatrixXd> particle_locations, int num_bins_lat,
+                                            int num_bins_lon, const Eigen::Vector4d& bounds, int num_proj) {
+
+        obj = new SlicedWassersteinDistance<dimension>(num_bins_lat, num_bins_lon, bounds, num_proj);
+        auto temp_list = new ParticleList<dimension>();
+
+        for (int i = 0; i < particle_locations.rows(); i++) {
+            temp_list->create_particle(particle_locations.row(i));
+        }
+
+        obj->set_observed_values(*temp_list);
+
+        temp_list->delete_all_particles();
+        delete temp_list;
+    }
+
+    double calculate_objective_function() {
+        return obj->calculate_value(particles);
     }
 
 };

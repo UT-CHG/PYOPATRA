@@ -20,6 +20,8 @@ public:
 //    void advance();
     ILLNode<T>* get_head() { return head; }
     ILLNode<T>* get_tail() { return tail; }
+    void reset_head() { head = nullptr; }
+    void reset_tail() { tail = nullptr; }
     const ILLNode<T>* get_head() const { return head; }
     const ILLNode<T>* get_tail() const { return tail; }
 

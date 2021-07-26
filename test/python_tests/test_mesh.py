@@ -103,7 +103,7 @@ class TestMesh:
         # assert np.isclose(updated_locations[0, 1], particle_locations[0, 1] + (11.3820833333333333 - particle_locations[0, 1]) * 6 / 185)
 
         mesh.reset_mesh()
-
+        #
         assert mesh._cpp_mesh.get_num_particles() == 0
 
 

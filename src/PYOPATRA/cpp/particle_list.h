@@ -70,6 +70,9 @@ public:
             current = prev->get_next();
             delete prev;
         }
+
+        list.reset_head();
+        list.reset_tail();
     }
 
     void increment_length() {
