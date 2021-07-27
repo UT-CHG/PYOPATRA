@@ -136,6 +136,8 @@ public:
         , num_proj(num_proj)
     {}
 
+    void set_num_proj(int new_num_proj) { num_proj = new_num_proj; }
+
 private:
     double calculate_value_impl() {
         double sum = 0.0;
