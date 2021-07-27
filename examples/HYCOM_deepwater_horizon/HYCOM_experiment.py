@@ -12,13 +12,13 @@ if __name__ == '__main__':
     # In hours
     time_delta = 1
     # Particle release per timedelta
-    num_particles = 1
+    num_particles = 10
     # Particle release location
     particle_lon = -88.365997
     particle_lat = 28.736628
     release_loc = np.array((particle_lat, particle_lon))
     # Time elapsed
-    total_days = 2 * 7
+    total_days = 8 * 7
     total_time_steps = int(24 / time_delta * total_days) - 4
     # When to add particles (time steps, not hours)
     add_particles_time_step_interval = 3
@@ -71,21 +71,22 @@ if __name__ == '__main__':
         # Inject more particles
         if i % add_particles_time_step_interval == 0:
             for j in range(num_particles):
-                print('Appending particle at ({}, {})'.format(particle_lon, particle_lat))
+                # print('Appending particle at ({}, {})'.format(particle_lon, particle_lat))
                 tm2d.append_particle(release_loc)
                 current_num_particles += 1
 
-        print('Taking time step...')
+        # print('Taking time step...')
         # Time stepping
         tm2d.time_step(time_delta)
 
         if i % frame_interval == 0:
             with h5py.File('{}/data/snapshots.hdf5'.format(file_prefix), 'a') as fp:
-                fp['snapshots'][:current_num_particles, :, frame] = tm2d.get_all_particle_locations()[:, :]
+                particles = tm2d.get_all_particle_locations()
+                fp['snapshots'][:particles.shape[0], :, frame] = particles
             frame += 1
 
     print('Saving particle locations...')
     particle_locations = tm2d.get_all_particle_locations()
-    with h5py.File('{}/data/final_particles.hdf5'.format(file_prefix), 'w') as fp:
+    with h5py.File('{}/data/observed_particles.hdf5'.format(file_prefix), 'w') as fp:
         fp.create_dataset('particles', particle_locations.shape, data=particle_locations)
 
