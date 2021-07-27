@@ -141,10 +141,7 @@ private:
         double sum = 0.0;
 
         for (int i = 0; i < num_proj; i++) {
-            for (int j = 0; j < proj.size(); j++) {
-                proj(j) = unif(generator);
-            }
-
+            proj = Eigen::VectorXd::NullaryExpr(Parent::get_latitude_bounds().rows(), [&]() { return unif(generator); });
             proj.normalize();
 
             sample_proj = Parent::get_bins() * proj;
