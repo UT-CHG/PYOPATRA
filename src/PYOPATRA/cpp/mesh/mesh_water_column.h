@@ -12,9 +12,7 @@
 
 #include "mesh_element.h"
 #include "../coordinate.h"
-#include "../pyopatra_random.h"
-//#include "../particle.h"
-
+#include "../util.h"
 
 
 template <int vertices, int dimension>

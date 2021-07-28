@@ -7,6 +7,7 @@
 
 #include "list.h"
 #include "particle.h"
+#include "util.h"
 
 template <int dim>
 class ParticleList{
@@ -14,11 +15,28 @@ public:
     using ParticleN = ParticleBase<dim>;
     using Vector = typename ParticleN::Vector;
 
+    ParticleList() {
+        ptr_wrapper.set_pointer(this);
+    };
+    ~ParticleList() {
+        ParticleN* current = get_head();
+
+        while (current) {
+            ParticleN* temp = current->get_next();
+            delete current;
+            current = temp;
+        }
+
+        list.reset_head();
+        list.reset_tail();
+    }
+
     void create_particle(const Vector& location) {
-        ParticleN* temp = new ParticleN();
+        auto temp = new ParticleN();
         temp->set_location(location);
         list.push(temp->get_node());
     }
+
     int get_num_particles() { return list.length; }
     Eigen::MatrixXd get_all_particle_locations() const {
         Eigen::MatrixXd temp = Eigen::MatrixXd::Zero(list.length, dim);
@@ -30,6 +48,7 @@ public:
         }
         return temp;
     }
+
     Eigen::VectorXi get_all_particle_column_indices() const {
         Eigen::VectorXi temp = Eigen::VectorXi::Zero(list.length);
         auto current = list.get_head();
@@ -40,6 +59,7 @@ public:
         }
         return temp;
     }
+
     ParticleN* get_head() const {
         if (list.get_head()) {
             return list.get_head()->owner;
@@ -83,10 +103,14 @@ public:
         list.length--;
     }
 
+    PointerWrapper<ParticleList<dim>> get_pointer_wrapper() { return ptr_wrapper; }
+
 private:
     List<ParticleN> list;
+    PointerWrapper<ParticleList<dim>> ptr_wrapper;
 };
 
 using ParticleList2D = ParticleList<2>;
+using ParticleList2DPtrWrapper = PointerWrapper<ParticleList2D>;
 
 #endif //PYOPATRA_PARTICLE_LIST_H

@@ -63,15 +63,22 @@ if __name__ == '__main__':
     tm2d = TriangularMesh2D()
     tm2d.setup_mesh(hfp, 2)
 
+    # Set up particles
+    particles = ParticleList()
+
+    # Set up objective function
+    obj = SlicedWassersteinDistance(700, 1000, [hfp.latitude[0], hfp.latitude[-1], hfp.longitude[0], hfp.longitude[-1]], 5000, 3000)
+
+    # Set up solver
+    solver = Solver(hfp.times, tm2d, particles, obj)
+
     # Set up objective function
     with h5py.File("{}/data/observed_particles.hdf5".format(file_prefix), "r") as fp:
         obs_particles_temp = fp['particles'][:, :]
 
     obs_particles = obs_particles_temp[~np.all(obs_particles_temp == 0, axis=1)]
-    tm2d.setup_objective_function(obs_particles,
-                                  num_bins_lat_long=[700, 1000],
-                                  bounds=[hfp.latitude[0], hfp.latitude[-1], hfp.longitude[0], hfp.longitude[-1]],
-                                  num_proj=5000)
+
+    obj.set_observed_values(obs_particles)
 
     previous_log_likelihood = 0
     previous_obj_value = 0
@@ -92,12 +99,12 @@ if __name__ == '__main__':
             # Inject more particles
             if i % add_particles_time_step_interval == 0:
                 for j in range(num_particles):
-                    tm2d.append_particle(proposed_loc)
+                    particles.append_particle(proposed_loc[0], proposed_loc[1])
                     current_num_particles += 1
 
-            tm2d.time_step(time_delta)
+            solver.time_step(time_delta)
 
-        obj_value = tm2d.get_objective_value()
+        obj_value = solver.calculate_objective_value()
         log_likelihood = -obj_value / (2 * precision_parameter**2)
         print(obj_value, previous_obj_value, log_likelihood, previous_log_likelihood)
 
@@ -118,11 +125,11 @@ if __name__ == '__main__':
 
         samples[sample, :] = prev_loc[:]
         obj_values[sample] = previous_obj_value
-        tm2d.reset_mesh()
+        solver.reset_solver()
 
     print("Acceptance Ratio: {}".format(accepted / num_samples))
 
-    with h5py.File("{}/data/mcmc_save_data.hdf5".format(file_prefix), "w") as fp:
+    with h5py.File("{}/data/mcmc_save_data_{}_samples.hdf5".format(file_prefix, num_samples), "w") as fp:
         fp.create_dataset('samples', data=samples)
         fp.create_dataset('objectives', data=obj_values)
 

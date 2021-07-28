@@ -22,7 +22,7 @@ class TestMesh:
 
         dummy_file = FileParserBase()
         dummy_file.vertices_per_polygon = 3
-        dummy_file.times = np.array([0, 3, 6], dtype=int)
+        dummy_file.times = np.array([0, 3, 6])
         dummy_file.regular_dimensions = (4, 5)
         dummy_file.num_vertices = 5 * 4
         dummy_file.num_elements = (5 - 1) * 2 * (4 - 1)
@@ -74,8 +74,11 @@ class TestMesh:
         yield tm2d, dummy_file
 
     def test_particle_list_setup(self, triangular_2d_hycom_mesh):
-        mesh = triangular_2d_hycom_mesh[0]
+        tmesh = triangular_2d_hycom_mesh[0]
         dummy_file = triangular_2d_hycom_mesh[1]
+
+        particles = ParticleList()
+        solver = Solver(dummy_file.times, tmesh, particles)
 
         particle_locations = np.array(
             [[1.25, 11.25],
@@ -89,22 +92,26 @@ class TestMesh:
         particle_indices = np.array([0, 8, 20, 21], dtype=int)
 
         for row_index in range(particle_locations.shape[0]):
-            mesh.append_particle(particle_locations[row_index, :])
+            particles.append_particle(particle_locations[row_index, 0], particle_locations[row_index, 1])
 
-        retrieved_particle_locations = mesh.get_all_particle_locations()
-        retrieved_particle_indices = mesh._cpp_mesh.get_all_particle_column_indices()
+        solver.update_particle_location_indices()
+
+        retrieved_particle_locations = particles.get_all_particle_locations()
+        retrieved_particle_indices = particles.get_all_particle_column_indices()
         assert np.linalg.norm(particle_locations - retrieved_particle_locations) < 10e-6
         assert np.linalg.norm(retrieved_particle_indices - particle_indices) < 10e-6
 
-        mesh.time_step(0.05)
-        updated_locations = mesh.get_all_particle_locations()
+        solver.time_step(0.05)
+        updated_locations = particles.get_all_particle_locations()
+
+        print(updated_locations)
 
         assert np.isclose(updated_locations[0, 0], particle_locations[0, 0] + (1.33208333333 - particle_locations[0, 0]) * 3600 / 111111 )
         # assert np.isclose(updated_locations[0, 1], particle_locations[0, 1] + (11.3820833333333333 - particle_locations[0, 1]) * 6 / 185)
 
-        mesh.reset_mesh()
+        solver.reset_solver()
         #
-        assert mesh._cpp_mesh.get_num_particles() == 0
+        assert particles.get_num_particles() == 0
 
 
 

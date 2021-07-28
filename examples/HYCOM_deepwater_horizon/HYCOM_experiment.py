@@ -57,6 +57,12 @@ if __name__ == '__main__':
     tm2d = TriangularMesh2D()
     tm2d.setup_mesh(hfp, 2)
 
+    # Set up particles
+    particles = ParticleList()
+
+    # Set up solver
+    solver = Solver(hfp.times, tm2d, particles)
+
     # Set up snapshot particle saving file
     with h5py.File('{}/data/snapshots.hdf5'.format(file_prefix), 'w') as fp:
         fp.create_dataset('snapshots', (total_particles, 2, total_time_steps // frame_interval + 1))
@@ -72,21 +78,21 @@ if __name__ == '__main__':
         if i % add_particles_time_step_interval == 0:
             for j in range(num_particles):
                 # print('Appending particle at ({}, {})'.format(particle_lon, particle_lat))
-                tm2d.append_particle(release_loc)
+                particles.append_particle(release_loc[0], release_loc[1])
                 current_num_particles += 1
 
         # print('Taking time step...')
         # Time stepping
-        tm2d.time_step(time_delta)
+        solver.time_step(time_delta)
 
         if i % frame_interval == 0:
             with h5py.File('{}/data/snapshots.hdf5'.format(file_prefix), 'a') as fp:
-                particles = tm2d.get_all_particle_locations()
-                fp['snapshots'][:particles.shape[0], :, frame] = particles
+                particle_locations = particles.get_all_particle_locations()
+                fp['snapshots'][:particle_locations.shape[0], :, frame] = particle_locations
             frame += 1
 
     print('Saving particle locations...')
-    particle_locations = tm2d.get_all_particle_locations()
+    particle_locations = particles.get_all_particle_locations()
     with h5py.File('{}/data/observed_particles.hdf5'.format(file_prefix), 'w') as fp:
         fp.create_dataset('particles', particle_locations.shape, data=particle_locations)
 

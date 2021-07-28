@@ -27,8 +27,8 @@ class MeshBase:
     def get_velocities(self, time_index):
         return self._cpp_mesh.get_velocities(time_index)
 
-    def update_particle_locations(self):
-        self._cpp_mesh.update_particle_locations()
+    # def update_particle_locations(self):
+    #     self._cpp_mesh.update_particle_locations()
 
     def get_water_column_pointer(self, index):
         return self._cpp_mesh.get_water_column_pointer(index)
@@ -39,31 +39,31 @@ class MeshBase:
     def check_water_column_adjacency(self, origin_index, destination_index, side):
         return self._cpp_mesh.check_water_column_adjacency(origin_index, destination_index, side)
 
-    def append_particle(self, location):
-        if self.dimensions == 2:
-            self._cpp_mesh.add_particle(location)
-        else:
-            raise NotImplementedError('Only 2D currently implemented')
+    # def append_particle(self, location):
+    #     if self.dimensions == 2:
+    #         self._cpp_mesh.add_particle(location)
+    #     else:
+    #         raise NotImplementedError('Only 2D currently implemented')
 
     # Not efficient! Only use for testing purposes or infrequently
-    def get_all_particle_locations(self):
-        return self._cpp_mesh.get_all_particle_locations()
-
-    def save_particle_locations_hdf5(self, filename):
-        pass
-
-    def time_step(self, time_delta):
-        self._cpp_mesh.time_step(time_delta)
-
-    def reset_mesh(self):
-        self._cpp_mesh.reset_mesh()
-
-    def setup_objective_function(self, particle_locations, num_bins_lat_long=None, bounds=None, num_proj=None, seed=None):
-        temp = np.array(particle_locations, order='F')
-        self._cpp_mesh.create_sliced_wasserstein_distance(temp, num_bins_lat_long[0], num_bins_lat_long[1], np.array(bounds), num_proj, seed)
-
-    def get_objective_value(self):
-        return self._cpp_mesh.calculate_objective_function()
+    # def get_all_particle_locations(self):
+    #     return self._cpp_mesh.get_all_particle_locations()
+    #
+    # def save_particle_locations_hdf5(self, filename):
+    #     pass
+    #
+    # def time_step(self, time_delta):
+    #     self._cpp_mesh.time_step(time_delta)
+    #
+    # def reset_mesh(self):
+    #     self._cpp_mesh.reset_mesh()
+    #
+    # def setup_objective_function(self, particle_locations, num_bins_lat_long=None, bounds=None, num_proj=None, seed=None):
+    #     temp = np.array(particle_locations, order='F')
+    #     self._cpp_mesh.create_sliced_wasserstein_distance(temp, num_bins_lat_long[0], num_bins_lat_long[1], np.array(bounds), num_proj, seed)
+    #
+    # def get_objective_value(self):
+    #     return self._cpp_mesh.calculate_objective_function()
 
 
 class TriangularMesh(MeshBase):

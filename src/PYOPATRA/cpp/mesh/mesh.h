@@ -12,6 +12,7 @@
 #include "mesh_water_column.h"
 #include "../particle_list.h"
 #include "../inversion_tools/objective_functions.h"
+#include "../util.h"
 
 template <int num_vertices_per_element, int dimension>
 class Mesh {
@@ -21,56 +22,61 @@ public:
 
 protected:
 //    time_t current_time;
-    size_t current_time_step;
-    int total_time_steps, time_step_size;
-    double starting_time;
-    double time;
-    std::vector<double> measured_times;
+//    size_t current_time_step;
+//    double starting_time;
+//    double time;
+//    std::vector<double> measured_times;
     std::vector<WaterCol> water_columns;
     std::vector<Vertex> vertices;
-    ParticleList<dimension> particles;
-    ObjectiveFunctionBase<dimension> *obj;
+//    ParticleList<dimension> particles;
+//    ObjectiveFunctionBase<dimension> *obj;
+    PointerWrapper<Mesh<num_vertices_per_element, dimension>> ptr_wrapper;
 
 public:
     using Vector = Eigen::Matrix<double, dimension, 1>;
 
     Mesh()
-        : current_time_step(0)
-        , total_time_steps(0)
-        , time_step_size(0)
-        , starting_time(0)
-        , time(0)
-        , measured_times()
-        , water_columns()
+//        : current_time_step(0)
+//        , total_time_steps(0)
+//        , time_step_size(0)
+//        , starting_time(0)
+//        , time(0)
+//        , measured_times()
+        : water_columns()
         , vertices()
-        , obj(nullptr)
-    {}
+//        , obj(nullptr)
+    {
+        ptr_wrapper.set_pointer(this);
+    }
 
     Mesh(int num_water_columns, int num_vertices, std::vector<double>&& measured_times)
-        : current_time_step(0)
-        , total_time_steps(0)
-        , time_step_size(0)
-        , starting_time(measured_times[0])
-        , time(measured_times[0])
-        , measured_times(measured_times)
-        , water_columns(num_water_columns, WaterCol())
+//        : current_time_step(0)
+//        , total_time_steps(0)
+//        , time_step_size(0)
+//        , starting_time(measured_times[0])
+//        , time(measured_times[0])
+//        , measured_times(measured_times)
+        : water_columns(num_water_columns, WaterCol())
         , vertices(num_vertices, Vertex(measured_times.size()))
-        , obj(nullptr)
+//        , obj(nullptr)
     {
         for (size_t i = 0; i < water_columns.size(); i++) {
             water_columns[i].set_index(i);
         }
+
+        ptr_wrapper.set_pointer(this);
     }
 
-    ~Mesh() {
-        particles.delete_all_particles();
+//    ~Mesh() {
+////        particles.delete_all_particles();
+//        if (obj) {
+//            delete obj;
+//        }
+//    }
 
-        if (obj) {
-            delete obj;
-        }
-    }
+//    double get_current_time() { return time; }
 
-    double get_current_time() { return time; }
+    PointerWrapper<Mesh<num_vertices_per_element, dimension>> get_pointer_wrapper() { return ptr_wrapper; }
     std::vector<Vertex>& get_vertices() { return vertices; }
     Eigen::MatrixXd get_vertex_locations() {
         Eigen::MatrixXd temp = Eigen::MatrixXd::Zero(vertices.size(), dimension);
@@ -107,57 +113,55 @@ public:
     Vertex* get_vertex_pointer(int vertex_index) { return &vertices[vertex_index]; }
     const WaterCol* get_water_column_pointer(int water_column_index) const { return &water_columns[water_column_index]; }
     const std::array<WaterCol*, num_vertices_per_element>& get_water_column_adjacencies(int water_column_index) const { return  water_columns[water_column_index].get_adjacencies(); }
-    void add_particle(Vector& location) {
-        particles.create_particle(location);
-        update_particle_mesh_location(*particles.get_tail());
-    }
-    Eigen::MatrixXd get_all_particle_locations() const { return particles.get_all_particle_locations(); };
-    Eigen::VectorXi get_all_particle_column_indices() const { return particles.get_all_particle_column_indices(); }
+//    void add_particle(Vector& location) {
+//        particles.create_particle(location);
+//        update_particle_mesh_location(*particles.get_tail());
+//    }
+//    Eigen::MatrixXd get_all_particle_locations() const { return particles.get_all_particle_locations(); };
+//    Eigen::VectorXi get_all_particle_column_indices() const { return particles.get_all_particle_column_indices(); }
 
-    void update_particle_locations(double time_delta) {
-        auto current = particles.get_head();
-        size_t lower_bound = current_time_step;
+//    void update_particle_locations(double time_delta) {
+//        auto current = particles.get_head();
+//        size_t lower_bound = current_time_step;
+//
+//        time += time_delta;
+//
+//        while (time >= measured_times[lower_bound + 1]) {
+//            lower_bound++;
+//        }
+//
+//        current_time_step = lower_bound;
+//
+//        while (current) {
+//            Vector velocity_update = water_columns[current->get_last_known_water_column_index()]
+//                    .interpolate_velocity(current->get_location(), lower_bound, time_delta, time,
+//                                          measured_times[current_time_step], measured_times[current_time_step + 1]);
+//            current->update_location(velocity_update, time_delta);
+//            update_particle_mesh_location(*current);
+//            current = current->get_next();
+//        }
+//    }
 
-        time += time_delta;
+//    void update_particle_location_indices() {
+//        auto current = particles.get_head();
+//
+//        while (current) {
+//            update_particle_mesh_location(*current);
+//            current = current->get_next();
+//        }
+//    }
 
-        while (time >= measured_times[lower_bound + 1]) {
-            lower_bound++;
-        }
-
-        current_time_step = lower_bound;
-
-        while (current) {
-            Vector velocity_update = water_columns[current->get_last_known_water_column_index()]
-                    .interpolate_velocity(current->get_location(), lower_bound, time_delta, time, measured_times[current_time_step], measured_times[current_time_step + 1]);
-//            Vector ub = water_columns[current->get_last_known_water_column_index()].interpolate_velocity(current->get_location(), lower_bound + 1);
-//            Vector interpolated = (1 - ((time - measured_times[current_time_step]) / (measured_times[current_time_step + 1] - measured_times[current_time_step]))) * lb +
-//                    ((time - measured_times[current_time_step]) / (measured_times[current_time_step + 1] - measured_times[current_time_step])) * ub;
-            current->update_location(velocity_update, time_delta);
-            update_particle_mesh_location(*current);
-            current = current->get_next();
-        }
-    }
-
-    void update_particle_location_indices() {
-        auto current = particles.get_head();
-
-        while (current) {
-            update_particle_mesh_location(*current);
-            current = current->get_next();
-        }
-    }
-
-    void update_particle_mesh_location(typename ParticleList<dimension>::ParticleN& particle) {
-        int new_col = locate_new_water_column(&water_columns[particle.get_last_known_water_column_index()], particle.get_location());
-
-        if (new_col >=0) {
-            particle.set_water_column_index(new_col);
-        } else {
-            // Particle has gone off the mesh, remove it
-            particle.get_node().remove();
-            particles.decrement_length();
-        }
-    }
+//    void update_particle_mesh_location(typename ParticleList<dimension>::ParticleN& particle) {
+//        int new_col = locate_new_water_column(&water_columns[particle.get_last_known_water_column_index()], particle.get_location());
+//
+//        if (new_col >=0) {
+//            particle.set_water_column_index(new_col);
+//        } else {
+//            // Particle has gone off the mesh, remove it
+//            particle.get_node().remove();
+//            particles.decrement_length();
+//        }
+//    }
 
     // From https://stackoverflow.com/questions/1903954/is-there-a-standard-sign-function-signum-sgn-in-c-c
     template <typename T>
@@ -185,58 +189,60 @@ public:
                 } else {
                     return locate_new_water_column(starting_water_col->get_adjacencies()[2], location);
                 }
+            } else {
+                return -1;
             }
-        } else {
-            return -1;
         }
 
         return -1;
     }
 
-    void time_step(double time_delta) {
-        update_particle_locations(time_delta);
-    }
-
-    void reset_mesh() {
-        time = starting_time;
-        current_time_step = 0;
-        particles.delete_all_particles();
-    }
-
-    int get_num_particles() {
-        return particles.get_num_particles();
-    }
+//    void time_step(double time_delta) {
+//        update_particle_locations(time_delta);
+//    }
+//
+//    void reset_mesh() {
+//        time = starting_time;
+//        current_time_step = 0;
+//        particles.delete_all_particles();
+//    }
+//
+//    int get_num_particles() {
+//        return particles.get_num_particles();
+//    }
 
     // One particle per row
     // bounds are {min latitude, max latitude, min longitude, max longitude}
-    void create_sliced_wasserstein_distance(const Eigen::Ref<Eigen::MatrixXd> particle_locations, int num_bins_lat,
-                                            int num_bins_lon, const Eigen::Ref<Eigen::Vector4d> bounds, int num_proj,
-                                            unsigned int seed) {
-
-        if (obj) {
-            delete obj;
-        }
-
-        obj = new SlicedWassersteinDistance<dimension>(num_bins_lat, num_bins_lon, bounds, num_proj, seed);
-        auto temp_list = new ParticleList<dimension>();
-
-        for (int i = 0; i < particle_locations.rows(); i++) {
-            temp_list->create_particle(particle_locations.row(i));
-        }
-
-        obj->set_observed_values(*temp_list);
-
-        temp_list->delete_all_particles();
-        delete temp_list;
-    }
-
-    double calculate_objective_function() {
-        return obj->calculate_value(particles);
-    }
+//    void create_sliced_wasserstein_distance(const Eigen::Ref<Eigen::MatrixXd> particle_locations, int num_bins_lat,
+//                                            int num_bins_lon, const Eigen::Ref<Eigen::Vector4d> bounds, int num_proj,
+//                                            unsigned int seed) {
+//
+//        if (obj) {
+//            delete obj;
+//        }
+//
+//        obj = new SlicedWassersteinDistance<dimension>(num_bins_lat, num_bins_lon, bounds, num_proj, seed);
+//        auto temp_list = new ParticleList<dimension>();
+//
+//        for (int i = 0; i < particle_locations.rows(); i++) {
+//            temp_list->create_particle(particle_locations.row(i));
+//        }
+//
+//        obj->set_observed_values(*temp_list);
+//
+//        temp_list->delete_all_particles();
+//        delete temp_list;
+//    }
+//
+//    double calculate_objective_function() {
+//        return obj->calculate_value(particles);
+//    }
 
 };
 
 using TriangularMesh2D = Mesh<3, 2>;
 using TriangularMesh3D = Mesh<3, 3>;
+
+using TriangularMesh2DPtrWrapper = PointerWrapper<TriangularMesh2D>;
 
 #endif //PYOPATRA_MESH_H

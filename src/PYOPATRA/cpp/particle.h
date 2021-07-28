@@ -16,7 +16,7 @@ public:
 
 protected:
     Vector location;
-    size_t last_known_water_column_index;
+    int last_known_water_column_index;
 
     // Enable Intrusive Linked List Structure
     ILLNode<ParticleBase<dimension>> node;
@@ -32,7 +32,7 @@ public:
 //        location += velocity * 6.0 / 185.0 * time_delta;
     }
     size_t get_last_known_water_column_index() { return last_known_water_column_index; }
-    void set_water_column_index(size_t wc_index) { last_known_water_column_index = wc_index; }
+    void set_water_column_index(int wc_index) { last_known_water_column_index = wc_index; }
     ParticleBase<dimension>* get_next() const {
         if (node.next) {
             return node.next->owner;

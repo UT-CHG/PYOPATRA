@@ -7,36 +7,56 @@
 
 #include "Eigen/Dense"
 #include "../particle_list.h"
-#include "../pyopatra_random.h"
+#include "../util.h"
 
 // At this time, only rectangular domains are implemented
 
 template <int dimension>
 class ObjectiveFunctionBase {
 public:
-    ObjectiveFunctionBase() = default;
+    ObjectiveFunctionBase() { ptr_wrapper = this; };
     virtual ~ObjectiveFunctionBase() = default;
 
-    virtual void set_observed_values(const ParticleList<dimension>& particles) = 0;
+//    virtual void set_observed_values(const ParticleList<dimension>& particles) = 0;
     virtual double calculate_value(const ParticleList<dimension>& particles) = 0;
+    PointerWrapper<ObjectiveFunctionBase<dimension>> get_pointer_wrapper() { return ptr_wrapper; }
+    void set_observed_values(const Eigen::Ref<Eigen::MatrixXd> particle_locations) {
+        auto temp_list = new ParticleList<dimension>();
+
+        for (int i = 0; i < particle_locations.rows(); i++) {
+            temp_list->create_particle(particle_locations.row(i));
+        }
+
+        finish_observed_setup_impl(*temp_list);
+
+        temp_list->delete_all_particles();
+        delete temp_list;
+    }
+
+protected:
+    virtual void finish_observed_setup_impl(ParticleList<dimension>& particles) = 0;
+    PointerWrapper<ObjectiveFunctionBase<dimension>> ptr_wrapper;
 };
 
 template <int dimension>
 class BinObjectiveFunctionBase : public ObjectiveFunctionBase<dimension> {
-private:
+protected:
     Eigen::VectorXd latitude_bounds, longitude_bounds;
     Eigen::MatrixXd bins, observed_bins;
 
 public:
     BinObjectiveFunctionBase()
-        : latitude_bounds(0)
+        : ObjectiveFunctionBase<dimension>()
+        , latitude_bounds(0)
         , longitude_bounds(0)
         , bins(0, 0)
-        , observed_bins(0, 0) {}
+        , observed_bins(0, 0)
+    {}
 
     // bounds are {min latitude, max latitude, min longitude, max longitude}
     BinObjectiveFunctionBase(int num_bins_lat, int num_bins_lon, const Eigen::Vector4d& bounds)
-        : latitude_bounds(num_bins_lat)
+        : ObjectiveFunctionBase<dimension>()
+        , latitude_bounds(num_bins_lat)
         , longitude_bounds(num_bins_lon)
         , bins(num_bins_lon, num_bins_lat)
         , observed_bins(num_bins_lon, num_bins_lat)
@@ -56,14 +76,9 @@ public:
         bins.setZero();
     }
 
-    virtual double calculate_value(const ParticleList<dimension>& particles) {
+    double calculate_value(const ParticleList<dimension>& particles) {
         fill_bins(particles, bins);
-
         return calculate_value_impl();
-    }
-
-    void set_observed_values(const ParticleList<dimension>& particles) {
-        fill_bins(particles, observed_bins);
     }
 
     Eigen::MatrixXd& get_observed_bins() { return observed_bins; }
@@ -73,6 +88,10 @@ public:
 
 protected:
     virtual double calculate_value_impl() = 0;
+
+    void finish_observed_setup_impl(ParticleList<dimension>& particles) {
+        fill_bins(particles, observed_bins);
+    }
 
     int get_1D_bin_coord(double position, const Eigen::VectorXd& bounds) {
         size_t len = bounds.size();
@@ -145,7 +164,7 @@ private:
         double sum = 0.0;
 
         for (int i = 0; i < num_proj; i++) {
-            proj = Eigen::VectorXd::NullaryExpr(Parent::get_latitude_bounds().rows(), [&]() { return unif(generator); });
+            proj = Eigen::VectorXd::NullaryExpr(Parent::get_latitude_bounds().rows(), [&]() { return unif(sw_generator); });
             proj.normalize();
 
             sample_proj = Parent::get_bins() * proj;
@@ -170,5 +189,6 @@ private:
 };
 
 using SlicedWassersteinDistance2D = SlicedWassersteinDistance<2>;
+using ObjectiveFunction2DPtrWrapper = PointerWrapper<ObjectiveFunctionBase<2>>;
 
 #endif //PYOPATRA_OBJECTIVE_FUNCTIONS_H
