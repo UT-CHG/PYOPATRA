@@ -48,6 +48,7 @@ if (${BUILD_PYTHON})
             src/PYOPATRA/cpp/particle_list.h
             src/PYOPATRA/cpp/inversion_tools/objective_functions.h
             src/PYOPATRA/cpp/util.h
+            src/PYOPATRA/cpp/solver.h
             )
     target_include_directories(pyopatra_pybind PUBLIC SYSTEM ${MPI_CXX_INCLUDE_PATH} ${HDF5_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
     target_link_libraries(pyopatra_pybind PUBLIC ${MPI_CXX_LIBRARIES} ${HDF5_LIBRARIES} Eigen3::Eigen)
@@ -73,7 +74,8 @@ if (${BUILD_CPP} OR ${BUILD_TEST})
             src/PYOPATRA/cpp/mesh/mesh_element.cpp
             src/PYOPATRA/cpp/particle_list.h
             src/PYOPATRA/cpp/inversion_tools/objective_functions.h
-            src/PYOPATRA/cpp/util.h src/PYOPATRA/cpp/solver.h)
+            src/PYOPATRA/cpp/util.h
+            src/PYOPATRA/cpp/solver.h)
     target_include_directories(pyopatra_lib PUBLIC SYSTEM ${HDF5_INCLUDE_DIRS})
     target_link_libraries(pyopatra_lib PUBLIC ${MPI_CXX_LIBRARIES} ${HDF5_LIBRARIES} Eigen3::Eigen)
     target_compile_definitions(pyopatra_lib PUBLIC ${HDF5_DEFINITIONS})
