@@ -125,15 +125,17 @@ private:
     using Parent = BinObjectiveFunctionBase<dimension>;
     Eigen::VectorXd proj, sample_proj, observed_proj, emd_vec;
     int num_proj;
+    std::default_random_engine sw_generator;
 
 public:
-    SlicedWassersteinDistance(int num_bins_lat, int num_bins_lon, const Eigen::Vector4d& bounds, int num_proj)
+    SlicedWassersteinDistance(int num_bins_lat, int num_bins_lon, const Eigen::Vector4d& bounds, int num_proj, unsigned int seed)
         : Parent(num_bins_lat, num_bins_lon, bounds)
         , proj(num_bins_lat)
         , sample_proj(num_bins_lon)
         , observed_proj(num_bins_lon)
         , emd_vec(num_bins_lon)
         , num_proj(num_proj)
+        , sw_generator(seed)
     {}
 
     void set_num_proj(int new_num_proj) { num_proj = new_num_proj; }

@@ -7,7 +7,7 @@
 #include "PYOPATRA/cpp/particle_list.h"
 
 TEST_CASE("Objective Tests", "[objective-tests]") {
-    SlicedWassersteinDistance2D obj(5, 10, {20, 25, -90, -80}, 20);
+    SlicedWassersteinDistance2D obj(5, 10, {20, 25, -90, -80}, 20, 5000);
 
     Eigen::VectorXd lat_bins(5), lon_bins(10);
     lat_bins << 20, 21, 22, 23, 24;
