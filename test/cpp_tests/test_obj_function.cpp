@@ -23,14 +23,22 @@ TEST_CASE("Objective Tests", "[objective-tests]") {
     p_list.create_particle({20.5, -90});
     p_list.create_particle({25, -88.5});
 
+    Eigen::MatrixXd particle_locations(4, 2);
+    particle_locations << 21.5, -88.5,
+                          24.5, -80.5,
+                          20.5, -90.0,
+                          25.0, -88.5;
+
     ParticleList2D p_list2;
+
+
 
     p_list2.create_particle({21.5, -88.5});
     p_list2.create_particle({24.5, -80.5});
     p_list2.create_particle({20.5, -90});
     p_list2.create_particle({23.5, -88.5});
 
-    obj.set_observed_values(p_list);
+    obj.set_observed_values(particle_locations);
 
     Eigen::MatrixXd bin(10, 5);
     bin << 0.25, 0, 0, 0, 0,
