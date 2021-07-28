@@ -210,13 +210,14 @@ public:
     // One particle per row
     // bounds are {min latitude, max latitude, min longitude, max longitude}
     void create_sliced_wasserstein_distance(const Eigen::Ref<Eigen::MatrixXd> particle_locations, int num_bins_lat,
-                                            int num_bins_lon, const Eigen::Ref<Eigen::Vector4d> bounds, int num_proj) {
+                                            int num_bins_lon, const Eigen::Ref<Eigen::Vector4d> bounds, int num_proj,
+                                            unsigned int seed) {
 
         if (obj) {
             delete obj;
         }
 
-        obj = new SlicedWassersteinDistance<dimension>(num_bins_lat, num_bins_lon, bounds, num_proj);
+        obj = new SlicedWassersteinDistance<dimension>(num_bins_lat, num_bins_lon, bounds, num_proj, seed);
         auto temp_list = new ParticleList<dimension>();
 
         for (int i = 0; i < particle_locations.rows(); i++) {

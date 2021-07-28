@@ -58,9 +58,9 @@ class MeshBase:
     def reset_mesh(self):
         self._cpp_mesh.reset_mesh()
 
-    def setup_objective_function(self, particle_locations, num_bins_lat_long=None, bounds=None, num_proj=None):
+    def setup_objective_function(self, particle_locations, num_bins_lat_long=None, bounds=None, num_proj=None, seed=None):
         temp = np.array(particle_locations, order='F')
-        self._cpp_mesh.create_sliced_wasserstein_distance(temp, num_bins_lat_long[0], num_bins_lat_long[1], np.array(bounds), num_proj)
+        self._cpp_mesh.create_sliced_wasserstein_distance(temp, num_bins_lat_long[0], num_bins_lat_long[1], np.array(bounds), num_proj, seed)
 
     def get_objective_value(self):
         return self._cpp_mesh.calculate_objective_function()

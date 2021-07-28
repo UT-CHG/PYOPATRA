@@ -74,7 +74,7 @@ PYBIND11_MODULE(pyopatra_pybind, m) {
             .def("create_particle", &ParticleList2D::create_particle);
 
     py::class_<SlicedWassersteinDistance2D>(m, "CppSlicedWassersteinDistance2D")
-            .def(py::init<int, int, const Eigen::Vector4d&, int>())
+            .def(py::init<int, int, const Eigen::Vector4d&, int, unsigned int>())
             .def("calculate_value", &SlicedWassersteinDistance2D::calculate_value);
 
 }
