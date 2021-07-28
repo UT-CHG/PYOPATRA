@@ -18,7 +18,7 @@ if __name__ == '__main__':
     true_particle_lat = 28.736628
     # Starting particle release location
     particle_lon = -87.8
-    particle_lat = 28.2
+    particle_lat = 29.2
     prev_loc = np.array((particle_lat, particle_lon))
     proposed_loc = np.array((particle_lat, particle_lon))
     # Time elapsed
@@ -33,12 +33,12 @@ if __name__ == '__main__':
     # Frame interval
     frame_interval = 3
     # Number of samples to draw for MCMC process
-    num_samples = 5000
+    num_samples = 10000
     samples = np.zeros((num_samples, 2))
     obj_values = np.zeros(num_samples)
     # Other MCMC specifiers
     precision_parameter = 0.1
-    step_length = np.array((0.01, 0.01))
+    step_length = np.array((0.03, 0.03))
 
     times = ['000', '003', '006', '009', '012', '015', '018', '021']
     start_date = date(2010, 4, 20)
