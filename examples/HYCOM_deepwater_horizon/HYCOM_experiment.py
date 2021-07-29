@@ -12,7 +12,7 @@ if __name__ == '__main__':
     # In hours
     time_delta = 1
     # Particle release per timedelta
-    num_particles = 10
+    num_particles = 5
     # Particle release location
     particle_lon = -88.365997
     particle_lat = 28.736628

@@ -1,4 +1,9 @@
 import numpy as np
+from mpi4py import MPI
+
+comm = MPI.COMM_WORLD
+size = comm.Get_size()
+rank = comm.Get_rank()
 
 from PYOPATRA import FileParserBase, MeshVertex2D
 from .pyopatra_pybind import CppTriangularMesh2D, TriangularMeshElement2D
@@ -79,9 +84,12 @@ class TriangularMesh2D(TriangularMesh):
 
     def setup_mesh(self, file_parser: FileParserBase, dimensions: int):
         self._setup_mesh(file_parser, dimensions)
-        self._setup_vertices(file_parser)
-        self._setup_water_columns(file_parser)
-        self._setup_elements_vertices()
+        if rank == 0:
+            self._setup_vertices(file_parser)
+            self._setup_elements_vertices()
+            self._setup_water_columns(file_parser)
+
+        comm.barrier()
 
     def _setup_mesh(self, file_parser: FileParserBase, dimensions: int):
         if dimensions == 2:

@@ -4,6 +4,11 @@
 
 import numpy as np
 import netCDF4 as nc
+from mpi4py import MPI
+
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+size = comm.Get_size()
 
 class FileParserBase:
     """
@@ -146,39 +151,53 @@ class HYCOMFileParser(FileParserBase):
 
         self.times = np.zeros(len(list_of_hycom_files))
 
-        with nc.Dataset(list_of_hycom_files[0]) as ds:
-            self.regular_dimensions = (ds['lat'].shape[0], ds['lon'].shape[0])
-            self.num_vertices = ds['lat'].shape[0] * ds['lon'].shape[0]
-            self.num_elements = (ds['lon'].shape[0] - 1) * 2 * (ds['lat'].shape[0] - 1)
-            self.latitude = ds['lat'][:]
-            self.longitude = ds['lon'][:]
+
+        if rank == 0:
+            with nc.Dataset(list_of_hycom_files[0]) as ds:
+                self.regular_dimensions = (ds['lat'].shape[0], ds['lon'].shape[0])
+                self.num_vertices = ds['lat'].shape[0] * ds['lon'].shape[0]
+                self.num_elements = (ds['lon'].shape[0] - 1) * 2 * (ds['lat'].shape[0] - 1)
+                self.latitude = ds['lat'][:]
+                self.longitude = ds['lon'][:]
+
+        self.regular_dimensions = comm.bcast(self.regular_dimensions, root=0)
+        self.num_vertices = comm.bcast(self.num_vertices, root=0)
+        self.num_elements = comm.bcast(self.num_elements, root=0)
+        self.latitude = comm.bcast(self.latitude, root=0)
+        self.longitude = comm.bcast(self.longitude, root=0)
+
 
         if dimensions == 2:
             self.velocity = np.zeros((2, self.num_vertices, len(list_of_hycom_files)))
+            self.diffusion_coefficient = np.ones((2, self.num_vertices, len(list_of_hycom_files))) * diffusion_coefficient
         else:
             raise NotImplementedError('Dimensions other than 2 have not been implemented.')
 
         # TODO: Make diffusion coefficient more flexible
-        self.diffusion_coefficient = np.ones((2, self.num_vertices, len(list_of_hycom_files))) * diffusion_coefficient
 
-        for index, filename in enumerate(list_of_hycom_files):
-            with nc.Dataset(filename) as ds:
-                if dimensions == 2:
-                    water_v = ds['water_v'][0, 0, :, :].flatten()
-                    self.velocity[0, :, index] = water_v[:]
-                    mv = self.velocity[0, :, index] == float(ds['water_v'].missing_value)
-                    self.velocity[0, :, index][mv] = 0.0
-                    self.diffusion_coefficient[0, :, index][mv] = 0.0
+        if rank == 0:
+            for index, filename in enumerate(list_of_hycom_files):
+                with nc.Dataset(filename) as ds:
+                    if dimensions == 2:
+                        water_v = ds['water_v'][0, 0, :, :].flatten()
+                        self.velocity[0, :, index] = water_v[:]
+                        mv = self.velocity[0, :, index] == float(ds['water_v'].missing_value)
+                        self.velocity[0, :, index][mv] = 0.0
+                        self.diffusion_coefficient[0, :, index][mv] = 0.0
 
-                    water_u = ds['water_u'][0, 0, :, :].flatten()
-                    self.velocity[1, :, index] = water_u[:]
-                    mv = self.velocity[1, :, index] == float(ds['water_u'].missing_value)
-                    self.velocity[1, :, index][mv] = 0.0
-                    self.diffusion_coefficient[0, :, index][mv] = 0.0
+                        water_u = ds['water_u'][0, 0, :, :].flatten()
+                        self.velocity[1, :, index] = water_u[:]
+                        mv = self.velocity[1, :, index] == float(ds['water_u'].missing_value)
+                        self.velocity[1, :, index][mv] = 0.0
+                        self.diffusion_coefficient[0, :, index][mv] = 0.0
 
-                    self.times[index] = ds['time'][0]
-                else:
-                    raise NotImplementedError('Dimensions other than 2 have not been implemented.')
+                        self.times[index] = ds['time'][0]
+                    else:
+                        raise NotImplementedError('Dimensions other than 2 have not been implemented.')
+
+        self.velocity = comm.bcast(self.velocity, root=0)
+        self.diffusion_coefficient = comm.bcast(self.diffusion_coefficient, root=0)
+        self.times = comm.bcast(self.times, root=0)
 
 
 

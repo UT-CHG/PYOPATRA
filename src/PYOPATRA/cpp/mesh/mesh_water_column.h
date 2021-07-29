@@ -20,20 +20,20 @@ class WaterColumn {
 public:
     using Vector = Eigen::Matrix<double, dimension, 1>;
 private:
-    std::vector<MeshElementT<vertices, dimension>> mesh_elements;
+    MeshElementT<vertices, dimension> *mesh_elements;
     int num_depths;
     std::array<WaterColumn<vertices, dimension>*, vertices> adjacent_columns;
-    std::tuple<MeshElementT<vertices, dimension>*, MeshElementT<vertices, dimension>*> get_element_depth_bounds(const Vector &location);
-    size_t index;
+//    std::tuple<MeshElementT<vertices, dimension>*, MeshElementT<vertices, dimension>*> get_element_depth_bounds(const Vector &location);
+    int index;
 
 public:
     WaterColumn()
-        : mesh_elements(1, MeshElementT<vertices, dimension>())
+        : mesh_elements(nullptr)
         , num_depths(1)
         , index(0)
     {}
     explicit WaterColumn(int num_depths)
-        : mesh_elements(num_depths, MeshElementT<vertices, dimension>())
+        : mesh_elements(nullptr)
         , num_depths(num_depths)
         , index(0)
     {}
@@ -62,13 +62,13 @@ public:
         }
     }
     void set_num_depths(int new_num_depths) { num_depths = new_num_depths; }
+    void set_element_head(MeshElementT<vertices, dimension>* head) { mesh_elements = head; }
     void set_adjacent_columns(WaterColumn<vertices, dimension>* a, WaterColumn<vertices, dimension>* b, WaterColumn<vertices, dimension>* c) { adjacent_columns = {a, b, c}; }
     void set_adjacent_column(WaterColumn<vertices, dimension>* col, int position) { adjacent_columns[position] = col; }
-    void set_element_vertex(int depth_index, int position, MeshVertex<dimension>* vert) { mesh_elements[depth_index].set_vertex(vert, position); }
     const std::array<WaterColumn<vertices, dimension>*, vertices>& get_adjacencies() const { return adjacent_columns; }
-    const std::vector<MeshElementT<vertices, dimension>>& get_mesh_elements() const { return mesh_elements; }
-    size_t get_index() const { return index; }
-    void set_index(size_t new_index) { index = new_index; }
+    MeshElementT<vertices, dimension>* get_mesh_elements() const { return mesh_elements; }
+    int get_index() const { return index; }
+    void set_index(int new_index) { index = new_index; }
 };
 
 using TriangularWaterColumn2D = WaterColumn<3, 2>;

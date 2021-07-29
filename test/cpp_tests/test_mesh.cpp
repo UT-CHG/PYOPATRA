@@ -8,8 +8,8 @@
 TEST_CASE("Mesh Tests", "[mesh-tests]") {
     TriangularMesh2D mesh(12, 12, {0, 3, 6, 9});
 
-    REQUIRE(mesh.get_vertices().size() == 12);
-    REQUIRE(mesh.get_water_columns().size() == 12);
+    REQUIRE(mesh.get_num_vertices() == 12);
+    REQUIRE(mesh.get_num_columns() == 12);
     REQUIRE(mesh.get_water_column_pointer(1) != nullptr);
 
     mesh.set_water_column_adjacency(0, 1, 1);

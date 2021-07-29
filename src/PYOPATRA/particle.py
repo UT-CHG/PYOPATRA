@@ -1,5 +1,10 @@
 from configparser import ConfigParser
 import numpy as np
+from mpi4py import MPI
+
+comm = MPI.COMM_WORLD
+size = comm.Get_size()
+rank = comm.Get_rank()
 
 from .pyopatra_pybind import CppParticleList2D
 
@@ -20,13 +25,45 @@ class ParticleList:
             raise NotImplementedError('Only 2D currently implemented')
 
     def get_all_particle_locations(self):
-        return self._cpp_particle_list.get_all_particle_locations()
+        locations = comm.gather(self._cpp_particle_list.get_all_particle_locations(), root=0)
+
+        if rank == 0:
+            total_num_particles = 0
+            for location in locations:
+                total_num_particles += location.shape[0]
+
+            snapshot = np.zeros((total_num_particles, 2))
+
+            position = 0
+            for location in locations:
+                snapshot[position:position + locations.shape[0], :] = location
+                position += locations.shape[0]
+
+            return locations
+        else:
+            return None
 
     def get_all_particle_column_indices(self):
-        return self._cpp_particle_list.get_all_particle_column_indices()
+        locations = comm.gather(self._cpp_particle_list.get_all_particle_column_indices(), root=0)
+
+        if rank == 0:
+            total_num_particles = 0
+            for location in locations:
+                total_num_particles += location.shape[0]
+
+            snapshot = np.zeros((total_num_particles, 2))
+
+            position = 0
+            for location in locations:
+                snapshot[position:position + locations.shape[0], :] = location
+                position += locations.shape[0]
+
+            return locations
+        else:
+            return None
 
     def get_num_particles(self):
-        return self._cpp_particle_list.get_length()
+        return comm.reduce(self._cpp_particle_list.get_length(), root=0, op=MPI.SUM)
 
     def reset_particles(self):
         self._cpp_particle_list.reset_particles()

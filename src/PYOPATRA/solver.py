@@ -2,6 +2,11 @@ from .pyopatra_pybind import CppTriangularMesh2DSolver
 from .particle import ParticleList
 from .objective_functions import ObjectiveFunctionBase
 from .mesh import MeshBase
+from mpi4py import MPI
+
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+size = comm.Get_size()
 
 
 class Solver:
@@ -24,4 +29,4 @@ class Solver:
         self._cpp_solver.update_particle_location_indices()
 
     def calculate_objective_value(self):
-        return self._cpp_solver.calculate_objective_value()
+        return comm.reduce(self._cpp_solver.calculate_objective_value(), op=MPI.SUM, root=0) / size
