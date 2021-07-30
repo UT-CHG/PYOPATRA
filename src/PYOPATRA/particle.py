@@ -51,11 +51,11 @@ class ParticleList:
             for location in locations:
                 total_num_particles += location.shape[0]
 
-            snapshot = np.zeros((total_num_particles, 2))
+            snapshot = np.zeros(total_num_particles, dtype=int)
 
             position = 0
             for location in locations:
-                snapshot[position:position + location.shape[0], :] = location
+                snapshot[position:position + location.shape[0]] = location
                 position += location.shape[0]
 
             return locations
