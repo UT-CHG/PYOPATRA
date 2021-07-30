@@ -5,15 +5,15 @@
 #include <cmath>
 
 template <int dimension>
-MeshVertexBase<dimension>::MeshVertexBase(int num_timesteps)
+MeshVertexBase<dimension>::MeshVertexBase(int index, int num_timesteps)
     : location(MeshVertexBase<dimension>::Vector::Zero())
-    , velocity(num_timesteps, MeshVertexBase<dimension>::Vector::Zero())
-    , diffusion_coefficient(num_timesteps, MeshVertexBase<dimension>::Vector::Zero())
+    , velocity(index * num_timesteps)
+    , diffusion_coefficient(index * num_timesteps)
 {}
 
 template <int dimension>
-MeshVertexBase<dimension>::MeshVertexBase(double latitude, double longitude, int num_timesteps)
-    : MeshVertexBase<dimension>(num_timesteps)
+MeshVertexBase<dimension>::MeshVertexBase(double latitude, double longitude, int index, int num_timesteps)
+    : MeshVertexBase<dimension>(index, num_timesteps)
 {
     location(0) = latitude;
     location(1) = longitude;

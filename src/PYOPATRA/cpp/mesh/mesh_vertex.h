@@ -7,6 +7,7 @@
 
 #include <Eigen/Dense>
 #include <initializer_list>
+#include <array>
 
 #include "../coordinate.h"
 
@@ -17,23 +18,23 @@ public:
 
 protected:
     Vector location;
-    std::vector<Vector> velocity;
-    std::vector<Vector> diffusion_coefficient;
+    int velocity;
+    int diffusion_coefficient;
 
 public:
-    explicit MeshVertexBase(int num_timesteps);
-    MeshVertexBase(double latitude, double longitude, int num_timesteps);
+    explicit MeshVertexBase(int index, int num_timesteps);
+    MeshVertexBase(double latitude, double longitude, int index, int num_timesteps);
 //    MeshVertexBase(double latitude, double longitude, Vector velocity);
 //    MeshVertexBase(double latitude, double longitude, Vector velocity, Vector diffusion_coefficient);
 
     Vector get_location() const { return location; }
     double get_latitude() const { return location[0]; }
     double get_longitude() const { return location[1]; }
-    const std::vector<Vector>& get_velocity() const { return velocity; }
-    const std::vector<Vector>& get_diffusion_coefficient() const { return diffusion_coefficient; }
+    int get_velocity() const { return velocity; }
+    int get_diffusion_coefficient() const { return diffusion_coefficient; }
 
-    void set_diffusion_coefficient(Vector new_diffusion_coefficient, int time_index) { diffusion_coefficient[time_index] = new_diffusion_coefficient; }
-    void set_velocity(Vector new_velocity, int time_index) { velocity[time_index] = new_velocity; }
+    void set_diffusion_coefficient(int new_diffusion_coefficient) { diffusion_coefficient = new_diffusion_coefficient; }
+    void set_velocity(int new_velocity) { velocity = new_velocity; }
     void set_location(Vector new_location) { location = new_location; }
 };
 
@@ -46,8 +47,8 @@ class MeshVertex : MeshVertexBase<dimension> {};
 template <>
 class MeshVertex<2> : public MeshVertexBase<2> {
 public:
-    explicit MeshVertex(size_t num_timesteps) : MeshVertexBase<2>(num_timesteps) {}
-    MeshVertex(double latitude, double longitude, int num_timesteps) : MeshVertexBase<2>(latitude, longitude, num_timesteps) {}
+    MeshVertex(int index, int num_timesteps) : MeshVertexBase<2>(index, num_timesteps) {}
+    MeshVertex(double latitude, double longitude, int index, int num_timesteps) : MeshVertexBase<2>(latitude, longitude, index, num_timesteps) {}
 //    MeshVertex(double latitude, double longitude, Vector velocity, Vector diffusion_coefficient)
 //        : MeshVertexBase<2>(latitude, longitude, velocity, diffusion_coefficient)
 //    {}
@@ -59,8 +60,8 @@ private:
     std::vector<double> density, temperature, water_viscosity, viscosity;
 
 public:
-    explicit MeshVertex(int num_timesteps);
-    MeshVertex(double latitude, double longitude, double bathymetric_depth, int num_timesteps);
+    explicit MeshVertex(int index, int num_timesteps);
+    MeshVertex(double latitude, double longitude, double bathymetric_depth, int index, int num_timesteps);
 //    MeshVertex(double latitude, double longitude, double bathymetric_depth, double density, double temperature, int num_timesteps);
 //    MeshVertex(double latitude, double longitude, double bathymetric_depth, double density, double temperature, Vector velocity);
 //    MeshVertex(double latitude, double longitude, double bathymetric_depth, double density, double temperature, Vector velocity, Vector diffusion_coefficient);

@@ -38,7 +38,9 @@ public:
         , starting_time(measured_times(0))
         , time(starting_time)
         , measured_times(measured_times)
-    {}
+    {
+        update_particle_location_indices();
+    }
 
     Solver(PointerWrapper<SolverMesh>& mesh_ptr, PointerWrapper<SolverParticles>& particle_list_ptr, Eigen::VectorXd measured_times)
             : mesh(mesh_ptr.get_pointer())
@@ -48,7 +50,9 @@ public:
             , starting_time(measured_times(0))
             , time(starting_time)
             , measured_times(measured_times)
-    {}
+    {
+        update_particle_location_indices();
+    }
 
     double get_current_time() { return time; }
 
@@ -76,7 +80,7 @@ public:
 
         while (current) {
             Vector velocity_update = mesh->get_water_columns()[current->get_last_known_water_column_index()]
-                    .interpolate_velocity(current->get_location(), lower_bound, time_delta, time,
+                    .interpolate_velocity(mesh->get_elements(), mesh->get_vertices(), mesh->get_velocities_ptr(), mesh->get_diffusions_ptr(), current->get_location(), lower_bound, time_delta, time,
                                           measured_times[current_time_step], measured_times[current_time_step + 1]);
             current->update_location(velocity_update, time_delta);
             update_particle_mesh_location(*current);

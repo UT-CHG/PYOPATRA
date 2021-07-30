@@ -20,35 +20,35 @@ class WaterColumn {
 public:
     using Vector = Eigen::Matrix<double, dimension, 1>;
 private:
-    MeshElementT<vertices, dimension> *mesh_elements;
+    int mesh_elements;
     int num_depths;
-    std::array<WaterColumn<vertices, dimension>*, vertices> adjacent_columns;
+    std::array<int, vertices> adjacent_columns;
 //    std::tuple<MeshElementT<vertices, dimension>*, MeshElementT<vertices, dimension>*> get_element_depth_bounds(const Vector &location);
     int index;
 
 public:
     WaterColumn()
-        : mesh_elements(nullptr)
+        : mesh_elements(0)
         , num_depths(1)
         , index(0)
     {}
     explicit WaterColumn(int num_depths)
-        : mesh_elements(nullptr)
+        : mesh_elements(0)
         , num_depths(num_depths)
         , index(0)
     {}
 
-    Vector interpolate_velocity(const Vector location, size_t time_index, double delta_t,  double time, double lower_time, double upper_time) {
+    Vector interpolate_velocity(const MeshElementT<vertices, dimension>* elements, const MeshVertex<dimension>* vertex_array, Vector* velocities, Vector* diffusions, const Vector& location, size_t time_index, double delta_t,  double time, double lower_time, double upper_time) {
         if constexpr (dimension == 2) {
             double t = ((time - lower_time) / (upper_time - lower_time));
-            auto barycentric = mesh_elements[0].calculate_barycentric_coordinate(location);
+            auto barycentric = elements[mesh_elements].calculate_barycentric_coordinate(vertex_array, location);
 
-            Vector lb = mesh_elements[0].sample_velocity(barycentric, time_index);
-            Vector ub = mesh_elements[0].sample_velocity(barycentric, time_index + 1);
+            Vector lb = elements[mesh_elements].sample_velocity(vertex_array, velocities, barycentric, time_index);
+            Vector ub = elements[mesh_elements].sample_velocity(vertex_array, velocities, barycentric, time_index + 1);
             Vector interpolated_velocity = (1 - t) * lb + t * ub;
 
-            lb = mesh_elements[0].sample_diffusion_coefficient(barycentric, time_index);
-            ub = mesh_elements[0].sample_diffusion_coefficient(barycentric, time_index + 1);
+            lb = elements[mesh_elements].sample_diffusion_coefficient(vertex_array, diffusions, barycentric, time_index);
+            ub = elements[mesh_elements].sample_diffusion_coefficient(vertex_array, diffusions, barycentric, time_index + 1);
             Vector interpolated_diffusion = (1 - t) * lb + t * ub;
 
             Vector new_velocity = interpolated_velocity;
@@ -62,11 +62,11 @@ public:
         }
     }
     void set_num_depths(int new_num_depths) { num_depths = new_num_depths; }
-    void set_element_head(MeshElementT<vertices, dimension>* head) { mesh_elements = head; }
-    void set_adjacent_columns(WaterColumn<vertices, dimension>* a, WaterColumn<vertices, dimension>* b, WaterColumn<vertices, dimension>* c) { adjacent_columns = {a, b, c}; }
-    void set_adjacent_column(WaterColumn<vertices, dimension>* col, int position) { adjacent_columns[position] = col; }
-    const std::array<WaterColumn<vertices, dimension>*, vertices>& get_adjacencies() const { return adjacent_columns; }
-    MeshElementT<vertices, dimension>* get_mesh_elements() const { return mesh_elements; }
+    void set_element_head(int head) { mesh_elements = head; }
+    void set_adjacent_columns(int a, int b, int c) { adjacent_columns = {a, b, c}; }
+    void set_adjacent_column(int col, int position) { adjacent_columns[position] = col; }
+    const std::array<int, vertices>& get_adjacencies() const { return adjacent_columns; }
+    int get_mesh_elements() const { return mesh_elements; }
     int get_index() const { return index; }
     void set_index(int new_index) { index = new_index; }
 };

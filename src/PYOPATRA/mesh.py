@@ -84,12 +84,12 @@ class TriangularMesh2D(TriangularMesh):
 
     def setup_mesh(self, file_parser: FileParserBase, dimensions: int):
         self._setup_mesh(file_parser, dimensions)
-        if rank == 0:
-            self._setup_vertices(file_parser)
-            self._setup_elements_vertices()
-            self._setup_water_columns(file_parser)
+        self._setup_vertices(file_parser)
+        self._setup_elements_vertices()
+        self._setup_water_columns(file_parser)
 
         comm.barrier()
+        print('Finished Set Up')
 
     def _setup_mesh(self, file_parser: FileParserBase, dimensions: int):
         if dimensions == 2:

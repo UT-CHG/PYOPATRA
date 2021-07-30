@@ -25,7 +25,7 @@ if __name__ == '__main__':
     # How frequently to save particles (time steps, not hours)
     particle_save_interval = 3
     # Number of Particles at the end
-    total_particles = (total_time_steps // add_particles_time_step_interval + 1) * num_particles
+    total_particles = (total_time_steps // add_particles_time_step_interval + 1) * (num_particles * size)
     # Frame interval
     frame_interval = 3
 
@@ -50,7 +50,7 @@ if __name__ == '__main__':
     print('Reading HYCOM files....')
     # Read HYCOM files
     hfp = HYCOMFileParser()
-    hfp.read(hycom_files, diffusion_coefficient=10.0)
+    hfp.read(hycom_files, diffusion_coefficient=15.0)
 
     print('Setting up mesh...')
     # Set up 2D Triangular Mesh
@@ -64,8 +64,9 @@ if __name__ == '__main__':
     solver = Solver(hfp.times, tm2d, particles)
 
     # Set up snapshot particle saving file
-    with h5py.File('{}/data/snapshots.hdf5'.format(file_prefix), 'w') as fp:
-        fp.create_dataset('snapshots', (total_particles, 2, total_time_steps // frame_interval + 1))
+    if rank == 0:
+        with h5py.File('{}/data/snapshots.hdf5'.format(file_prefix), 'w') as fp:
+            fp.create_dataset('snapshots', (total_particles, 2, total_time_steps // frame_interval + 1))
 
     print('Time stepping...')
     current_num_particles = 0
@@ -81,18 +82,22 @@ if __name__ == '__main__':
                 particles.append_particle(release_loc[0], release_loc[1])
                 current_num_particles += 1
 
-        # print('Taking time step...')
         # Time stepping
         solver.time_step(time_delta)
 
         if i % frame_interval == 0:
-            with h5py.File('{}/data/snapshots.hdf5'.format(file_prefix), 'a') as fp:
-                particle_locations = particles.get_all_particle_locations()
-                fp['snapshots'][:particle_locations.shape[0], :, frame] = particle_locations
+            print('Saving particles')
+            particle_locations = particles.get_all_particle_locations()
+            if rank == 0:
+                with h5py.File('{}/data/snapshots.hdf5'.format(file_prefix), 'a') as fp:
+                    fp['snapshots'][:particle_locations.shape[0], :, frame] = particle_locations
             frame += 1
+
+
 
     print('Saving particle locations...')
     particle_locations = particles.get_all_particle_locations()
-    with h5py.File('{}/data/observed_particles.hdf5'.format(file_prefix), 'w') as fp:
-        fp.create_dataset('particles', particle_locations.shape, data=particle_locations)
+    if rank == 0:
+        with h5py.File('{}/data/observed_particles.hdf5'.format(file_prefix), 'w') as fp:
+            fp.create_dataset('particles', particle_locations.shape, data=particle_locations)
 
