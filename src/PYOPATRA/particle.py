@@ -39,7 +39,7 @@ class ParticleList:
                 snapshot[position:position + location.shape[0], :] = location
                 position += location.shape[0]
 
-            return locations
+            return snapshot
         else:
             return None
 
@@ -58,7 +58,7 @@ class ParticleList:
                 snapshot[position:position + location.shape[0]] = location
                 position += location.shape[0]
 
-            return locations
+            return snapshot
         else:
             return None
 
