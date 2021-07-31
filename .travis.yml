@@ -1,5 +1,7 @@
 language: c++
 dist: focal
+services:
+  - docker
 addons:
   apt:
     packages:
@@ -47,3 +49,6 @@ after_success:
   # Uploading report to CodeCov
   - bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
   - bash <(curl -s https://codecov.io/bash) -cF python
+  - docker build -t georgiastuart/PYOPATRA:latest -f dockerfiles/Dockerfile .
+  - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" docker.io
+  - docker push georgiastuart/PYOPATRA:latest
