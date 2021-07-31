@@ -1,0 +1,11 @@
+examples
+build
+.github
+test
+docs
+codecov.yml
+.travis.yml
+.readthedocs.yml
+.pytest_cache
+cmake-build-debug
+README.rst
