@@ -49,6 +49,7 @@ after_success:
   # Uploading report to CodeCov
   - bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
   - bash <(curl -s https://codecov.io/bash) -cF python
-  - docker build -t "$DOCKER_USERNAME"/pyopatra:latest -f dockerfiles/Dockerfile .
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker push "$DOCKER_USERNAME"/pyopatra:latest
+  - test $TRAVIS_BRANCH = "main" &&
+    docker build -t "$DOCKER_USERNAME"/pyopatra:latest -f dockerfiles/Dockerfile . &&
+    echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin &&
+    docker push "$DOCKER_USERNAME"/pyopatra:latest
