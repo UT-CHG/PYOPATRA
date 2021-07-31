@@ -51,4 +51,4 @@ after_success:
   - bash <(curl -s https://codecov.io/bash) -cF python
   - docker build -t "$DOCKER_USERNAME"/pyopatra:latest -f dockerfiles/Dockerfile .
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker push "$DOCKER_USERNAME"/PYOPATRA:latest
+  - docker push "$DOCKER_USERNAME"/pyopatra:latest
