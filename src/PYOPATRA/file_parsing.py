@@ -209,7 +209,7 @@ class HYCOMFileParser(FileParserBase):
         else:
             if sharedmaster > 0:
                 self.velocity = comm.recv(source=0, tag=5)
-                self.diffusion_coefficient = comm.recv(source=0, tag=5)
+                self.diffusion_coefficient = comm.recv(source=0, tag=6)
 
         self.times = comm.bcast(self.times, root=0)
 

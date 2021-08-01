@@ -11,8 +11,8 @@ if __name__ == '__main__':
     # Configuration settings
     # In hours
     time_delta = 1
-    # Particle release per timedelta
-    num_particles = 10
+    # Particle release per timedelta and process
+    num_particles = 5
     # True particle release location
     true_particle_lon = -88.365997
     true_particle_lat = 28.736628
@@ -34,8 +34,9 @@ if __name__ == '__main__':
     frame_interval = 3
     # Number of samples to draw for MCMC process
     num_samples = 10000
-    samples = np.zeros((num_samples, 2))
-    obj_values = np.zeros(num_samples)
+    if rank == 0:
+        samples = np.zeros((num_samples, 2))
+        obj_values = np.zeros(num_samples)
     # Other MCMC specifiers
     precision_parameter = 0.1
     step_length = np.array((0.03, 0.03))
@@ -53,12 +54,14 @@ if __name__ == '__main__':
             file = '{}/data/hycom_gomu_501_{}{:02d}{:02d}00_t{}.nc'.format(file_prefix, date.year, date.month, date.day, time_str)
             hycom_files.append(file)
 
-    print('Reading HYCOM files....')
+    if rank == 0:
+        print('Reading HYCOM files....')
     # Read HYCOM files
     hfp = HYCOMFileParser()
     hfp.read(hycom_files, diffusion_coefficient=10.0)
 
-    print('Setting up mesh...')
+    if rank == 0:
+        print('Setting up mesh...')
     # Set up 2D Triangular Mesh
     tm2d = TriangularMesh2D()
     tm2d.setup_mesh(hfp, 2)
@@ -72,12 +75,15 @@ if __name__ == '__main__':
     # Set up solver
     solver = Solver(hfp.times, tm2d, particles, obj)
 
+    obs_particles = None
     # Set up objective function
-    with h5py.File("{}/data/observed_particles.hdf5".format(file_prefix), "r") as fp:
-        obs_particles_temp = fp['particles'][:, :]
+    if rank == 0:
+        with h5py.File("{}/data/observed_particles.hdf5".format(file_prefix), "r") as fp:
+            obs_particles_temp = fp['particles'][:, :]
 
-    obs_particles = obs_particles_temp[~np.all(obs_particles_temp == 0, axis=1)]
+        obs_particles = obs_particles_temp[~np.all(obs_particles_temp == 0, axis=1)]
 
+    obs_particles = comm.bcast(obs_particles, root=0)
     obj.set_observed_values(obs_particles)
 
     previous_log_likelihood = 0
@@ -86,9 +92,11 @@ if __name__ == '__main__':
 
     for sample in range(num_samples):
         if sample > 0:
-            proposed_loc = prev_loc +  np.random.randn(2) * step_length
+            if rank == 0:
+                print("Sample number {}".format(sample))
+                proposed_loc = prev_loc +  np.random.randn(2) * step_length
+            proposed_loc = comm.bcast(proposed_loc, root=0)
 
-        print("Sample number {}".format(sample))
         # print('Time stepping...')
         current_num_particles = 0
         frame = 0
@@ -105,31 +113,38 @@ if __name__ == '__main__':
             solver.time_step(time_delta)
 
         obj_value = solver.calculate_objective_value()
+        obj_value = comm.bcast(obj_value, root=0)
         log_likelihood = -obj_value / (2 * precision_parameter**2)
-        print(obj_value, previous_obj_value, log_likelihood, previous_log_likelihood)
+        if rank == 0:
+            print(obj_value, previous_obj_value, log_likelihood, previous_log_likelihood)
 
         if sample == 0:
             previous_log_likelihood = log_likelihood
             previous_obj_value = obj_value
         else:
-            value = np.exp(log_likelihood - previous_log_likelihood)
-            check = np.random.random()
+            if rank == 0:
+                value = np.exp(log_likelihood - previous_log_likelihood)
+                check = np.random.random()
 
-            print(value, check, value > check)
+                print(value, check, value > check)
 
-            if value > check:
+            truth_val = comm.bcast(value > check, root=0)
+
+            if truth_val:
                 previous_log_likelihood = log_likelihood
                 previous_obj_value = obj_value
                 prev_loc[:] = proposed_loc[:]
                 accepted += 1
 
-        samples[sample, :] = prev_loc[:]
-        obj_values[sample] = previous_obj_value
+        if rank == 0:
+            samples[sample, :] = prev_loc[:]
+            obj_values[sample] = previous_obj_value
         solver.reset_solver()
 
-    print("Acceptance Ratio: {}".format(accepted / num_samples))
+    if rank == 0:
+        print("Acceptance Ratio: {}".format(accepted / num_samples))
 
-    with h5py.File("{}/data/mcmc_save_data_{}_samples.hdf5".format(file_prefix, num_samples), "w") as fp:
-        fp.create_dataset('samples', data=samples)
-        fp.create_dataset('objectives', data=obj_values)
+        with h5py.File("{}/data/mcmc_save_data_{}_samples.hdf5".format(file_prefix, num_samples), "w") as fp:
+            fp.create_dataset('samples', data=samples)
+            fp.create_dataset('objectives', data=obj_values)
 
