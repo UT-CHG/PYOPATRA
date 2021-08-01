@@ -90,6 +90,9 @@ if __name__ == '__main__':
     previous_obj_value = 0
     accepted = 0
 
+    value = 0
+    check = 0
+
     for sample in range(num_samples):
         if sample > 0:
             if rank == 0:
