@@ -24,6 +24,9 @@ class ParticleList:
         else:
             raise NotImplementedError('Only 2D currently implemented')
 
+    def get_num_particles(self):
+        return self._cpp_particle_list.get_length()
+
     def get_all_particle_locations(self):
         locations = comm.gather(self._cpp_particle_list.get_all_particle_locations(), root=0)
 

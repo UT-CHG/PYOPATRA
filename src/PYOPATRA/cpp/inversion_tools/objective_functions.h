@@ -6,6 +6,8 @@
 #define PYOPATRA_OBJECTIVE_FUNCTIONS_H
 
 #include "Eigen/Dense"
+#include "mpi.h"
+
 #include "../particle_list.h"
 #include "../util.h"
 
@@ -14,7 +16,10 @@
 template <int dimension>
 class ObjectiveFunctionBase {
 public:
-    ObjectiveFunctionBase() { ptr_wrapper = this; };
+    ObjectiveFunctionBase() {
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        ptr_wrapper = this;
+    };
     virtual ~ObjectiveFunctionBase() = default;
 
 //    virtual void set_observed_values(const ParticleList<dimension>& particles) = 0;
@@ -32,8 +37,10 @@ public:
         temp_list->delete_all_particles();
         delete temp_list;
     }
+    int get_rank() { return rank; }
 
 protected:
+    int rank;
     virtual void finish_observed_setup_impl(ParticleList<dimension>& particles) = 0;
     PointerWrapper<ObjectiveFunctionBase<dimension>> ptr_wrapper;
 };
@@ -78,7 +85,7 @@ public:
 
     double calculate_value(const ParticleList<dimension>& particles) {
         fill_bins(particles, bins);
-        return calculate_value_impl();
+        return calculate_value_impl(particles);
     }
 
     Eigen::MatrixXd& get_observed_bins() { return observed_bins; }
@@ -87,10 +94,11 @@ public:
     Eigen::VectorXd& get_longitude_bounds() { return longitude_bounds; }
 
 protected:
-    virtual double calculate_value_impl() = 0;
+    virtual double calculate_value_impl(const ParticleList<dimension>& particles) = 0;
 
     void finish_observed_setup_impl(ParticleList<dimension>& particles) {
         fill_bins(particles, observed_bins);
+        observed_bins /= particles.get_length();
     }
 
     int get_1D_bin_coord(double position, const Eigen::VectorXd& bounds) {
@@ -124,8 +132,6 @@ protected:
 
             current_particle = current_particle->get_next();
         }
-
-        bins_array /= particles.get_length();
     }
 };
 
@@ -160,20 +166,33 @@ public:
     void set_num_proj(int new_num_proj) { num_proj = new_num_proj; }
 
 private:
-    double calculate_value_impl() {
+    double calculate_value_impl(const ParticleList<dimension>& particles) {
         double sum = 0.0;
+        int proc_num_particles = particles.get_length();
 
         for (int i = 0; i < num_proj; i++) {
             proj = Eigen::VectorXd::NullaryExpr(Parent::get_latitude_bounds().rows(), [&]() { return unif(sw_generator); });
             proj.normalize();
 
             sample_proj = Parent::get_bins() * proj;
-            observed_proj = Parent::get_observed_bins() * proj;
+            observed_proj = Parent::get_observed_bins() * proc_num_particles * proj;
 
             sum += wasserstein_distance_1d(sample_proj, observed_proj);
         }
 
-        return sum / num_proj;
+        sum /= num_proj;
+
+        int num_particles;
+        double all_sum;
+
+        MPI_Reduce(&proc_num_particles, &num_particles, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+        MPI_Reduce(&sum, &all_sum, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
+        if (Parent::ObjectiveFunctionBase::rank == 0) {
+            return all_sum / num_particles;
+        } else {
+            return 0.0;
+        }
     }
 
     // https://en.wikipedia.org/wiki/Earth_mover%27s_distance#Computing_the_EMD

@@ -1,7 +1,7 @@
 import numpy as np
 
 from .pyopatra_pybind import CppSlicedWassersteinDistance2D
-from .particle import ParticleList
+from .particle import ParticleList, comm, rank
 
 class ObjectiveFunctionBase:
     def __init__(self):
