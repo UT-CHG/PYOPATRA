@@ -93,7 +93,7 @@ class TriangularMesh2D(TriangularMesh):
 
     def _setup_mesh(self, file_parser: FileParserBase, dimensions: int):
         if dimensions == 2:
-            print(file_parser.num_elements, file_parser.num_vertices, file_parser.times)
+            # print(file_parser.num_elements, file_parser.num_vertices, file_parser.times)
             self._cpp_mesh = CppTriangularMesh2D(file_parser.num_elements, file_parser.num_vertices, file_parser.times)
         elif dimensions == 3:
             raise NotImplementedError('3D Meshes are not yet implemented.')
@@ -114,10 +114,13 @@ class TriangularMesh2D(TriangularMesh):
                     self._cpp_mesh.set_vertex_location(i * file_parser.regular_dimensions[1] + j,
                                                        [file_parser.latitude[i], file_parser.longitude[j]])
                     for time in range(len(self.times)):
-                        self._cpp_mesh.set_vertex_velocity(i * file_parser.regular_dimensions[1] + j, time,
-                                                           file_parser.velocity[:, i * self.regular_dimensions[1] + j, time])
-                        self._cpp_mesh.set_vertex_diffusion(i * file_parser.regular_dimensions[1] + j, time,
-                                                           file_parser.diffusion_coefficient[:, i * self.regular_dimensions[1] + j, time])
+                        try:
+                            self._cpp_mesh.set_vertex_velocity(i * file_parser.regular_dimensions[1] + j, time,
+                                                               file_parser.velocity[:, i * self.regular_dimensions[1] + j, time])
+                            self._cpp_mesh.set_vertex_diffusion(i * file_parser.regular_dimensions[1] + j, time,
+                                                               file_parser.diffusion_coefficient[:, i * self.regular_dimensions[1] + j, time])
+                        except TypeError:
+                            pass
 
     def _setup_elements_vertices(self, depths_array=None):
         if self.regular_dimensions is not None:

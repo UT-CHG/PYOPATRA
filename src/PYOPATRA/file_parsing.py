@@ -9,6 +9,9 @@ from mpi4py import MPI
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
+sharedcomm = comm.Split_type(MPI.COMM_TYPE_SHARED)
+sharedrank = sharedcomm.Get_rank()
+sharedmaster = rank if sharedrank == 0 else -1
 
 class FileParserBase:
     """
@@ -51,6 +54,10 @@ class FileParserBase:
         """Longitude Numpy Array"""
         self.diffusion_coefficient = None
         """Diffusion Coefficient Matrix"""
+
+        self.master_ranks = comm.gather(sharedmaster, root=0)
+        if rank == 0:
+            print(self.master_ranks)
 
 
 class ADCIRCFileParser(FileParserBase):
@@ -151,7 +158,6 @@ class HYCOMFileParser(FileParserBase):
 
         self.times = np.zeros(len(list_of_hycom_files))
 
-
         if rank == 0:
             with nc.Dataset(list_of_hycom_files[0]) as ds:
                 self.regular_dimensions = (ds['lat'].shape[0], ds['lon'].shape[0])
@@ -160,16 +166,16 @@ class HYCOMFileParser(FileParserBase):
                 self.latitude = ds['lat'][:]
                 self.longitude = ds['lon'][:]
 
+        self.latitude = comm.bcast(self.latitude, root=0)
+        self.longitude = comm.bcast(self.longitude, root=0)
         self.regular_dimensions = comm.bcast(self.regular_dimensions, root=0)
         self.num_vertices = comm.bcast(self.num_vertices, root=0)
         self.num_elements = comm.bcast(self.num_elements, root=0)
-        self.latitude = comm.bcast(self.latitude, root=0)
-        self.longitude = comm.bcast(self.longitude, root=0)
-
 
         if dimensions == 2:
-            self.velocity = np.zeros((2, self.num_vertices, len(list_of_hycom_files)))
-            self.diffusion_coefficient = np.ones((2, self.num_vertices, len(list_of_hycom_files))) * diffusion_coefficient
+            if rank == 0:
+                self.velocity = np.zeros((2, self.num_vertices, len(list_of_hycom_files)))
+                self.diffusion_coefficient = np.ones((2, self.num_vertices, len(list_of_hycom_files))) * diffusion_coefficient
         else:
             raise NotImplementedError('Dimensions other than 2 have not been implemented.')
 
@@ -195,10 +201,17 @@ class HYCOMFileParser(FileParserBase):
                     else:
                         raise NotImplementedError('Dimensions other than 2 have not been implemented.')
 
-        self.velocity = comm.bcast(self.velocity, root=0)
-        self.diffusion_coefficient = comm.bcast(self.diffusion_coefficient, root=0)
-        self.times = comm.bcast(self.times, root=0)
+            for r in self.master_ranks:
+                if r > 0:
+                    comm.send(self.velocity, dest=r, tag=5)
+                    comm.send(self.diffusion_coefficient, dest=r, tag=6)
 
+        else:
+            if sharedmaster > 0:
+                self.velocity = comm.recv(source=0, tag=5)
+                self.diffusion_coefficient = comm.recv(source=0, tag=5)
+
+        self.times = comm.bcast(self.times, root=0)
 
 
 class POMFileParser(FileParserBase):

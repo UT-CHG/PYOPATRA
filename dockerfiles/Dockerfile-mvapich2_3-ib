@@ -44,4 +44,4 @@ RUN DEBIAN_FRONTEND="noninteractive" apt-get -y install libmpich12 \
 
 COPY . /PYOPATRA
 
-RUN pip3 install PYOPATRA/ --install-option="--sandybridge"
+RUN pip3 install PYOPATRA/
