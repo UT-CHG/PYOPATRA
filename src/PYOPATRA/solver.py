@@ -11,7 +11,7 @@ size = comm.Get_size()
 
 class Solver:
     def __init__(self, times, mesh: MeshBase, particles: ParticleList, objective_function=None):
-        print("times in solver {}".format(times))
+        # print("times in solver {}".format(times))
         if objective_function is None:
             self._cpp_solver = CppTriangularMesh2DSolver(mesh._cpp_mesh.get_pointer_wrapper(),
                                                          particles._cpp_particle_list.get_pointer_wrapper(), times)
