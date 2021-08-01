@@ -49,7 +49,7 @@ after_success:
   # Uploading report to CodeCov
   - bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
   - bash <(curl -s https://codecov.io/bash) -cF python
-  - test (($TRAVIS_BRANCH = "main") AND (tag IS present)) &&
+  - test tag IS present &&
     echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin &&
     docker build -t "$DOCKER_USERNAME"/pyopatra:"$TRAVIS_TAG" -f dockerfiles/Dockerfile . &&
     docker build -t "$DOCKER_USERNAME"/pyopatra-sandybridge-mvapich-ib:"$TRAVIS_TAG" -f dockerfiles/Dockerfile-sandybridge-mvapich2_3-ib . &&

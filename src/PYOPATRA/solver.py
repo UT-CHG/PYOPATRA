@@ -30,8 +30,4 @@ class Solver:
         self._cpp_solver.update_particle_location_indices()
 
     def calculate_objective_value(self):
-        obj_val = comm.reduce(self._cpp_solver.calculate_objective_value(), op=MPI.SUM, root=0)
-        try:
-            return obj_val / size
-        except TypeError:
-            pass
+        return self._cpp_solver.calculate_objective_value()

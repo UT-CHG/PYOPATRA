@@ -116,7 +116,7 @@ if __name__ == '__main__':
             solver.time_step(time_delta)
 
         obj_value = solver.calculate_objective_value()
-        obj_value = comm.bcast(obj_value, root=0)
+        # obj_value = comm.bcast(obj_value, root=0)
         log_likelihood = -obj_value / (2 * precision_parameter**2)
         if rank == 0:
             print(obj_value, previous_obj_value, log_likelihood, previous_log_likelihood)
@@ -131,18 +131,17 @@ if __name__ == '__main__':
 
                 print(value, check, value > check)
 
-            truth_val = comm.bcast(value > check, root=0)
-
-            if truth_val:
-                previous_log_likelihood = log_likelihood
-                previous_obj_value = obj_value
-                prev_loc[:] = proposed_loc[:]
-                accepted += 1
+                if value > check:
+                    previous_log_likelihood = log_likelihood
+                    previous_obj_value = obj_value
+                    prev_loc[:] = proposed_loc[:]
+                    accepted += 1
 
         if rank == 0:
             samples[sample, :] = prev_loc[:]
             obj_values[sample] = previous_obj_value
         solver.reset_solver()
+        comm.barrier()
 
     if rank == 0:
         print("Acceptance Ratio: {}".format(accepted / num_samples))
