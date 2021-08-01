@@ -51,5 +51,7 @@ after_success:
   - bash <(curl -s https://codecov.io/bash) -cF python
   - test (($TRAVIS_BRANCH = "main") AND (tag IS present)) &&
     docker build -t "$DOCKER_USERNAME"/pyopatra:"$TRAVIS_TAG" -f dockerfiles/Dockerfile . &&
+    docker build -t "$DOCKER_USERNAME"/pyopatra-sandybridge-mvapich-ib:"$TRAVIS_TAG" -f dockerfiles/Dockerfile-sandybridge-mvapich2_3-ib . &&
     echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin &&
-    docker push "$DOCKER_USERNAME"/pyopatra:"$TRAVIS_TAG"
+    docker push "$DOCKER_USERNAME"/pyopatra:"$TRAVIS_TAG" &&
+    docker push "$DOCKER_USERNAME"/pyopatra-sandybridge-mvapich-ib:"$TRAVIS_TAG"
