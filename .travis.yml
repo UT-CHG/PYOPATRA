@@ -49,4 +49,4 @@ after_success:
   # Uploading report to CodeCov
   - bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
   - bash <(curl -s https://codecov.io/bash) -cF python
-  - bash dockerfile/travis_build_docker.sh
+  - bash dockerfiles/travis_build_docker.sh
