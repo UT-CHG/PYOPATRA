@@ -3,3 +3,4 @@ ignore:
   - "examples"
   - "docs"
   - ".github"
+  - "dockerfiles"
