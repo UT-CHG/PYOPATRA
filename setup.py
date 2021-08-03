@@ -115,7 +115,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name='PYOPATRA',
-    version='0.2',
+    version='0.2.4',
     author='Georgia Stuart',
     author_email='georgia.stuart@austin.utexas.edu',
     description='A lagrangian particle tracker (LPT) open ocean solver',
