@@ -7,7 +7,7 @@ then
   echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin &&
 
   # Build all images
-  BUILD_ARRAY=("" "-mvapich-ib" "-sandybridge-mvapich-ib")
+  BUILD_ARRAY=("" "-mvapich-ib" "-mvapich231-ib" "-sandybridge-mvapich-ib")
   for BUILD_NAME in "${BUILD_ARRAY[@]}"; do
     if [[ ${#TRAVIS_TAG} -gt 0 ]];
     then
