@@ -18,6 +18,7 @@ class ObjectiveFunctionBase {
 public:
     ObjectiveFunctionBase() {
         MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        MPI_Comm_size(MPI_COMM_WORLD, &world_size);
         ptr_wrapper = this;
     };
     virtual ~ObjectiveFunctionBase() = default;
@@ -40,7 +41,7 @@ public:
     int get_rank() { return rank; }
 
 protected:
-    int rank;
+    int rank, world_size;
     virtual void finish_observed_setup_impl(ParticleList<dimension>& particles) = 0;
     PointerWrapper<ObjectiveFunctionBase<dimension>> ptr_wrapper;
 };
@@ -149,6 +150,7 @@ class SlicedWassersteinDistance : public BinObjectiveFunctionBase<dimension> {
 private:
     using Parent = BinObjectiveFunctionBase<dimension>;
     Eigen::VectorXd proj, sample_proj, observed_proj, emd_vec;
+    Eigen::MatrixXd recv_bin;
     int num_proj;
     std::default_random_engine sw_generator;
 
@@ -159,9 +161,12 @@ public:
         , sample_proj(num_bins_lon)
         , observed_proj(num_bins_lon)
         , emd_vec(num_bins_lon)
+        , recv_bin(num_bins_lon, num_bins_lat)
         , num_proj(num_proj)
         , sw_generator(seed)
-    {}
+    {
+        this->num_proj /= Parent::ObjectiveFunctionBase::world_size;
+    }
 
     void set_num_proj(int new_num_proj) { num_proj = new_num_proj; }
 
@@ -169,27 +174,29 @@ private:
     double calculate_value_impl(const ParticleList<dimension>& particles) {
         double sum = 0.0;
         int proc_num_particles = particles.get_length();
+        int num_particles;
+
+        MPI_Allreduce(&proc_num_particles, &num_particles, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+        MPI_Allreduce(Parent::get_bins().data(), recv_bin.data(), recv_bin.rows() * recv_bin.cols(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+
+        recv_bin /= num_particles;
 
         for (int i = 0; i < num_proj; i++) {
-            proj = Eigen::VectorXd::NullaryExpr(Parent::get_latitude_bounds().rows(), [&]() { return unif(sw_generator); });
+            proj = Eigen::VectorXd::NullaryExpr(proj.size(), [&]() { return unif(sw_generator); });
             proj.normalize();
 
-            sample_proj = Parent::get_bins() * proj;
-            observed_proj = Parent::get_observed_bins() * proc_num_particles * proj;
+            sample_proj = recv_bin * proj;
+            observed_proj = Parent::get_observed_bins() * proj;
 
             sum += wasserstein_distance_1d(sample_proj, observed_proj);
         }
 
-        sum /= num_proj;
-
-        int num_particles;
         double all_sum;
 
-        MPI_Reduce(&proc_num_particles, &num_particles, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
         MPI_Reduce(&sum, &all_sum, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 
         if (Parent::ObjectiveFunctionBase::rank == 0) {
-            return all_sum / num_particles;
+            return all_sum / (num_proj * Parent::ObjectiveFunctionBase::world_size);
         } else {
             return 0.0;
         }
