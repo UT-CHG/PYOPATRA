@@ -1,0 +1,23 @@
+name: PYOPATRA Docker Build
+on:
+  workflow_run:
+    workflows:
+      - "PYOPATRA Unit Tests"
+    types:
+      - completed
+
+jobs:
+  build:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        build_name: [ "", "-mvapich-ib", "-sandybridge-mvapich-ib", "-mvapich-psm2" ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Environment
+        run: |
+          echo "GITHUB_TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: Build Docker container
+        run: |
+          bash dockerfiles/GH_actions_build_docker.sh

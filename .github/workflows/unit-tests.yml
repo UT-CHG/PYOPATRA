@@ -1,8 +1,13 @@
 name: PYOPATRA Unit Tests
 on:
-  - push
+  push:
+    paths-ignore:
+      - 'docs/**'
+      - 'examples/**'
+      - 'README.rst'
+      - 'LICENSE.txt'
 jobs:
-  Test:
+  test:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
