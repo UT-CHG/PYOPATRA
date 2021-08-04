@@ -5,6 +5,7 @@ jobs:
   Test:
     runs-on: ubuntu-20.04
     steps:
+      - uses: actions/checkout@v2
       - name: Install Dependencies
         run: |
           sudo apt-get update && sudo apt-get install \
@@ -29,10 +30,11 @@ jobs:
           cd ..
           pip3 install numpy scipy matplotlib coverage pytest netcdf4 mpi4py
       - name: Install PYOPATRA C++
-        working-directory: ./cpp_build
         run: |
+          mkdir cpp_build && cd cpp_build
           cmake .. -DBUILD_TEST=ON -DCODE_COVERAGE=ON
           make
+          cd ..
       - name: Install PYOPATRA Python
         run: |
           pip3 install .
