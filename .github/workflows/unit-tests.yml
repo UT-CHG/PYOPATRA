@@ -1,4 +1,4 @@
-name: PYOPATRA Test and Docker Build
+name: PYOPATRA Unit Tests
 on:
   - push
 jobs:
@@ -28,14 +28,13 @@ jobs:
           sudo cmake --build build/ --target install
           cd ..
           pip3 install numpy scipy matplotlib coverage pytest netcdf4 mpi4py
-      - name: Install PYOPATRA
+      - name: Install PYOPATRA C++
+        working-directory: ./cpp_build
         run: |
-          mkdir cpp_build
-          cd cpp_build
           cmake .. -DBUILD_TEST=ON -DCODE_COVERAGE=ON
           make
-          cd ..
-          pip3 install -e .
+      - name: Install PYOPATRA Python
+          pip3 install .
       - name: Run tests
         run: |
           ./cpp_build/pyopatra_test
