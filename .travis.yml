@@ -1,52 +1,80 @@
 language: c++
 dist: focal
-services:
-  - docker
-addons:
-  apt:
-    packages:
-      - libmpich12
-      - libmpich-dev
-      - mpich
-      - libhdf5-dev
-      - cmake
-      - lcov
-      - libeigen3-dev
-      - pybind11-dev
-      - python3
-      - libpython3-dev
-      - python3-pip
-    update: true
 
-before_install:
-  - test -n $CC  && unset CC
-  - test -n $CXX && unset CXX
-  - wget https://github.com/catchorg/Catch2/archive/v2.13.4.tar.gz
-  - tar -xzf v2.13.4.tar.gz
-  - cd Catch2-2.13.4
-  - cmake -Bbuild -H. -DBUILD_TESTING=OFF
-  - sudo cmake --build build/ --target install
-  - cd ..
-  - pip3 install numpy scipy matplotlib coverage pytest netcdf4 mpi4py
+stages:
+  - test
+  - deploy
 
-install:
-  - mkdir cpp_build
-  - cd cpp_build
-  - cmake .. -DBUILD_TEST=ON -DCODE_COVERAGE=ON
-  - make
-  - cd ..
-  - pip3 install -e .
+jobs:
+  include:
+    - stage: test
+      addons:
+        apt:
+          packages:
+            - libmpich12
+            - libmpich-dev
+            - mpich
+            - libhdf5-dev
+            - cmake
+            - lcov
+            - libeigen3-dev
+            - pybind11-dev
+            - python3
+            - libpython3-dev
+            - python3-pip
+          update: true
+      before_install:
+        - test -n $CC  && unset CC
+        - test -n $CXX && unset CXX
+        - wget https://github.com/catchorg/Catch2/archive/v2.13.4.tar.gz
+        - tar -xzf v2.13.4.tar.gz
+        - cd Catch2-2.13.4
+        - cmake -Bbuild -H. -DBUILD_TESTING=OFF
+        - sudo cmake --build build/ --target install
+        - cd ..
+        - pip3 install numpy scipy matplotlib coverage pytest netcdf4 mpi4py
+      install:
+        - mkdir cpp_build
+        - cd cpp_build
+        - cmake .. -DBUILD_TEST=ON -DCODE_COVERAGE=ON
+        - make
+        - cd ..
+        - pip3 install -e .
+      script:
+        - ./cpp_build/pyopatra_test
+        - coverage run -m pytest test/python_tests
+      after_success:
+        # Create lcov report
+        - lcov --capture --directory cpp_build --output-file coverage.info
+        - lcov --remove coverage.info '/usr/*' --output-file coverage.info # filter system-files
+        - lcov --list coverage.info # debug info
+        # Uploading report to CodeCov
+        - bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
+        - bash <(curl -s https://codecov.io/bash) -cF python
+    - stage: deploy
+      env:
+        - DOCKER_BUILD_NAME=""
+      services: docker
+      script: bash dockerfiles/travis_build_docker.sh
+    - stage: deploy
+      env:
+        - DOCKER_BUILD_NAME="-mvapich-ib"
+      services: docker
+      script: bash dockerfiles/travis_build_docker.sh
+    - stage: deploy
+      env:
+        - DOCKER_BUILD_NAME="-sandybridge-mvapich-ib"
+      services: docker
+      script: bash dockerfiles/travis_build_docker.sh
+    - stage: deploy
+      env:
+        - DOCKER_BUILD_NAME="-mvapich-psm2"
+      services: docker
+      script: bash dockerfiles/travis_build_docker.sh
 
-script:
-  - ./cpp_build/pyopatra_test
-  - coverage run -m pytest test/python_tests
 
-after_success:
-  # Create lcov report
-  - lcov --capture --directory cpp_build --output-file coverage.info
-  - lcov --remove coverage.info '/usr/*' --output-file coverage.info # filter system-files
-  - lcov --list coverage.info # debug info
-  # Uploading report to CodeCov
-  - bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
-  - bash <(curl -s https://codecov.io/bash) -cF python
-  - bash dockerfiles/travis_build_docker.sh
+
+
+
+
+

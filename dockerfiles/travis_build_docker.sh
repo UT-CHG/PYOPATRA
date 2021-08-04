@@ -6,28 +6,22 @@ then
   # Log in to docker hub
   echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin &&
 
-  # Build all images
-  BUILD_ARRAY=("" "-mvapich-ib" "-sandybridge-mvapich-ib" "-mvapich-psm2")
-  for BUILD_NAME in "${BUILD_ARRAY[@]}"; do
-    if [[ ${#TRAVIS_TAG} -gt 0 ]];
-    then
-  #    DOCKER_TAG="-t $DOCKER_USERNAME/pyopatra$BUILD_NAME:$TRAVIS_TAG -t $DOCKER_USERNAME/pyopatra$BUILD_NAME:latest"
-      TAG_ARRAY=("$TRAVIS_TAG" "latest")
-    else
-      TAG_ARRAY=("unstable")
-  #    DOCKER_TAG="-t $DOCKER_USERNAME/pyopatra$BUILD_NAME:unstable"
-    fi
+  if [[ ${#TRAVIS_TAG} -gt 0 ]];
+  then
+    TAG_ARRAY=("$TRAVIS_TAG" "latest")
+  else
+    TAG_ARRAY=("unstable")
+  fi
 
-    DOCKER_TAG=""
-    for TAG_NAME in "${TAG_ARRAY[@]}"; do
-      docker pull "$DOCKER_USERNAME"/pyopatra"$BUILD_NAME":"$TAG_NAME" || echo "No existing image for pyopatra$BUILD_NAME:$TAG_NAME"
-      DOCKER_TAG="$DOCKER_TAG -t $DOCKER_USERNAME/pyopatra$BUILD_NAME:$TAG_NAME"
-    done
+  DOCKER_TAG=""
+  for TAG_NAME in "${TAG_ARRAY[@]}"; do
+    docker pull "$DOCKER_USERNAME"/pyopatra"$DOCKER_BUILD_NAME":"$TAG_NAME" || echo "No existing image for pyopatra$DOCKER_BUILD_NAME:$TAG_NAME"
+    DOCKER_TAG="$DOCKER_TAG -t $DOCKER_USERNAME/pyopatra$DOCKER_BUILD_NAME:$TAG_NAME"
+  done
 
-    docker build $DOCKER_TAG -f dockerfiles/Dockerfile"$BUILD_NAME" .
+  docker build $DOCKER_TAG -f dockerfiles/Dockerfile"$DOCKER_BUILD_NAME" .
 
-    for TAG_NAME in ${TAG_ARRAY[@]}; do
-      docker push "$DOCKER_USERNAME"/pyopatra"$BUILD_NAME":"$TAG_NAME"
-    done
+  for TAG_NAME in ${TAG_ARRAY[@]}; do
+    docker push "$DOCKER_USERNAME"/pyopatra"$DOCKER_BUILD_NAME":"$TAG_NAME"
   done
 fi
