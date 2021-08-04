@@ -3,9 +3,9 @@ PYOPATRA
 
 *PYthon Ocean PArticle TRAcking*
 
-.. image:: https://travis-ci.com/georgiastuart/PYOPATRA.svg?token=FkVfxc1EjLgxwETbDbF1&branch=main
-    :target: https://travis-ci.com/georgiastuart/PYOPATRA
-    :alt: Travis CI Status
+.. image:: https://github.com/georgiastuart/PYOPATRA/actions/workflows/unit-tests.yml/badge.svg
+    :target: https://github.com/georgiastuart/PYOPATRA/actions/workflows/unit-tests.yml
+    :alt: PYOPATRA Unit Tests Status
 
 .. image:: https://codecov.io/gh/georgiastuart/PYOPATRA/branch/main/graph/badge.svg?token=V0YWRP6F80
     :target: https://codecov.io/gh/georgiastuart/PYOPATRA
