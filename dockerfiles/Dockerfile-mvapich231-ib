@@ -29,9 +29,7 @@ RUN curl http://mvapich.cse.ohio-state.edu/download/mvapich/mv${MAJV}/${DIR}.tar
     && rm -rf /usr/local/share/doc/mvapich2
 
 # PYOPATRA Requirements
-RUN DEBIAN_FRONTEND="noninteractive" apt-get -y install libmpich12 \
-    libmpich-dev \
-    libhdf5-dev \
+RUN DEBIAN_FRONTEND="noninteractive" apt-get -y install libhdf5-dev \
     cmake \
     libeigen3-dev \
     pybind11-dev \
