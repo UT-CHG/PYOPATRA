@@ -7,7 +7,7 @@ then
   echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin &&
 
   # Build all images
-  BUILD_ARRAY=("" "-mvapich-ib" "-mvapich231-ib" "-sandybridge-mvapich-ib" "-mvapich-psm2")
+  BUILD_ARRAY=("" "-mvapich-ib" "-sandybridge-mvapich-ib" "-mvapich-psm2")
   for BUILD_NAME in "${BUILD_ARRAY[@]}"; do
     if [[ ${#TRAVIS_TAG} -gt 0 ]];
     then
@@ -19,7 +19,8 @@ then
     fi
 
     DOCKER_TAG=""
-    for TAG_NAME in ${TAG_ARRAY[@]}; do
+    for TAG_NAME in "${TAG_ARRAY[@]}"; do
+      docker pull $DOCKER_USERNAME/pyopatra$BUILD_NAME:$TAG_NAME || echo "No existing image for pyopatra$BUILD_NAME:$TAG_NAME"
       DOCKER_TAG="$DOCKER_TAG -t $DOCKER_USERNAME/pyopatra$BUILD_NAME:$TAG_NAME"
     done
 
