@@ -34,6 +34,7 @@ jobs:
           cmake .. -DBUILD_TEST=ON -DCODE_COVERAGE=ON
           make
       - name: Install PYOPATRA Python
+        run: |
           pip3 install .
       - name: Run tests
         run: |
