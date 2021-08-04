@@ -20,7 +20,7 @@ then
 
     DOCKER_TAG=""
     for TAG_NAME in "${TAG_ARRAY[@]}"; do
-      docker pull $DOCKER_USERNAME/pyopatra$BUILD_NAME:$TAG_NAME || echo "No existing image for pyopatra$BUILD_NAME:$TAG_NAME"
+      docker pull "$DOCKER_USERNAME"/pyopatra"$BUILD_NAME":"$TAG_NAME" || echo "No existing image for pyopatra$BUILD_NAME:$TAG_NAME"
       DOCKER_TAG="$DOCKER_TAG -t $DOCKER_USERNAME/pyopatra$BUILD_NAME:$TAG_NAME"
     done
 
