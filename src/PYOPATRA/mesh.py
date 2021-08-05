@@ -107,20 +107,44 @@ class TriangularMesh2D(TriangularMesh):
 
         self.times = file_parser.times
 
+        num_time_steps = int(len(self.times) / size) + (1 if len(self.times) % size > rank else 0)
+
+        ts_list = comm.gather(num_time_steps, root=0)
+        if rank == 0:
+            print(ts_list)
+            ts_list_array = np.array(ts_list)
+            print('Time steps:', len(file_parser.times), np.sum(ts_list_array))
+
+        if rank == 0:
+            for i, ts in enumerate(ts_list):
+                if i == 0:
+                    velocities = file_parser.velocity[:, :, :ts]
+                    diffusions = file_parser.diffusion_coefficient[:, :, :ts]
+                    start_time = 0
+                else:
+                    temp = file_parser.velocity[:, :, np.sum(ts_list_array[:i]):np.sum(ts_list_array[:i+1])]
+                    comm.send(temp, dest=i, tag=0)
+                    comm.send(np.sum(ts_list_array[:i]), dest=i, tag=1)
+                    temp = file_parser.diffusion_coefficient[:, :, np.sum(ts_list_array[:i]):np.sum(ts_list_array[:i+1])]
+                    comm.send(temp, dest=i, tag=2)
+        else:
+            velocities = comm.recv(source=0, tag=0)
+            start_time = comm.recv(source=0, tag=1)
+            diffusions = comm.recv(source=0, tag=2)
+            print('Rank {} received velocity of shape {} and start time {}'.format(rank, velocities.shape, start_time))
+
         if file_parser.regular_dimensions is not None:
             self.regular_dimensions = file_parser.regular_dimensions
             for i in range(file_parser.regular_dimensions[0]):
                 for j in range(file_parser.regular_dimensions[1]):
-                    self._cpp_mesh.set_vertex_location(i * file_parser.regular_dimensions[1] + j,
-                                                       [file_parser.latitude[i], file_parser.longitude[j]])
-                    for time in range(len(self.times)):
-                        try:
-                            self._cpp_mesh.set_vertex_velocity(i * file_parser.regular_dimensions[1] + j, time,
-                                                               file_parser.velocity[:, i * self.regular_dimensions[1] + j, time])
-                            self._cpp_mesh.set_vertex_diffusion(i * file_parser.regular_dimensions[1] + j, time,
-                                                               file_parser.diffusion_coefficient[:, i * self.regular_dimensions[1] + j, time])
-                        except TypeError:
-                            pass
+                    if rank == 0:
+                        self._cpp_mesh.set_vertex_location(i * file_parser.regular_dimensions[1] + j,
+                                                           [file_parser.latitude[i], file_parser.longitude[j]])
+                    for time in range(velocities.shape[2]):
+                        self._cpp_mesh.set_vertex_velocity(i * file_parser.regular_dimensions[1] + j, start_time + time,
+                                                           velocities[:, i * self.regular_dimensions[1] + j, time])
+                        self._cpp_mesh.set_vertex_diffusion(i * file_parser.regular_dimensions[1] + j, start_time + time,
+                                                           diffusions[:, i * self.regular_dimensions[1] + j, time])
 
     def _setup_elements_vertices(self, depths_array=None):
         if self.regular_dimensions is not None:

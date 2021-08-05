@@ -184,21 +184,15 @@ public:
     MeshElement* get_elements() { return elements; }
     WaterCol* get_water_columns() { return water_columns; }
     void set_vertex_location(int vertex_index, Vector new_location) {
-        if (rank == 0) {
-            vertices[vertex_index].set_location(new_location);
-        }
+        vertices[vertex_index].set_location(new_location);
     }
 
     void set_vertex_velocity(int vertex_index, int time_index, Vector new_velocity) {
-        if (rank == 0) {
-            velocities[vertex_index * num_time_steps + time_index] = new_velocity;
-        }
+        velocities[vertex_index * num_time_steps + time_index] = new_velocity;
     }
 
     void set_vertex_diffusion(int vertex_index, int time_index, Vector new_diffusion) {
-        if (rank == 0) {
-            diffusions[vertex_index * num_time_steps + time_index] = new_diffusion;
-        }
+        diffusions[vertex_index * num_time_steps + time_index] = new_diffusion;
     }
     void set_water_column_adjacency(int water_column_index, int adjacent_index, int position) {
         if (rank == 0) {

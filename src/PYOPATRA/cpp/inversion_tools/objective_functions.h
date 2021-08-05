@@ -196,6 +196,7 @@ private:
         MPI_Reduce(&sum, &all_sum, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 
         if (Parent::ObjectiveFunctionBase::rank == 0) {
+            std::cout << "Proj: " << num_proj << ", world size: " << Parent::ObjectiveFunctionBase::world_size << std::endl;
             return all_sum / (num_proj * Parent::ObjectiveFunctionBase::world_size);
         } else {
             return 0.0;
