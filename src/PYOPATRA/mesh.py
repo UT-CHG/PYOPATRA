@@ -139,7 +139,7 @@ class TriangularMesh2D(TriangularMesh):
 
             for i in range(file_parser.regular_dimensions[0]):
                 for j in range(file_parser.regular_dimensions[1]):
-                    if rank == 0:
+                    if sharedrank == 0:
                         self._cpp_mesh.set_vertex_location(i * file_parser.regular_dimensions[1] + j,
                                                            [file_parser.latitude[i], file_parser.longitude[j]])
                     for time in range(velocities.shape[2]):
