@@ -8,6 +8,8 @@ class ObjectiveFunctionBase:
         self._cpp_obj_fn = None
 
     def set_observed_values(self, observed_locations):
+        if observed_locations is None:
+            observed_locations = np.zeros((0, 2))
         self._cpp_obj_fn.set_observed_values(np.array(observed_locations, order='F'))
 
 

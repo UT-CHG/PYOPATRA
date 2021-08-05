@@ -56,8 +56,8 @@ class FileParserBase:
         """Diffusion Coefficient Matrix"""
 
         self.master_ranks = comm.gather(sharedmaster, root=0)
-        if rank == 0:
-            print(self.master_ranks)
+        # if rank == 0:
+        #     print(self.master_ranks)
 
 
 class ADCIRCFileParser(FileParserBase):

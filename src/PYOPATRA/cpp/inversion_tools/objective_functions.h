@@ -27,22 +27,22 @@ public:
     virtual double calculate_value(const ParticleList<dimension>& particles) = 0;
     PointerWrapper<ObjectiveFunctionBase<dimension>> get_pointer_wrapper() { return ptr_wrapper; }
     void set_observed_values(const Eigen::Ref<Eigen::MatrixXd> particle_locations) {
-        auto temp_list = new ParticleList<dimension>();
+//        auto temp_list = new ParticleList<dimension>();
+//
+//        for (int i = 0; i < particle_locations.rows(); i++) {
+//            temp_list->create_particle(particle_locations.row(i));
+//        }
 
-        for (int i = 0; i < particle_locations.rows(); i++) {
-            temp_list->create_particle(particle_locations.row(i));
-        }
+        finish_observed_setup_impl(particle_locations);
 
-        finish_observed_setup_impl(*temp_list);
-
-        temp_list->delete_all_particles();
-        delete temp_list;
+//        temp_list->delete_all_particles();
+//        delete temp_list;
     }
     int get_rank() { return rank; }
 
 protected:
     int rank, world_size;
-    virtual void finish_observed_setup_impl(ParticleList<dimension>& particles) = 0;
+    virtual void finish_observed_setup_impl(const Eigen::Ref<Eigen::MatrixXd> particle_locations) = 0;
     PointerWrapper<ObjectiveFunctionBase<dimension>> ptr_wrapper;
 };
 
@@ -95,11 +95,48 @@ public:
     Eigen::VectorXd& get_longitude_bounds() { return longitude_bounds; }
 
 protected:
+    using Parent = ObjectiveFunctionBase<dimension>;
     virtual double calculate_value_impl(const ParticleList<dimension>& particles) = 0;
 
-    void finish_observed_setup_impl(ParticleList<dimension>& particles) {
-        fill_bins(particles, observed_bins);
-        observed_bins /= particles.get_length();
+    void finish_observed_setup_impl(const Eigen::Ref<Eigen::MatrixXd> particle_locations) {
+        int num_particles, num_particles_on_rank;
+        std::vector<int> num_particles_on_each_proc(Parent::world_size);
+
+        if (Parent::rank == 0) {
+            num_particles = particle_locations.rows();
+        }
+
+        MPI_Bcast(&num_particles, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+        num_particles_on_rank = num_particles / Parent::world_size + (num_particles % Parent::world_size > Parent::rank ? 1 : 0);
+
+        MPI_Gather(&num_particles_on_rank, 1, MPI_INT, num_particles_on_each_proc.data(), 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+        Eigen::MatrixXd temp_bins(observed_bins.rows(), observed_bins.cols());
+        Eigen::MatrixXd temp_particles(num_particles_on_rank, dimension);
+        Eigen::MatrixXd send_particle_buf(0, 0);
+
+        if (Parent::rank == 0) {
+            int start = 0;
+
+            temp_particles = particle_locations.block(0, 0, num_particles_on_rank, dimension);
+
+            for (int i = 1; i < Parent::world_size; i++) {
+                start += num_particles_on_each_proc[i - 1];
+                send_particle_buf.resize(num_particles_on_each_proc[i], dimension);
+                send_particle_buf = particle_locations.block(start, 0, num_particles_on_each_proc[i], dimension);
+
+                MPI_Send(send_particle_buf.data(), num_particles_on_each_proc[i] * dimension, MPI_DOUBLE, i, 1, MPI_COMM_WORLD);
+            }
+        } else {
+            MPI_Recv(temp_particles.data(), num_particles_on_rank * dimension, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        }
+
+        fill_bins(temp_particles, temp_bins);
+
+        MPI_Allreduce(temp_bins.data(), observed_bins.data(), temp_bins.rows() * temp_bins.cols(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+
+        observed_bins /= num_particles;
     }
 
     int get_1D_bin_coord(double position, const Eigen::VectorXd& bounds) {
@@ -132,6 +169,18 @@ protected:
             bins_array(lon_bin, lat_bin) += 1;
 
             current_particle = current_particle->get_next();
+        }
+    }
+
+    void fill_bins(const Eigen::MatrixXd& particles, Eigen::MatrixXd& bins_array) {
+        bins_array.setZero();
+        int lat_bin, lon_bin;
+
+        for (int i = 0; i < particles.rows(); i++) {
+            lat_bin = get_1D_bin_coord(particles(i, 0), latitude_bounds);
+            lon_bin = get_1D_bin_coord(particles(i, 1), longitude_bounds);
+
+            bins_array(lon_bin, lat_bin) += 1;
         }
     }
 };
@@ -196,7 +245,6 @@ private:
         MPI_Reduce(&sum, &all_sum, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 
         if (Parent::ObjectiveFunctionBase::rank == 0) {
-            std::cout << "Proj: " << num_proj << ", world size: " << Parent::ObjectiveFunctionBase::world_size << std::endl;
             return all_sum / (num_proj * Parent::ObjectiveFunctionBase::world_size);
         } else {
             return 0.0;
