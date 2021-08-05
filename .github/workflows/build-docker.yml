@@ -45,6 +45,6 @@ jobs:
             docker build $DOCKER_TAG -f dockerfiles/Dockerfile"${{ matrix.build_name }}" .
 
             for TAG_NAME in ${TAG_ARRAY[@]}; do
-              docker push "${{ secrets.DOCKER_USER }}"/pyopatra"${{ matrix.build_name }}":"${{ env.GITHUB_TAG }}"
+              docker push "${{ secrets.DOCKER_USER }}"/pyopatra"${{ matrix.build_name }}":"$TAG_NAME"
             done
           fi
