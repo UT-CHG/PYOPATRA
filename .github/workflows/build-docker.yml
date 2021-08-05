@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        build_name: [ "", "-mvapich-ib", "-sandybridge-mvapich-ib", "-mvapich-psm2" ]
+        build_name: [ "", "-mvapich-ib", "-sandybridge-mvapich-ib", "-mvapich-psm2", "-knl-mvapich-psm2" ]
     steps:
       - uses: actions/checkout@v2
       - name: Setup Environment

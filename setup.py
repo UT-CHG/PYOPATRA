@@ -18,13 +18,15 @@ from setuptools.command.develop import develop
 class CommandMixin:
     user_options = install.user_options + [
         ('cxxcompiler=', None, None),
-        ('sandybridge', None, 'Compile for Sandy Bridge Architectures')
+        ('sandybridge', None, 'Compile for Sandy Bridge Architectures'),
+        ('knl', None, 'Compile for Knights Landing Architectures')
     ]
 
     def initialize_options(self):
         super().initialize_options()
         self.cxxcompiler = None
         self.sandybridge = None
+        self.knl = None
 
     def finalize_options(self):
         print("value of cxxcompiler is", self.cxxcompiler)
@@ -34,8 +36,10 @@ class CommandMixin:
     def run(self):
         global cxxcompiler
         global sandybridge
+        global knl
         cxxcompiler = self.cxxcompiler # will be 1 or None
         sandybridge = self.sandybridge
+        knl = self.knl
 
         super().run()
 
@@ -84,6 +88,12 @@ class CMakeBuild(build_ext):
         try:
             if sandybridge:
                 cmake_args.append('-DSANDY_BRIDGE=ON')
+        except NameError:
+            pass
+
+        try:
+            if knl:
+                cmake_args.append('-DKNL=ON')
         except NameError:
             pass
 
