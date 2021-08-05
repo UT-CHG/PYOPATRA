@@ -19,7 +19,7 @@ public:
     ObjectiveFunctionBase() {
         MPI_Comm_rank(MPI_COMM_WORLD, &rank);
         MPI_Comm_size(MPI_COMM_WORLD, &world_size);
-        ptr_wrapper = this;
+        ptr_wrapper.set_pointer(this);
     };
     virtual ~ObjectiveFunctionBase() = default;
 
