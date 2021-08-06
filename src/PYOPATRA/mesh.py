@@ -5,7 +5,7 @@ comm = MPI.COMM_WORLD
 size = comm.Get_size()
 rank = comm.Get_rank()
 
-sharedcomm = comm.Split_type(MPI.COMM_TYPE_SHARED)
+sharedcomm = comm.Split_type(MPI.COMM_TYPE_SHARED, key=rank)
 sharedsize = sharedcomm.Get_size()
 sharedrank = sharedcomm.Get_rank()
 

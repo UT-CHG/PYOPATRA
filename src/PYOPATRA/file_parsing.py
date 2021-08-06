@@ -9,9 +9,11 @@ from mpi4py import MPI
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
-sharedcomm = comm.Split_type(MPI.COMM_TYPE_SHARED)
+
+sharedcomm = comm.Split_type(MPI.COMM_TYPE_SHARED, key=rank)
 sharedrank = sharedcomm.Get_rank()
 sharedmaster = rank if sharedrank == 0 else -1
+
 
 class FileParserBase:
     """

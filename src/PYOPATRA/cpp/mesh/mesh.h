@@ -55,9 +55,10 @@ public:
         , num_depths(1)
         , num_time_steps(measured_times.size())
     {
-        int world_size;
+        int world_size, full_rank;
+        MPI_Comm_rank(MPI_COMM_WORLD, &full_rank);
 
-        MPI_Comm_split_type(MPI_COMM_WORLD, MPI_COMM_TYPE_SHARED, 0, MPI_INFO_NULL, &node_comm);
+        MPI_Comm_split_type(MPI_COMM_WORLD, MPI_COMM_TYPE_SHARED, full_rank, MPI_INFO_NULL, &node_comm);
         MPI_Comm_rank(node_comm, &rank);
         MPI_Comm_size(node_comm, &world_size);
 
