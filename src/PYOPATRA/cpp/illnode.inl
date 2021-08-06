@@ -8,7 +8,7 @@ void ILLNode<T>::remove() {
         prev->next = next;
     }
 
-    if (prev != nullptr) {
+    if (next != nullptr) {
         next->prev = prev;
     }
 
