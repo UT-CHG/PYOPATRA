@@ -43,7 +43,7 @@ PYBIND11_MODULE(pyopatra_pybind, m) {
 //            .def("set_vertices", &TriangularMeshElement2D::set_vertices)
             .def("get_vertices", &TriangularMeshElement2D::get_vertices);
 
-    py::class_<TriangularMesh2D>(m, "CppTriangularMesh2D")
+    py::class_<TriangularMesh2D, std::unique_ptr<TriangularMesh2D, py::nodelete>>(m, "CppTriangularMesh2D")
             .def(py::init<int, int, std::vector<double>&&>())
             .def("set_vertex_location", &TriangularMesh2D::set_vertex_location)
             .def("set_vertex_velocity", &TriangularMesh2D::set_vertex_velocity)
@@ -79,8 +79,8 @@ PYBIND11_MODULE(pyopatra_pybind, m) {
             .def("update_particle_location_indices", &TriangularMesh2DSolver::update_particle_location_indices)
             .def("calculate_objective_value", &TriangularMesh2DSolver::calculate_objective_value);
 
-    py::class_<TriangularWaterColumn2D>(m, "CppTriangleWaterColumn2D")
-            .def("set_adjacent_columns", &TriangularWaterColumn2D::set_adjacent_columns);
+//    py::class_<TriangularWaterColumn2D>(m, "CppTriangleWaterColumn2D")
+//            .def("set_adjacent_columns", &TriangularWaterColumn2D::set_adjacent_columns);
 
     py::class_<ParticleList2D, std::unique_ptr<ParticleList2D, py::nodelete>>(m, "CppParticleList2D")
             .def(py::init<>())
