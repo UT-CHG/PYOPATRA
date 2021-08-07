@@ -110,7 +110,6 @@ public:
             particle.get_node().remove();
             particles->decrement_length();
             delete &particle;
-            std::cout << "Removing a particle" << std::endl;
         }
     }
 
