@@ -35,3 +35,6 @@ class Solver:
 
     def calculate_objective_value(self):
         return self._cpp_solver.calculate_objective_value()
+
+    def get_current_time(self):
+        return self._cpp_solver.get_current_time()

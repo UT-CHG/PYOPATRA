@@ -31,14 +31,22 @@ public:
         : mesh_elements(0)
         , num_depths(1)
         , index(0)
-    {}
+    {
+        for (int i = 0; i < vertices; i++) {
+            adjacent_columns[i] = -1;
+        }
+    }
     explicit WaterColumn(int num_depths)
         : mesh_elements(0)
         , num_depths(num_depths)
         , index(0)
-    {}
+    {
+        for (int i = 0; i < vertices; i++) {
+            adjacent_columns[i] = -1;
+        }
+    }
 
-    Vector interpolate_velocity(const MeshElementT<vertices, dimension>* elements, const MeshVertex<dimension>* vertex_array, Vector* velocities, Vector* diffusions, const Vector& location, size_t time_index, double delta_t,  double time, double lower_time, double upper_time) {
+    void interpolate_velocity(const MeshElementT<vertices, dimension>* elements, const MeshVertex<dimension>* vertex_array, Vector* velocities, Vector* diffusions, const Vector& location, size_t time_index, double delta_t,  double time, double lower_time, double upper_time, Vector &out_vec) {
         if constexpr (dimension == 2) {
             double t = ((time - lower_time) / (upper_time - lower_time));
             auto barycentric = elements[mesh_elements].calculate_barycentric_coordinate(vertex_array, location);
@@ -51,14 +59,12 @@ public:
             ub = elements[mesh_elements].sample_diffusion_coefficient(vertex_array, diffusions, barycentric, time_index + 1);
             Vector interpolated_diffusion = (1 - t) * lb + t * ub;
 
-            Vector new_velocity = interpolated_velocity;
+            out_vec = interpolated_velocity;
             double ra = unif_pi(generator);
             double rn = normal(generator);
 
-            new_velocity(0) += rn * sqrt(4.0 * interpolated_diffusion(0) / (delta_t * 3600.0)) * sin(ra);
-            new_velocity(1) += rn * sqrt(4.0 * interpolated_diffusion(1) / (delta_t * 3600.0)) * cos(ra);
-
-            return new_velocity;
+            out_vec(0) += rn * sqrt(4.0 * interpolated_diffusion(0) / (delta_t * 3600.0)) * sin(ra);
+            out_vec(1) += rn * sqrt(4.0 * interpolated_diffusion(1) / (delta_t * 3600.0)) * cos(ra);
         }
     }
     void set_num_depths(int new_num_depths) { num_depths = new_num_depths; }

@@ -80,9 +80,6 @@ public:
             MPI_Win_allocate_shared(size, sizeof(Vector), MPI_INFO_NULL, node_comm, &vel_bsptr, &velocities_win);
             MPI_Win_allocate_shared(size, sizeof(Vector), MPI_INFO_NULL, node_comm, &dif_bsptr, &diffusions_win);
         } else {
-            MPI_Aint ssize;
-            int disp_unit;
-
             size = 0;
 
             MPI_Win_allocate_shared(size, sizeof(Vertex), MPI_INFO_NULL, node_comm, &vert_bsptr, &vertices_win);
@@ -90,13 +87,16 @@ public:
             MPI_Win_allocate_shared(size, sizeof(WaterCol), MPI_INFO_NULL, node_comm, &col_bsptr, &columns_win);
             MPI_Win_allocate_shared(size, sizeof(Vector), MPI_INFO_NULL, node_comm, &vel_bsptr, &velocities_win);
             MPI_Win_allocate_shared(size, sizeof(Vector), MPI_INFO_NULL, node_comm, &dif_bsptr, &diffusions_win);
-
-            MPI_Win_shared_query(vertices_win, 0, &ssize, &disp_unit, &vert_bsptr);
-            MPI_Win_shared_query(elements_win, 0, &ssize, &disp_unit, &el_bsptr);
-            MPI_Win_shared_query(columns_win, 0, &ssize, &disp_unit, &col_bsptr);
-            MPI_Win_shared_query(velocities_win, 0, &ssize, &disp_unit, &vel_bsptr);
-            MPI_Win_shared_query(diffusions_win, 0, &ssize, &disp_unit, &dif_bsptr);
         }
+
+        MPI_Aint ssize;
+        int disp_unit;
+
+        MPI_Win_shared_query(vertices_win, MPI_PROC_NULL, &ssize, &disp_unit, &vert_bsptr);
+        MPI_Win_shared_query(elements_win, MPI_PROC_NULL, &ssize, &disp_unit, &el_bsptr);
+        MPI_Win_shared_query(columns_win, MPI_PROC_NULL, &ssize, &disp_unit, &col_bsptr);
+        MPI_Win_shared_query(velocities_win, MPI_PROC_NULL, &ssize, &disp_unit, &vel_bsptr);
+        MPI_Win_shared_query(diffusions_win, MPI_PROC_NULL, &ssize, &disp_unit, &dif_bsptr);
 
         water_columns = static_cast<WaterCol*>(col_bsptr);
         vertices = static_cast<Vertex*>(vert_bsptr);
@@ -224,30 +224,33 @@ public:
 
     int locate_new_water_column(const WaterCol* starting_water_col, const Vector& location) {
         if constexpr (dimension == 2 && num_vertices_per_element == 3) {
-            if (starting_water_col) {
-                Vector A = vertices[elements[starting_water_col->get_mesh_elements()].get_vertices()[0]].get_location();
-                Vector B = vertices[elements[starting_water_col->get_mesh_elements()].get_vertices()[1]].get_location();
-                Vector C = vertices[elements[starting_water_col->get_mesh_elements()].get_vertices()[2]].get_location();
+            int next_col;
 
-                int side_1 = sgn((B[0] - A[0]) * (location[1] - A[1]) - (B[1] - A[1]) * (location[0] - A[0]));
-                int side_2 = sgn((C[0] - B[0]) * (location[1] - B[1]) - (C[1] - B[1]) * (location[0] - B[0]));
-                int side_3 = sgn((A[0] - C[0]) * (location[1] - C[1]) - (A[1] - C[1]) * (location[0] - C[0]));
+            Vector A = vertices[elements[starting_water_col->get_mesh_elements()].get_vertices()[0]].get_location();
+            Vector B = vertices[elements[starting_water_col->get_mesh_elements()].get_vertices()[1]].get_location();
+            Vector C = vertices[elements[starting_water_col->get_mesh_elements()].get_vertices()[2]].get_location();
 
-                if (side_1 <= 0 && side_2 <= 0 && side_3 <= 0) {
-                    return starting_water_col->get_index();
-                } else if (side_1 > 0) {
-                    return locate_new_water_column(&water_columns[starting_water_col->get_adjacencies()[0]], location);
-                } else if (side_2 > 0) {
-                    return locate_new_water_column(&water_columns[starting_water_col->get_adjacencies()[1]], location);
-                } else {
-                    return locate_new_water_column(&water_columns[starting_water_col->get_adjacencies()[2]], location);
-                }
+            int side_1 = sgn((B[0] - A[0]) * (location[1] - A[1]) - (B[1] - A[1]) * (location[0] - A[0]));
+            int side_2 = sgn((C[0] - B[0]) * (location[1] - B[1]) - (C[1] - B[1]) * (location[0] - B[0]));
+            int side_3 = sgn((A[0] - C[0]) * (location[1] - C[1]) - (A[1] - C[1]) * (location[0] - C[0]));
+
+            if (side_1 <= 0 && side_2 <= 0 && side_3 <= 0) {
+                return starting_water_col->get_index();
+            } else if (side_1 > 0) {
+                next_col = starting_water_col->get_adjacencies()[0];
+            } else if (side_2 > 0) {
+                next_col = starting_water_col->get_adjacencies()[1];
+            } else {
+                next_col = starting_water_col->get_adjacencies()[2];
+            }
+
+            if (next_col >= 0) {
+                return locate_new_water_column(&water_columns[next_col], location);
             } else {
                 return -1;
             }
         }
 
-        return -1;
     }
 };
 

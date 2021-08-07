@@ -6,6 +6,7 @@
 #define PYOPATRA_SOLVER_H
 
 #include "Eigen/Dense"
+#include "mpi.h"
 
 #include "mesh/mesh.h"
 #include "particle_list.h"
@@ -68,7 +69,9 @@ public:
 
     void update_particle_locations(double time_delta) {
         auto current = particles->get_head();
+        auto temp = current;
         size_t lower_bound = current_time_step;
+        Vector velocity_update;
 
         time += time_delta;
 
@@ -79,12 +82,13 @@ public:
         current_time_step = lower_bound;
 
         while (current) {
-            Vector velocity_update = mesh->get_water_columns()[current->get_last_known_water_column_index()]
+            temp = current->get_next();
+            mesh->get_water_columns()[current->get_last_known_water_column_index()]
                     .interpolate_velocity(mesh->get_elements(), mesh->get_vertices(), mesh->get_velocities_ptr(), mesh->get_diffusions_ptr(), current->get_location(), lower_bound, time_delta, time,
-                                          measured_times[current_time_step], measured_times[current_time_step + 1]);
+                                          measured_times[current_time_step], measured_times[current_time_step + 1], velocity_update);
             current->update_location(velocity_update, time_delta);
             update_particle_mesh_location(*current);
-            current = current->get_next();
+            current = temp;
         }
     }
 
@@ -105,6 +109,8 @@ public:
             // Particle has gone off the mesh, remove it
             particle.get_node().remove();
             particles->decrement_length();
+            delete &particle;
+            std::cout << "Removing a particle" << std::endl;
         }
     }
 

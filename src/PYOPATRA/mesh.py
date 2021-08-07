@@ -191,7 +191,7 @@ class TriangularMesh2D(TriangularMesh):
                             # First Adjacency
                             # Top row, even triangles
                             if k == 0 and i == 0:
-                                # No adjacency, should stay a nullptr
+                                # No adjacency, should stay a -1
                                 pass
 
                             # Other even triangles
@@ -201,7 +201,7 @@ class TriangularMesh2D(TriangularMesh):
                                                                           0)
                             # Right side, odd triangles
                             elif j == self.regular_dimensions[1] - 2:
-                                # No adjancency, should stay a nullptr
+                                # No adjancency, should stay a -1
                                 pass
 
                             # Other odd triangles
@@ -231,7 +231,7 @@ class TriangularMesh2D(TriangularMesh):
                             # Third Adjacency
                             # Left side, even triangles
                             if j == 0 and k == 0:
-                                # No adjacency
+                                # No adjacency should stay -1
                                 pass
 
                             # All other triangles
