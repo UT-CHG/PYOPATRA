@@ -88,6 +88,12 @@ PYBIND11_MODULE(pyopatra_pybind, m) {
             .def("set_observed_values", &SlicedWassersteinDistance2D::set_observed_values)
             .def("get_pointer_wrapper", &SlicedWassersteinDistance2D::get_pointer_wrapper, py::return_value_policy::copy);
 
+    py::class_<BhattacharyyaDistance2D>(m, "CppBhattacharyyaDistance2D")
+            .def(py::init<int, int, const Eigen::Vector4d&>())
+            .def("calculate_value", &SlicedWassersteinDistance2D::calculate_value)
+            .def("set_observed_values", &SlicedWassersteinDistance2D::set_observed_values)
+            .def("get_pointer_wrapper", &SlicedWassersteinDistance2D::get_pointer_wrapper, py::return_value_policy::copy);
+
     py::class_<TriangularMesh2DPtrWrapper>(m, "CppTriangularMesh2DPtrWrapper");
     py::class_<ParticleList2DPtrWrapper>(m, "CppParticleList2DPtrWrapper");
     py::class_<ObjectiveFunction2DPtrWrapper>(m, "CppObjectiveFunction2DPtrWrapper");

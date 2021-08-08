@@ -1,6 +1,6 @@
 import numpy as np
 
-from .pyopatra_pybind import CppSlicedWassersteinDistance2D
+from .pyopatra_pybind import CppSlicedWassersteinDistance2D, CppBhattacharyyaDistance2D
 from .particle import ParticleList, comm, rank
 
 class ObjectiveFunctionBase:
@@ -17,3 +17,8 @@ class SlicedWassersteinDistance(ObjectiveFunctionBase):
     def __init__(self, num_bins_lat, num_bins_lon, bounds, num_projections, rng_seed):
         super().__init__()
         self._cpp_obj_fn = CppSlicedWassersteinDistance2D(num_bins_lat, num_bins_lon, np.array(bounds), num_projections, rng_seed)
+
+class SlicedBhattacharyyaDistance(ObjectiveFunctionBase):
+    def __init__(self, num_bins_lat, num_bins_lon, bounds):
+        super().__init__()
+        self._cpp_obj_fn = CppBhattacharyyaDistance2D(num_bins_lat, num_bins_lon, np.array(bounds))

@@ -7,6 +7,7 @@
 
 #include "Eigen/Dense"
 #include "mpi.h"
+#include <cmath>
 
 #include "../particle_list.h"
 #include "../util.h"
@@ -263,7 +264,37 @@ private:
     }
 };
 
+template <int dimension>
+class BhattacharyyaDistance : public BinObjectiveFunctionBase<dimension> {
+private:
+    using Parent = BinObjectiveFunctionBase<dimension>;
+
+    Eigen::MatrixXd recv_bin;
+    int num_particles;
+
+    double calculate_value_impl(const ParticleList<dimension>& particles) {
+        int num_particles_per_proc = particles.get_length();
+
+        MPI_Reduce(&num_particles_per_proc, &num_particles, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+        MPI_Reduce(Parent::get_bins().data(), recv_bin.data(), recv_bin.size(), MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
+        if (Parent::rank == 0) {
+            recv_bin /= num_particles;
+            return -1 * std::log(recv_bin.cwiseProduct(Parent::get_observed_bins()).cwiseSqrt().sum());
+        } else {
+            return 0.0;
+        }
+    }
+
+public:
+    BhattacharyyaDistance(int num_bins_lat, int num_bins_lon, const Eigen::Vector4d& bounds)
+            : Parent(num_bins_lat, num_bins_lon, bounds)
+            , recv_bin(num_bins_lon, num_bins_lat)
+    {}
+}
+
 using SlicedWassersteinDistance2D = SlicedWassersteinDistance<2>;
+using BhattacharyyaDistance2D = BhattacharyyaDistance<2>;
 using ObjectiveFunction2DPtrWrapper = PointerWrapper<ObjectiveFunctionBase<2>>;
 
 #endif //PYOPATRA_OBJECTIVE_FUNCTIONS_H
