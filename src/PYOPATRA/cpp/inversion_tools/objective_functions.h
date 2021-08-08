@@ -291,7 +291,7 @@ public:
             : Parent(num_bins_lat, num_bins_lon, bounds)
             , recv_bin(num_bins_lon, num_bins_lat)
     {}
-}
+};
 
 using SlicedWassersteinDistance2D = SlicedWassersteinDistance<2>;
 using BhattacharyyaDistance2D = BhattacharyyaDistance<2>;
