@@ -18,7 +18,7 @@ class SlicedWassersteinDistance(ObjectiveFunctionBase):
         super().__init__()
         self._cpp_obj_fn = CppSlicedWassersteinDistance2D(num_bins_lat, num_bins_lon, np.array(bounds), num_projections, rng_seed)
 
-class SlicedBhattacharyyaDistance(ObjectiveFunctionBase):
+class BhattacharyyaDistance(ObjectiveFunctionBase):
     def __init__(self, num_bins_lat, num_bins_lon, bounds):
         super().__init__()
         self._cpp_obj_fn = CppBhattacharyyaDistance2D(num_bins_lat, num_bins_lon, np.array(bounds))
