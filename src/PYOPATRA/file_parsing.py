@@ -5,6 +5,8 @@
 import numpy as np
 import netCDF4 as nc
 from mpi4py import MPI
+import h5py
+from datetime import datetime
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -218,3 +220,84 @@ class HYCOMFileParser(FileParserBase):
 
 class POMFileParser(FileParserBase):
     pass
+
+
+class MOHIDStyleFileParser(FileParserBase):
+    def __init__(self):
+        super().__init__()
+
+    def read(self, mohid_file, latitude, longitude, dimensions=2, num_time_steps=None, starting_time_step=1, triangulate=True, diffusion_coefficient=0.0):
+        if rank == 0:
+            latitude = latitude[0, :-1]
+            longitude = longitude[:-1, 0]
+        print(np.min(latitude), np.max(latitude))
+        print(np.min(longitude), np.max(longitude))
+        self.latitude = comm.bcast(latitude, root=0)
+        self.longitude = comm.bcast(longitude, root=0)
+
+        if dimensions == 2:
+            if rank == 0:
+                self.regular_dimensions = (self.latitude.shape[0], self.longitude.shape[0])
+                self.num_vertices = self.latitude.shape[0] * self.longitude.shape[0]
+                self.num_elements = (self.longitude.shape[0] - 1) * 2 * (self.latitude.shape[0] - 1)
+                with h5py.File(mohid_file, 'r') as fp:
+                    # print(list(fp['Time'].keys()))
+                    # print(fp['Time']['Time_00001'][:])
+                    # print(list(fp['Results']['velocity U'].keys()))
+                    velocity = fp['Results']['velocity U']['velocity U_00001'][:, :, :]
+                    # print(velocity.shape)
+                    # print(np.unravel_index(np.argmax(velocity), velocity.shape))
+                    # print(latitude.shape, longitude.shape)
+                    # print(velocity[-1, :, :])
+
+                    if num_time_steps is None:
+                        num_time_steps = len(list(fp['Time'].keys()))
+
+            self.regular_dimensions = comm.bcast(self.regular_dimensions, root=0)
+            self.num_vertices = comm.bcast(self.num_vertices, root=0)
+            self.num_elements = comm.bcast(self.num_elements, root=0)
+
+            if rank == 0:
+                self.velocity = np.zeros((2, self.num_vertices, num_time_steps))
+                self.diffusion_coefficient = np.ones((2, self.num_vertices, num_time_steps)) * diffusion_coefficient
+
+            # TODO: Make diffusion coefficient more flexible
+            times = None
+
+            if rank == 0:
+                times = np.zeros(num_time_steps)
+                with h5py.File(mohid_file, 'r') as fp:
+                    for i in range(num_time_steps):
+                        water_v = fp['Results']['velocity V']['velocity V_{:05d}'.format(i + starting_time_step)][-1, :, :].flatten()
+                        self.velocity[0, :, i] = water_v[:]
+                        mv = self.velocity[0, :, i] == 0
+                        self.diffusion_coefficient[0, :, i][mv] = 0.0
+
+                        water_u = fp['Results']['velocity U']['velocity U_{:05d}'.format(i + starting_time_step)][-1, :, :].flatten()
+                        self.velocity[1, :, i] = water_u[:]
+                        mu = self.velocity[1, :, i] == 0
+                        self.diffusion_coefficient[1, :, i][mu] = 0.0
+
+                        temp_time = fp['Time']['Time_{:05d}'.format(i + 1)][:]
+                        temp_time = np.array(temp_time, dtype=int)
+                        temp_DateTime = datetime(temp_time[0], temp_time[1], temp_time[2], temp_time[3], temp_time[4])
+                        temp_DateTime -= datetime(2000, 1, 1)
+                        times[i] = temp_DateTime.days * 24 + temp_DateTime.seconds // 3600
+
+                print(np.max(velocity))
+
+                for r in self.master_ranks:
+                    if r > 0:
+                        comm.send(self.velocity, dest=r, tag=5)
+                        comm.send(self.diffusion_coefficient, dest=r, tag=6)
+
+            else:
+                if sharedmaster > 0:
+                    self.velocity = comm.recv(source=0, tag=5)
+                    self.diffusion_coefficient = comm.recv(source=0, tag=6)
+
+            self.times = comm.bcast(times, root=0)
+            print(self.times)
+
+        else:
+            raise NotImplementedError('Only 2D files are currently implemented.')
