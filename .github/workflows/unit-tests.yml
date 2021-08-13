@@ -33,7 +33,7 @@ jobs:
           cmake -Bbuild -H. -DBUILD_TESTING=OFF
           sudo cmake --build build/ --target install
           cd ..
-          pip3 install numpy scipy matplotlib coverage pytest netcdf4 mpi4py
+          pip3 install numpy scipy matplotlib coverage pytest netcdf4 mpi4py h5py
       - name: Install PYOPATRA C++
         run: |
           mkdir cpp_build && cd cpp_build
