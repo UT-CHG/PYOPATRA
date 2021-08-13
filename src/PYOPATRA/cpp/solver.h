@@ -80,7 +80,7 @@ public:
         }
 
         current_time_step = lower_bound;
-
+        
         while (current) {
             temp = current->get_next();
             mesh->get_water_columns()[current->get_last_known_water_column_index()]

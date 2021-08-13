@@ -46,7 +46,9 @@ public:
         }
     }
 
-    void interpolate_velocity(const MeshElementT<vertices, dimension>* elements, const MeshVertex<dimension>* vertex_array, Vector* velocities, Vector* diffusions, const Vector& location, size_t time_index, double delta_t,  double time, double lower_time, double upper_time, Vector &out_vec) {
+    void interpolate_velocity(const MeshElementT<vertices, dimension>* elements, const MeshVertex<dimension>* vertex_array,
+                              Vector* velocities, Vector* diffusions, const Vector& location, size_t time_index, double delta_t,
+                              double time, double lower_time, double upper_time, Vector &out_vec) {
         if constexpr (dimension == 2) {
             double t = ((time - lower_time) / (upper_time - lower_time));
             auto barycentric = elements[mesh_elements].calculate_barycentric_coordinate(vertex_array, location);

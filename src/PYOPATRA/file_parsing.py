@@ -230,8 +230,7 @@ class MOHIDStyleFileParser(FileParserBase):
         if rank == 0:
             latitude = latitude[0, :-1]
             longitude = longitude[:-1, 0]
-        print(np.min(latitude), np.max(latitude))
-        print(np.min(longitude), np.max(longitude))
+
         self.latitude = comm.bcast(latitude, root=0)
         self.longitude = comm.bcast(longitude, root=0)
 
@@ -240,17 +239,8 @@ class MOHIDStyleFileParser(FileParserBase):
                 self.regular_dimensions = (self.latitude.shape[0], self.longitude.shape[0])
                 self.num_vertices = self.latitude.shape[0] * self.longitude.shape[0]
                 self.num_elements = (self.longitude.shape[0] - 1) * 2 * (self.latitude.shape[0] - 1)
-                with h5py.File(mohid_file, 'r') as fp:
-                    # print(list(fp['Time'].keys()))
-                    # print(fp['Time']['Time_00001'][:])
-                    # print(list(fp['Results']['velocity U'].keys()))
-                    velocity = fp['Results']['velocity U']['velocity U_00001'][:, :, :]
-                    # print(velocity.shape)
-                    # print(np.unravel_index(np.argmax(velocity), velocity.shape))
-                    # print(latitude.shape, longitude.shape)
-                    # print(velocity[-1, :, :])
-
-                    if num_time_steps is None:
+                if num_time_steps is None:
+                    with h5py.File(mohid_file, 'r') as fp:
                         num_time_steps = len(list(fp['Time'].keys()))
 
             self.regular_dimensions = comm.bcast(self.regular_dimensions, root=0)
@@ -268,12 +258,13 @@ class MOHIDStyleFileParser(FileParserBase):
                 times = np.zeros(num_time_steps)
                 with h5py.File(mohid_file, 'r') as fp:
                     for i in range(num_time_steps):
-                        water_v = fp['Results']['velocity V']['velocity V_{:05d}'.format(i + starting_time_step)][-1, :, :].flatten()
+                        water_v = fp['Results']['velocity V']['velocity V_{:05d}'.format(i + starting_time_step)][-1, :, :].T
+                        water_v = water_v.flatten()
                         self.velocity[0, :, i] = water_v[:]
                         mv = self.velocity[0, :, i] == 0
                         self.diffusion_coefficient[0, :, i][mv] = 0.0
 
-                        water_u = fp['Results']['velocity U']['velocity U_{:05d}'.format(i + starting_time_step)][-1, :, :].flatten()
+                        water_u = fp['Results']['velocity U']['velocity U_{:05d}'.format(i + starting_time_step)][-1, :, :].T.flatten()
                         self.velocity[1, :, i] = water_u[:]
                         mu = self.velocity[1, :, i] == 0
                         self.diffusion_coefficient[1, :, i][mu] = 0.0
@@ -283,8 +274,6 @@ class MOHIDStyleFileParser(FileParserBase):
                         temp_DateTime = datetime(temp_time[0], temp_time[1], temp_time[2], temp_time[3], temp_time[4])
                         temp_DateTime -= datetime(2000, 1, 1)
                         times[i] = temp_DateTime.days * 24 + temp_DateTime.seconds // 3600
-
-                print(np.max(velocity))
 
                 for r in self.master_ranks:
                     if r > 0:
@@ -297,7 +286,6 @@ class MOHIDStyleFileParser(FileParserBase):
                     self.diffusion_coefficient = comm.recv(source=0, tag=6)
 
             self.times = comm.bcast(times, root=0)
-            print(self.times)
 
         else:
             raise NotImplementedError('Only 2D files are currently implemented.')
