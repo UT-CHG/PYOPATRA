@@ -53,6 +53,8 @@ public:
 //    double sample_viscosity(const MeshVertex<dimensions>* vertex_array, const VectorTd& barycentric_coordinates, int time_index) const;
 //    double sample_water_viscosity(const MeshVertex<dimensions>* vertex_array, const VectorTd& barycentric_coordinates, int time_index) const;
     Vector sample_diffusion_coefficient(const MeshVertex<dimensions>* vertex_array, const Eigen::Matrix<double, dimensions, 1>* diffusions, const VectorTd& barycentric_coordinates, int time_index) const;
+    Vector sample_wind(const MeshVertex<dimensions>* vertex_array, const Eigen::Matrix<double, dimensions, 1>* winds, const VectorTd& barycentric_coordinates, int wind_time_index) const;
+
     // 1 if deeper, -1 if shallower, 0 if on the element
 //    virtual int check_halfspace(const MeshVertex<3>* vertex_array, const Vector& point) const;
 };

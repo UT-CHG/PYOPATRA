@@ -20,10 +20,11 @@ protected:
     Vector location;
     int velocity;
     int diffusion_coefficient;
+    int wind;
 
 public:
-    explicit MeshVertexBase(int index, int num_timesteps);
-    MeshVertexBase(double latitude, double longitude, int index, int num_timesteps);
+    explicit MeshVertexBase(int index, int num_timesteps, int num_wind_timesteps);
+    MeshVertexBase(double latitude, double longitude, int index, int num_timesteps, int num_wind_timesteps);
 //    MeshVertexBase(double latitude, double longitude, Vector velocity);
 //    MeshVertexBase(double latitude, double longitude, Vector velocity, Vector diffusion_coefficient);
 
@@ -32,9 +33,11 @@ public:
     double get_longitude() const { return location[1]; }
     int get_velocity() const { return velocity; }
     int get_diffusion_coefficient() const { return diffusion_coefficient; }
+    int get_wind() const { return wind; }
 
     void set_diffusion_coefficient(int new_diffusion_coefficient) { diffusion_coefficient = new_diffusion_coefficient; }
     void set_velocity(int new_velocity) { velocity = new_velocity; }
+    void set_wind(int new_wind) { wind = new_wind; }
     void set_location(Vector new_location) { location = new_location; }
 };
 
@@ -47,8 +50,8 @@ class MeshVertex : MeshVertexBase<dimension> {};
 template <>
 class MeshVertex<2> : public MeshVertexBase<2> {
 public:
-    MeshVertex(int index, int num_timesteps) : MeshVertexBase<2>(index, num_timesteps) {}
-    MeshVertex(double latitude, double longitude, int index, int num_timesteps) : MeshVertexBase<2>(latitude, longitude, index, num_timesteps) {}
+    MeshVertex(int index, int num_timesteps, int num_wind_timesteps) : MeshVertexBase<2>(index, num_timesteps, num_wind_timesteps) {}
+    MeshVertex(double latitude, double longitude, int index, int num_timesteps, int num_wind_timesteps) : MeshVertexBase<2>(latitude, longitude, index, num_timesteps, num_wind_timesteps) {}
 //    MeshVertex(double latitude, double longitude, Vector velocity, Vector diffusion_coefficient)
 //        : MeshVertexBase<2>(latitude, longitude, velocity, diffusion_coefficient)
 //    {}
@@ -60,8 +63,8 @@ private:
     std::vector<double> density, temperature, water_viscosity, viscosity;
 
 public:
-    explicit MeshVertex(int index, int num_timesteps);
-    MeshVertex(double latitude, double longitude, double bathymetric_depth, int index, int num_timesteps);
+    explicit MeshVertex(int index, int num_timesteps, int num_wind_timesteps);
+    MeshVertex(double latitude, double longitude, double bathymetric_depth, int index, int num_timesteps, int num_wind_timesteps);
 //    MeshVertex(double latitude, double longitude, double bathymetric_depth, double density, double temperature, int num_timesteps);
 //    MeshVertex(double latitude, double longitude, double bathymetric_depth, double density, double temperature, Vector velocity);
 //    MeshVertex(double latitude, double longitude, double bathymetric_depth, double density, double temperature, Vector velocity, Vector diffusion_coefficient);

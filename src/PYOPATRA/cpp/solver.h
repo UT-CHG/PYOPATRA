@@ -29,9 +29,10 @@ public:
         , starting_time(measured_times(0))
         , time(starting_time)
         , measured_times(Eigen::VectorXd::Zero())
+        , measured_wind_times(Eigen::VectorXd::Zero())
     {}
 
-    Solver(PointerWrapper<SolverMesh>& mesh_ptr, PointerWrapper<SolverParticles>& particle_list_ptr, PointerWrapper<SolverObjFn>& obj_fn_ptr, Eigen::VectorXd measured_times)
+    Solver(PointerWrapper<SolverMesh>& mesh_ptr, PointerWrapper<SolverParticles>& particle_list_ptr, PointerWrapper<SolverObjFn>& obj_fn_ptr, Eigen::VectorXd measured_times, Eigen::VectorXd measured_wind_times)
         : mesh(mesh_ptr.get_pointer())
         , particles(particle_list_ptr.get_pointer())
         , obj_fn(obj_fn_ptr.get_pointer())
@@ -39,11 +40,13 @@ public:
         , starting_time(measured_times(0))
         , time(starting_time)
         , measured_times(measured_times)
+        , measured_wind_times(measured_wind_times)
     {
+        std::cout << "Num wind times: " << measured_wind_times.size() << std::endl;
         update_particle_location_indices();
     }
 
-    Solver(PointerWrapper<SolverMesh>& mesh_ptr, PointerWrapper<SolverParticles>& particle_list_ptr, Eigen::VectorXd measured_times)
+    Solver(PointerWrapper<SolverMesh>& mesh_ptr, PointerWrapper<SolverParticles>& particle_list_ptr, Eigen::VectorXd measured_times, Eigen::VectorXd measured_wind_times)
             : mesh(mesh_ptr.get_pointer())
             , particles(particle_list_ptr.get_pointer())
             , obj_fn(nullptr)
@@ -51,7 +54,9 @@ public:
             , starting_time(measured_times(0))
             , time(starting_time)
             , measured_times(measured_times)
+            , measured_wind_times(measured_wind_times)
     {
+        std::cout << "Num wind times: " << measured_wind_times.size() << std::endl;
         update_particle_location_indices();
     }
 
@@ -70,7 +75,7 @@ public:
     void update_particle_locations(double time_delta) {
         auto current = particles->get_head();
         auto temp = current;
-        size_t lower_bound = current_time_step;
+        Eigen::Index lower_bound = current_time_step;
         Vector velocity_update;
 
         time += time_delta;
@@ -80,12 +85,28 @@ public:
         }
 
         current_time_step = lower_bound;
+
+        Eigen::Index lower_wind_bound = 0;
+        double lower_wind_time = 0.0;
+        double upper_wind_time = 0.0;
+        if (measured_wind_times.size() > 0) {
+            lower_wind_bound = current_wind_time_step;
+
+            while (time >= measured_wind_times[lower_wind_bound + 1]) {
+                lower_wind_bound++;
+            }
+
+            current_wind_time_step = lower_wind_bound;
+            lower_wind_time = measured_wind_times[current_wind_time_step];
+            upper_wind_time = measured_wind_times[current_wind_time_step + 1];
+        }
         
         while (current) {
             temp = current->get_next();
             mesh->get_water_columns()[current->get_last_known_water_column_index()]
-                    .interpolate_velocity(mesh->get_elements(), mesh->get_vertices(), mesh->get_velocities_ptr(), mesh->get_diffusions_ptr(), current->get_location(), lower_bound, time_delta, time,
-                                          measured_times[current_time_step], measured_times[current_time_step + 1], velocity_update);
+                    .interpolate_velocity(mesh->get_elements(), mesh->get_vertices(), mesh->get_velocities_ptr(),
+                                          mesh->get_diffusions_ptr(), mesh->get_winds_ptr(), current->get_location(), lower_bound, lower_wind_bound, time_delta, time,
+                                          measured_times[current_time_step], measured_times[current_time_step + 1], lower_wind_time, upper_wind_time, velocity_update);
             current->update_location(velocity_update, time_delta);
             update_particle_mesh_location(*current);
             current = temp;
@@ -121,10 +142,10 @@ private:
     SolverParticles *particles;
     SolverObjFn *obj_fn;
 
-    size_t current_time_step;
+    size_t current_time_step, current_wind_time_step;
     double starting_time;
     double time;
-    Eigen::VectorXd measured_times;
+    Eigen::VectorXd measured_times, measured_wind_times;
 };
 
 using TriangularMesh2DSolver = Solver<3, 2>;

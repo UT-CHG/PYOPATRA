@@ -3,6 +3,7 @@ from datetime import date, timedelta
 from configparser import ConfigParser
 import h5py
 import numpy as np
+from time import time
 
 from PYOPATRA import *
 
@@ -12,7 +13,7 @@ if __name__ == '__main__':
     # In hours
     time_delta = 1
     # Particle release per timedelta and process
-    num_particles = 5
+    num_particles = int(1 * 48 * 1 / size)
     # True particle release location
     true_particle_lon = -88.365997
     true_particle_lat = 28.736628
@@ -61,17 +62,20 @@ if __name__ == '__main__':
     hfp.read(hycom_files, diffusion_coefficient=10.0)
 
     if rank == 0:
+        mesh_start_time = time()
         print('Setting up mesh...')
     # Set up 2D Triangular Mesh
     tm2d = TriangularMesh2D()
     tm2d.setup_mesh(hfp, 2)
+    if rank == 0:
+        print('Set up mesh in {} minutes'.format((time() - mesh_start_time) / 60.0))
 
     # Set up particles
     particles = ParticleList()
 
     # Set up objective function
-    obj = SlicedWassersteinDistance(700, 1000, [hfp.latitude[0], hfp.latitude[-1], hfp.longitude[0], hfp.longitude[-1]], 5000, 3000)
-
+    obj = SlicedWassersteinDistance(700, 1000, [hfp.latitude[0], hfp.latitude[-1], hfp.longitude[0], hfp.longitude[-1]], 5024, 0)
+    # obj = BhattacharyyaDistance(700, 1000, [hfp.latitude[0], hfp.latitude[-1], hfp.longitude[0], hfp.longitude[-1]])
     # Set up solver
     solver = Solver(hfp.times, tm2d, particles, obj)
 
@@ -83,11 +87,13 @@ if __name__ == '__main__':
 
         obs_particles = obs_particles_temp[~np.all(obs_particles_temp == 0, axis=1)]
 
-    obs_particles = comm.bcast(obs_particles, root=0)
+    # obs_particles = comm.bcast(obs_particles, root=0)
     obj.set_observed_values(obs_particles)
 
     previous_log_likelihood = 0
     previous_obj_value = 0
+    log_likelihood = 0
+    obj_value = 0
     accepted = 0
 
     value = 0
@@ -105,20 +111,28 @@ if __name__ == '__main__':
         frame = 0
         # Time stepping
         for i in range(total_time_steps):
-            # print('Time step {}'.format(i))
+            # if rank == 0:
+            #     print('Time step {} rank {} time {} particles {}'.format(i, rank, solver.get_current_time(), current_num_particles))
 
             # Inject more particles
             if i % add_particles_time_step_interval == 0:
                 for j in range(num_particles):
+                    # if rank == 0:
+                    #     print('Appending particle {} of {}'.format(j, current_num_particles))
                     particles.append_particle(proposed_loc[0], proposed_loc[1])
                     current_num_particles += 1
 
+            # if rank == 0:
+            #     print('Time stepping...')
             solver.time_step(time_delta)
 
+        cur_time = time()
         obj_value = solver.calculate_objective_value()
-        # obj_value = comm.bcast(obj_value, root=0)
-        log_likelihood = -obj_value / (2 * precision_parameter**2)
         if rank == 0:
+            print("Objective function calculated in {} seconds with value {}".format(time() - cur_time, obj_value))
+        # obj_value = comm.bcast(obj_value, root=0)
+        if rank == 0:
+            log_likelihood = -obj_value / (2 * precision_parameter**2)
             print(obj_value, previous_obj_value, log_likelihood, previous_log_likelihood)
 
         if sample == 0:
@@ -146,7 +160,7 @@ if __name__ == '__main__':
     if rank == 0:
         print("Acceptance Ratio: {}".format(accepted / num_samples))
 
-        with h5py.File("{}/data/mcmc_save_data_{}_samples.hdf5".format(file_prefix, num_samples), "w") as fp:
+        with h5py.File("{}/data/mcmc_save_data_{}_samples_b.hdf5".format(file_prefix, num_samples), "w") as fp:
             fp.create_dataset('samples', data=samples)
             fp.create_dataset('objectives', data=obj_values)
 

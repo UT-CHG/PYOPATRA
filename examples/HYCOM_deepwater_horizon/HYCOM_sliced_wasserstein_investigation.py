@@ -3,6 +3,7 @@ from datetime import date, timedelta
 from configparser import ConfigParser
 import h5py
 import numpy as np
+import matplotlib.pyplot as plt
 
 from PYOPATRA import *
 
@@ -12,11 +13,15 @@ if __name__ == '__main__':
     # In hours
     time_delta = 1
     # Particle release per timedelta
-    num_particles = 5
-    # Particle release location
-    particle_lon = -88.365997
-    particle_lat = 28.736628
-    release_loc = np.array((particle_lat, particle_lon))
+    num_particles = 10
+    # True particle release location
+    true_particle_lon = -88.365997
+    true_particle_lat = 28.736628
+    # Starting particle release location
+    particle_lon = -88.0
+    particle_lat = 28.6
+    prev_loc = np.array((particle_lat, particle_lon))
+    proposed_loc = np.array((particle_lat, particle_lon))
     # Time elapsed
     total_days = 8 * 7
     total_time_steps = int(24 / time_delta * total_days) - 4
@@ -25,15 +30,14 @@ if __name__ == '__main__':
     # How frequently to save particles (time steps, not hours)
     particle_save_interval = 3
     # Number of Particles at the end
-    total_particles = (total_time_steps // add_particles_time_step_interval + 1) * (num_particles * size)
+    total_particles = (total_time_steps // add_particles_time_step_interval + 1) * num_particles
     # Frame interval
     frame_interval = 3
+    # For the Wasserstein investigation
+    num_to_try = 1000
+    obj_values = np.zeros(num_to_try)
+    num_proj = 5000
 
-    # # Read in config file
-    # config = ConfigParser()
-    # config.read('hycom_setup.ini')
-
-    # Set up HYCOM file paths
     times = ['000', '003', '006', '009', '012', '015', '018', '021']
     start_date = date(2010, 4, 20)
 
@@ -57,47 +61,39 @@ if __name__ == '__main__':
     tm2d = TriangularMesh2D()
     tm2d.setup_mesh(hfp, 2)
 
-    # Set up particles
-    particles = ParticleList()
+    # Set up objective function
+    with h5py.File("{}/data/observed_particles.hdf5".format(file_prefix), "r") as fp:
+        obs_particles_temp = fp['particles'][:, :]
 
-    # Set up solver
-    solver = Solver(hfp.times, tm2d, particles)
+    obs_particles = obs_particles_temp[~np.all(obs_particles_temp == 0, axis=1)]
+    tm2d.setup_objective_function(obs_particles,
+                                  num_bins_lat_long=[700, 1000],
+                                  bounds=[hfp.latitude[0], hfp.latitude[-1], hfp.longitude[0], hfp.longitude[-1]],
+                                  num_proj=num_proj)
 
-    # Set up snapshot particle saving file
-    if rank == 0:
-        with h5py.File('{}/data/snapshots.hdf5'.format(file_prefix), 'w') as fp:
-            fp.create_dataset('snapshots', (total_particles, 2, total_time_steps // frame_interval + 1))
+    previous_log_likelihood = 0
+    previous_obj_value = 0
+    accepted = 0
 
     print('Time stepping...')
     current_num_particles = 0
     frame = 0
     # Time stepping
     for i in range(total_time_steps):
-        print('Time step {}'.format(i))
+        # print('Time step {}'.format(i))
 
         # Inject more particles
         if i % add_particles_time_step_interval == 0:
             for j in range(num_particles):
-                # print('Appending particle at ({}, {})'.format(particle_lon, particle_lat))
-                particles.append_particle(release_loc[0], release_loc[1])
+                tm2d.append_particle(proposed_loc)
                 current_num_particles += 1
 
-        # Time stepping
-        solver.time_step(time_delta)
+        tm2d.time_step(time_delta)
 
-        if i % frame_interval == 0:
-            print('Saving particles')
-            particle_locations = particles.get_all_particle_locations()
-            if rank == 0:
-                with h5py.File('{}/data/snapshots.hdf5'.format(file_prefix), 'a') as fp:
-                    fp['snapshots'][:particle_locations.shape[0], :, frame] = particle_locations
-            frame += 1
+    for i in range(num_to_try):
+        print(i)
+        obj_values[i] = tm2d.get_objective_value()
 
+    plt.hist(obj_values)
 
-
-    print('Saving particle locations...')
-    particle_locations = particles.get_all_particle_locations()
-    if rank == 0:
-        with h5py.File('{}/data/observed_particles.hdf5'.format(file_prefix), 'w') as fp:
-            fp.create_dataset('particles', particle_locations.shape, data=particle_locations)
-
+    plt.savefig('wasserstein_hist_{}_proj.png'.format(num_proj), dpi=300)

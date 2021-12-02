@@ -22,7 +22,7 @@ namespace py = pybind11;
 PYBIND11_MODULE(pyopatra_pybind, m) {
     // Two dimensional MeshVertex and Mesh
     py::class_<MeshVertexBase2D>(m, "CppMeshVertexBase2D")
-            .def(py::init<int, int>())
+            .def(py::init<int, int, int>())
             .def("get_location", &MeshVertexBase2D::get_location)
             .def("get_latitude", &MeshVertexBase2D::get_latitude)
             .def("get_longitude", &MeshVertexBase2D::get_longitude)
@@ -30,10 +30,11 @@ PYBIND11_MODULE(pyopatra_pybind, m) {
             .def("get_diffusion_coefficient", &MeshVertexBase2D::get_diffusion_coefficient)
             .def("set_diffusion_coefficient", &MeshVertexBase2D::set_diffusion_coefficient)
             .def("set_velocity", &MeshVertexBase2D::set_velocity)
+            .def("set_wind", &MeshVertex2D::set_wind)
             .def("set_location", &MeshVertexBase2D::set_location);
 
     py::class_<MeshVertex2D, MeshVertexBase2D>(m, "CppMeshVertex2D")
-            .def(py::init<int, int>());
+            .def(py::init<int, int, int>());
 
     py::class_<TriangularMeshElement2D>(m, "TriangularMeshElement2D")
             .def(py::init<>())
@@ -45,10 +46,11 @@ PYBIND11_MODULE(pyopatra_pybind, m) {
 
 //    py::class_<TriangularMesh2D, std::unique_ptr<TriangularMesh2D, py::nodelete>>(m, "CppTriangularMesh2D")
     py::class_<TriangularMesh2D>(m, "CppTriangularMesh2D")
-            .def(py::init<int, int, std::vector<double>&&>())
+            .def(py::init<int, int, std::vector<double>&&, std::vector<double>&&>())
             .def("set_vertex_location", &TriangularMesh2D::set_vertex_location)
             .def("set_vertex_velocity", &TriangularMesh2D::set_vertex_velocity)
             .def("set_vertex_diffusion", &TriangularMesh2D::set_vertex_diffusion)
+            .def("set_vertex_wind", &TriangularMesh2D::set_vertex_wind)
             .def("get_vertex_pointer", &TriangularMesh2D::get_vertex_pointer, py::return_value_policy::reference)
             .def("get_vertex_locations", &TriangularMesh2D::get_vertex_locations)
             .def("get_velocities", &TriangularMesh2D::get_velocities)
@@ -63,8 +65,8 @@ PYBIND11_MODULE(pyopatra_pybind, m) {
 
 //    py::class_<TriangularMesh2DSolver, std::unique_ptr<TriangularMesh2DSolver, py::nodelete>>(m, "CppTriangularMesh2DSolver")
     py::class_<TriangularMesh2DSolver>(m, "CppTriangularMesh2DSolver")
-            .def(py::init<TriangularMesh2DPtrWrapper&, ParticleList2DPtrWrapper&, ObjectiveFunction2DPtrWrapper&, Eigen::VectorXd>())
-            .def(py::init<TriangularMesh2DPtrWrapper&, ParticleList2DPtrWrapper&, Eigen::VectorXd>())
+            .def(py::init<TriangularMesh2DPtrWrapper&, ParticleList2DPtrWrapper&, ObjectiveFunction2DPtrWrapper&, Eigen::VectorXd, Eigen::VectorXd>())
+            .def(py::init<TriangularMesh2DPtrWrapper&, ParticleList2DPtrWrapper&, Eigen::VectorXd, Eigen::VectorXd>())
             .def("get_current_time", &TriangularMesh2DSolver::get_current_time)
             .def("time_step", &TriangularMesh2DSolver::time_step)
             .def("reset_solver", &TriangularMesh2DSolver::reset_solver)

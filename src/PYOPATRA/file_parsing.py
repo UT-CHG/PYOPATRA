@@ -40,6 +40,8 @@ class FileParserBase:
         """Raw boundary information"""
         self.velocity = None
         """Raw velocity information"""
+        self.winds = None
+        """Raw wind information"""
         self.temperature = None
         """Raw temperature information"""
         self.salinity = None
@@ -48,8 +50,10 @@ class FileParserBase:
         """Raw density information"""
         self.turbulence = None
         """Raw turbulence information"""
-        self.times = None
+        self.times = []
         """Time spacing"""
+        self.wind_times = []
+        """Wind Time spacing"""
         self.regular_dimensions = None
         """Dimensions for regular grid spacing (e.g., HYCOM)"""
         self.latitude = None
@@ -170,6 +174,8 @@ class HYCOMFileParser(FileParserBase):
                 self.latitude = ds['lat'][:]
                 self.longitude = ds['lon'][:]
 
+        print(self.latitude)
+
         self.latitude = comm.bcast(self.latitude, root=0)
         self.longitude = comm.bcast(self.longitude, root=0)
         self.regular_dimensions = comm.bcast(self.regular_dimensions, root=0)
@@ -199,7 +205,7 @@ class HYCOMFileParser(FileParserBase):
                         self.velocity[1, :, index] = water_u[:]
                         mv = self.velocity[1, :, index] == float(ds['water_u'].missing_value)
                         self.velocity[1, :, index][mv] = 0.0
-                        self.diffusion_coefficient[0, :, index][mv] = 0.0
+                        self.diffusion_coefficient[1, :, index][mv] = 0.0
 
                         self.times[index] = ds['time'][0]
                     else:
@@ -226,13 +232,21 @@ class MOHIDStyleFileParser(FileParserBase):
     def __init__(self):
         super().__init__()
 
-    def read(self, mohid_file, latitude, longitude, dimensions=2, num_time_steps=None, starting_time_step=1, triangulate=True, diffusion_coefficient=0.0):
+    def read(self, mohid_file, latitude, longitude, mohid_wind_file=None, dimensions=2, num_time_steps=None, num_wind_time_steps=None,
+             starting_time_step=1, starting_wind_time_step=1, triangulate=True, diffusion_coefficient=0.0):
         if rank == 0:
-            latitude = latitude[0, :-1]
-            longitude = longitude[:-1, 0]
+            print(latitude)
+            latitude = (latitude[:, 1:] + latitude[:, :-1]) / 2.0
+            # latitude -= (latitude[0, 1] - latitude[0, 0]) / 2.0
+            latitude = latitude[0, :]
+            print(latitude.shape)
+            longitude = (longitude[1:, :] + longitude[:-1, :]) / 2.0
+            longitude = longitude[:, 0]
+            print(longitude)
 
         self.latitude = comm.bcast(latitude, root=0)
         self.longitude = comm.bcast(longitude, root=0)
+        print(self.latitude.shape, self.longitude.shape)
 
         if dimensions == 2:
             if rank == 0:
@@ -251,29 +265,54 @@ class MOHIDStyleFileParser(FileParserBase):
                 self.velocity = np.zeros((2, self.num_vertices, num_time_steps))
                 self.diffusion_coefficient = np.ones((2, self.num_vertices, num_time_steps)) * diffusion_coefficient
 
+                try:
+                    self.winds = np.zeros((2, self.num_vertices, num_wind_time_steps))
+                except TypeError:
+                    self.winds = np.zeros((2, self.num_vertices, 2))
+
             # TODO: Make diffusion coefficient more flexible
             times = None
+            wind_times = None
 
             if rank == 0:
                 times = np.zeros(num_time_steps)
+                wind_times = np.zeros(num_wind_time_steps)
                 with h5py.File(mohid_file, 'r') as fp:
                     for i in range(num_time_steps):
                         water_v = fp['Results']['velocity V']['velocity V_{:05d}'.format(i + starting_time_step)][-1, :, :].T
+                        print('Water V shape', water_v.shape)
                         water_v = water_v.flatten()
                         self.velocity[0, :, i] = water_v[:]
                         mv = self.velocity[0, :, i] == 0
                         self.diffusion_coefficient[0, :, i][mv] = 0.0
 
-                        water_u = fp['Results']['velocity U']['velocity U_{:05d}'.format(i + starting_time_step)][-1, :, :].T.flatten()
+                        water_u = fp['Results']['velocity U']['velocity U_{:05d}'.format(i + starting_time_step)][-1, :, :].T
+                        print('Water U shape', water_u.shape)
+                        water_u = water_u.flatten()
                         self.velocity[1, :, i] = water_u[:]
                         mu = self.velocity[1, :, i] == 0
                         self.diffusion_coefficient[1, :, i][mu] = 0.0
 
-                        temp_time = fp['Time']['Time_{:05d}'.format(i + 1)][:]
+                        temp_time = fp['Time']['Time_{:05d}'.format(i + starting_time_step)][:]
                         temp_time = np.array(temp_time, dtype=int)
                         temp_DateTime = datetime(temp_time[0], temp_time[1], temp_time[2], temp_time[3], temp_time[4])
                         temp_DateTime -= datetime(2000, 1, 1)
                         times[i] = temp_DateTime.days * 24 + temp_DateTime.seconds // 3600
+
+                if mohid_wind_file:
+                    with h5py.File(mohid_wind_file, 'r') as fp:
+                        for i in range(num_wind_time_steps):
+                            wind_v = fp['Results']['wind velocity Y']['wind velocity Y_{:05d}'.format(i + starting_wind_time_step)][0, :, :].T.flatten()
+                            self.winds[0, :, i] = wind_v
+
+                            wind_u = fp['Results']['wind velocity X']['wind velocity X_{:05d}'.format(i + starting_wind_time_step)][0, :, :].T.flatten()
+                            self.winds[1, :, i] = wind_u
+
+                            temp_time = fp['Time']['Time_{:05d}'.format(i + starting_wind_time_step)][:]
+                            temp_time = np.array(temp_time, dtype=int)
+                            temp_DateTime = datetime(temp_time[0], temp_time[1], temp_time[2], temp_time[3], temp_time[4])
+                            temp_DateTime -= datetime(2000, 1, 1)
+                            wind_times[i] = temp_DateTime.days * 24 + temp_DateTime.seconds // 3600
 
                 for r in self.master_ranks:
                     if r > 0:

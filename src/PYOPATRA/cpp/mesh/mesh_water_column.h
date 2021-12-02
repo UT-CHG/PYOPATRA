@@ -47,10 +47,13 @@ public:
     }
 
     void interpolate_velocity(const MeshElementT<vertices, dimension>* elements, const MeshVertex<dimension>* vertex_array,
-                              Vector* velocities, Vector* diffusions, const Vector& location, size_t time_index, double delta_t,
-                              double time, double lower_time, double upper_time, Vector &out_vec) {
+                              Vector* velocities, Vector* diffusions, Vector* winds, const Vector& location, Eigen::Index time_index, Eigen::Index wind_time_index, double delta_t,
+                              double time, double lower_time, double upper_time, double lower_wind_time, double upper_wind_time, Vector &out_vec) {
         if constexpr (dimension == 2) {
             double t = ((time - lower_time) / (upper_time - lower_time));
+            double wt = 0.0;
+            if (upper_wind_time != lower_wind_time)
+                wt = ((time - lower_wind_time) / (upper_wind_time - lower_wind_time));
             auto barycentric = elements[mesh_elements].calculate_barycentric_coordinate(vertex_array, location);
 
             Vector lb = elements[mesh_elements].sample_velocity(vertex_array, velocities, barycentric, time_index);
@@ -61,12 +64,27 @@ public:
             ub = elements[mesh_elements].sample_diffusion_coefficient(vertex_array, diffusions, barycentric, time_index + 1);
             Vector interpolated_diffusion = (1 - t) * lb + t * ub;
 
+            lb = elements[mesh_elements].sample_wind(vertex_array, winds, barycentric, wind_time_index);
+            ub = elements[mesh_elements].sample_wind(vertex_array, winds, barycentric, wind_time_index + 1);
+            Vector interpolated_wind = (1 - wt) * lb + wt * ub;
+
             out_vec = interpolated_velocity;
             double ra = unif_pi(generator);
             double rn = normal(generator);
 
             out_vec(0) += rn * sqrt(4.0 * interpolated_diffusion(0) / (delta_t * 3600.0)) * sin(ra);
             out_vec(1) += rn * sqrt(4.0 * interpolated_diffusion(1) / (delta_t * 3600.0)) * cos(ra);
+
+            double magnitude = sqrt(pow(interpolated_wind(0), 2.0) + pow(interpolated_wind(1), 2.0));
+            double theta = 0.0;
+            if (magnitude <= 25.0) {
+                theta = 40 - 8 * magnitude;
+            }
+
+            double cos_theta = cos(theta * M_PI / 180.0);
+            double sin_theta = sin(theta * M_PI / 180.0);
+            out_vec(0) += 0.03 * (-1.0 * sin_theta * interpolated_wind(1) + cos_theta * interpolated_wind(0));
+            out_vec(1) += 0.03 * (cos_theta * interpolated_wind(1) + sin_theta * interpolated_wind(0));
         }
     }
     void set_num_depths(int new_num_depths) { num_depths = new_num_depths; }

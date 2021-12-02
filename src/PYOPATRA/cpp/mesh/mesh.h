@@ -24,16 +24,26 @@ public:
     using Vector = Eigen::Matrix<double, dimension, 1>;
 
 protected:
-    WaterCol *water_columns;
-    Vertex *vertices;
-    MeshElement *elements;
-    Vector *velocities, *diffusions;
-    MPI_Win columns_win, vertices_win, elements_win, velocities_win, diffusions_win;
-    PointerWrapper<Mesh<num_vertices_per_element, dimension>> ptr_wrapper;
-    int rank, num_water_columns, num_vertices, num_mesh_elements, num_depths, num_time_steps;
-    MPI_Comm node_comm;
+    WaterCol *water_columns; /**< Array of water columns, initialized in MPI shared memory. */
+    Vertex *vertices; /**< Array of vertices, initialized in MPI shared memory. */
+    MeshElement *elements; /**< Array of mesh elements, initialized in MPI shared memory. */
+    Vector *velocities; /**< Array of velocities in time and space, initialized in MPI shared memory. */
+    Vector *diffusions; /**< Array of diffusions in time and space, initialized in MPI shared memory. */
+    Vector *winds; /**< Array of wind velocities in time and space, initialized in MPI shared memory. */
+    MPI_Win columns_win; /**< Water columns MPI window for accessing MPI shared memory. */
+    MPI_Win vertices_win; /**< Vertices MPI window for accessing MPI shared memory. */
+    MPI_Win elements_win; /**< Mesh element MPI window for accessing MPI shared memory. */
+    MPI_Win velocities_win; /**< Velocities MPI window for accessing MPI shared memory. */
+    MPI_Win diffusions_win; /**< Diffusions MPI window for accessing MPI shared memory. */
+    MPI_Win wind_win; /**< Wind MPI window for accessing MPI shared memory. */
+    PointerWrapper<Mesh<num_vertices_per_element, dimension>> ptr_wrapper; /**< Pointer wrapper for passing addresses through the Python layer. */
+    int rank, num_water_columns, num_vertices, num_mesh_elements, num_depths, num_time_steps, num_wind_time_steps;
+    MPI_Comm node_comm; /**< Node-level communication for accessing and initializing MPI shared memory. */
 
 public:
+    /**
+     * The base mesh class for 2D and 3D triangular meshes.
+     */
     Mesh()
         : water_columns(nullptr)
         , vertices(nullptr)
@@ -48,12 +58,13 @@ public:
         ptr_wrapper.set_pointer(this);
     }
 
-    Mesh(int num_water_columns, int num_vertices, std::vector<double>&& measured_times)
+    Mesh(int num_water_columns, int num_vertices, std::vector<double>&& measured_times, std::vector<double>&& winds_measured_times)
         : num_water_columns(num_water_columns)
         , num_vertices(num_vertices)
         , num_mesh_elements(num_water_columns)
         , num_depths(1)
         , num_time_steps(measured_times.size())
+        , num_wind_time_steps(winds_measured_times.size())
     {
         int world_size, full_rank;
         MPI_Comm_rank(MPI_COMM_WORLD, &full_rank);
@@ -64,7 +75,7 @@ public:
 
 
         MPI_Aint size;
-        void *vert_bsptr, *el_bsptr, *col_bsptr, *vel_bsptr, *dif_bsptr;
+        void *vert_bsptr, *el_bsptr, *col_bsptr, *vel_bsptr, *dif_bsptr, *wind_bsptr;
 
         if (rank == 0) {
             size = num_vertices * sizeof(Vertex);
@@ -79,6 +90,9 @@ public:
             size = num_vertices * num_time_steps * sizeof(Vector);
             MPI_Win_allocate_shared(size, sizeof(Vector), MPI_INFO_NULL, node_comm, &vel_bsptr, &velocities_win);
             MPI_Win_allocate_shared(size, sizeof(Vector), MPI_INFO_NULL, node_comm, &dif_bsptr, &diffusions_win);
+
+            size = num_vertices * (num_wind_time_steps == 0 ? 2 : num_wind_time_steps) * sizeof(Vector);
+            MPI_Win_allocate_shared(size, sizeof(Vector), MPI_INFO_NULL, node_comm, &wind_bsptr, &wind_win);
         } else {
             size = 0;
 
@@ -87,6 +101,7 @@ public:
             MPI_Win_allocate_shared(size, sizeof(WaterCol), MPI_INFO_NULL, node_comm, &col_bsptr, &columns_win);
             MPI_Win_allocate_shared(size, sizeof(Vector), MPI_INFO_NULL, node_comm, &vel_bsptr, &velocities_win);
             MPI_Win_allocate_shared(size, sizeof(Vector), MPI_INFO_NULL, node_comm, &dif_bsptr, &diffusions_win);
+            MPI_Win_allocate_shared(size, sizeof(Vector), MPI_INFO_NULL, node_comm, &wind_bsptr, &wind_win);
         }
 
         MPI_Aint ssize;
@@ -97,16 +112,18 @@ public:
         MPI_Win_shared_query(columns_win, MPI_PROC_NULL, &ssize, &disp_unit, &col_bsptr);
         MPI_Win_shared_query(velocities_win, MPI_PROC_NULL, &ssize, &disp_unit, &vel_bsptr);
         MPI_Win_shared_query(diffusions_win, MPI_PROC_NULL, &ssize, &disp_unit, &dif_bsptr);
+        MPI_Win_shared_query(wind_win, MPI_PROC_NULL, &ssize, &disp_unit, &wind_bsptr);
 
         water_columns = static_cast<WaterCol*>(col_bsptr);
         vertices = static_cast<Vertex*>(vert_bsptr);
         elements = static_cast<MeshElement*>(el_bsptr);
         velocities = static_cast<Vector*>(vel_bsptr);
         diffusions = static_cast<Vector*>(dif_bsptr);
+        winds = static_cast<Vector*>(wind_bsptr);
 
         if (rank == 0) {
             for (int i = 0; i < num_vertices; i++) {
-                new (vertices + i) Vertex(i, measured_times.size());
+                new (vertices + i) Vertex(i, measured_times.size(), winds_measured_times.size());
             }
 
             for (int i = 0; i < num_mesh_elements; i++) {
@@ -122,6 +139,10 @@ public:
             for (int i = 0; i < num_vertices * num_time_steps; i++) {
                 new (velocities + i) Vector();
                 new (diffusions + i) Vector();
+            }
+
+            for (int i = 0; i < num_vertices * (num_wind_time_steps == 0 ? 2 : num_wind_time_steps); i++) {
+                new (winds + i) Vector();
             }
         }
 
@@ -150,6 +171,10 @@ public:
                 velocities[i].~Vector();
                 diffusions[i].~Vector();
             }
+
+            for (int i = 0; i < num_vertices * (num_wind_time_steps == 0 ? 2 : num_wind_time_steps); i++) {
+                winds[i].~Vector();
+            }
         }
 
         MPI_Barrier(node_comm);
@@ -158,6 +183,7 @@ public:
         MPI_Win_free(&elements_win);
         MPI_Win_free(&velocities_win);
         MPI_Win_free(&diffusions_win);
+        MPI_Win_free(&wind_win);
     }
 
     PointerWrapper<Mesh<num_vertices_per_element, dimension>> get_pointer_wrapper() { return ptr_wrapper; }
@@ -175,6 +201,7 @@ public:
     }
     Vector* get_velocities_ptr() { return velocities; }
     Vector* get_diffusions_ptr() { return diffusions; }
+    Vector* get_winds_ptr() { return winds; }
     Eigen::MatrixXd get_velocities(int time_index) {
         Eigen::MatrixXd temp = Eigen::MatrixXd::Zero(num_vertices, dimension);
         for (int index = 0; index < num_vertices; index++) {
@@ -195,6 +222,11 @@ public:
     void set_vertex_diffusion(int vertex_index, int time_index, Vector new_diffusion) {
         diffusions[vertex_index * num_time_steps + time_index] = new_diffusion;
     }
+
+    void set_vertex_wind(int vertex_index, int time_index, Vector new_wind) {
+        winds[vertex_index * (num_wind_time_steps == 0 ? 2 : num_wind_time_steps) + time_index] = new_wind;
+    }
+
     void set_water_column_adjacency(int water_column_index, int adjacent_index, int position) {
         if (rank == 0) {
             water_columns[water_column_index].set_adjacent_column(adjacent_index, position);

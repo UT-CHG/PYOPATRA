@@ -9,7 +9,7 @@ sharedcomm = comm.Split_type(MPI.COMM_TYPE_SHARED, key=rank)
 sharedsize = sharedcomm.Get_size()
 sharedrank = sharedcomm.Get_rank()
 
-from PYOPATRA import FileParserBase, MeshVertex2D
+from PYOPATRA import FileParserBase
 from .pyopatra_pybind import CppTriangularMesh2D, TriangularMeshElement2D
 
 
@@ -99,7 +99,8 @@ class TriangularMesh2D(TriangularMesh):
     def _setup_mesh(self, file_parser: FileParserBase, dimensions: int):
         if dimensions == 2:
             # print(file_parser.num_elements, file_parser.num_vertices, file_parser.times)
-            self._cpp_mesh = CppTriangularMesh2D(file_parser.num_elements, file_parser.num_vertices, file_parser.times)
+            self._cpp_mesh = CppTriangularMesh2D(file_parser.num_elements, file_parser.num_vertices, file_parser.times,
+                                                 file_parser.wind_times)
         elif dimensions == 3:
             raise NotImplementedError('3D Meshes are not yet implemented.')
         else:
@@ -147,6 +148,14 @@ class TriangularMesh2D(TriangularMesh):
                                                            velocities[:, i * self.regular_dimensions[1] + j, time])
                         self._cpp_mesh.set_vertex_diffusion(i * file_parser.regular_dimensions[1] + j, start_time + time,
                                                            diffusions[:, i * self.regular_dimensions[1] + j, time])
+
+            # winds = comm.bcast(file_parser.winds, root=0)
+            if sharedrank == 0:
+                for i in range(file_parser.regular_dimensions[0]):
+                    for j in range(file_parser.regular_dimensions[1]):
+                        for time in range(file_parser.winds.shape[2]):
+                            self._cpp_mesh.set_vertex_wind(i * file_parser.regular_dimensions[1] + j, time,
+                                                           file_parser.winds[:, i * self.regular_dimensions[1] + j, time])
 
     def _setup_elements_vertices(self, depths_array=None):
         if self.regular_dimensions is not None:
