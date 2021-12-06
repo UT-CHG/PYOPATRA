@@ -158,7 +158,7 @@ class HYCOMFileParser(FileParserBase):
     def __init__(self):
         super().__init__()
 
-    def read(self, list_of_hycom_files, dimensions=2, triangulate=True, diffusion_coefficient=0.0):
+    def read(self, list_of_hycom_files, dimensions=2, triangulate=True, diffusion_coefficient=0.0, num_wind_time_steps=0):
         if triangulate:
             self.vertices_per_polygon = 3
         else:
@@ -173,6 +173,11 @@ class HYCOMFileParser(FileParserBase):
                 self.num_elements = (ds['lon'].shape[0] - 1) * 2 * (ds['lat'].shape[0] - 1)
                 self.latitude = ds['lat'][:]
                 self.longitude = ds['lon'][:]
+
+            try:
+                self.winds = np.zeros((2, self.num_vertices, num_wind_time_steps))
+            except TypeError:
+                self.winds = np.zeros((2, self.num_vertices, 2))
 
         print(self.latitude)
 

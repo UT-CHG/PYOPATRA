@@ -66,6 +66,8 @@ class TestMesh:
             [6.1, 6.2, 6.3, 6.4, 6.5]
         ]).flatten()
 
+        dummy_file.winds = np.zeros((2, dummy_file.num_vertices, 2))
+
         dummy_file.diffusion_coefficient = 0.0 * np.ones((2, dummy_file.num_vertices, len(dummy_file.times)))
 
         tm2d = TriangularMesh2D()
