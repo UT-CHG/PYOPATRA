@@ -46,7 +46,7 @@ PYBIND11_MODULE(pyopatra_pybind, m) {
 
 //    py::class_<TriangularMesh2D, std::unique_ptr<TriangularMesh2D, py::nodelete>>(m, "CppTriangularMesh2D")
     py::class_<TriangularMesh2D>(m, "CppTriangularMesh2D")
-            .def(py::init<int, int, std::vector<double>&&, std::vector<double>&&>())
+            .def(py::init<int, int, std::vector<double>&&, std::vector<double>&&, double>())
             .def("set_vertex_location", &TriangularMesh2D::set_vertex_location)
             .def("set_vertex_velocity", &TriangularMesh2D::set_vertex_velocity)
             .def("set_vertex_diffusion", &TriangularMesh2D::set_vertex_diffusion)
@@ -61,7 +61,8 @@ PYBIND11_MODULE(pyopatra_pybind, m) {
             .def("get_water_column_pointer", &TriangularMesh2D::get_water_column_pointer, py::return_value_policy::reference)
             .def("set_element_vertex", &TriangularMesh2D::set_element_vertex)
             .def("get_water_columns_size", &TriangularMesh2D::get_water_columns_size)
-            .def("get_pointer_wrapper", &TriangularMesh2D::get_pointer_wrapper, py::return_value_policy::copy);
+            .def("get_pointer_wrapper", &TriangularMesh2D::get_pointer_wrapper, py::return_value_policy::copy)
+            .def("set_wind_coef", &TriangularMesh2D::set_wind_coef);
 
 //    py::class_<TriangularMesh2DSolver, std::unique_ptr<TriangularMesh2DSolver, py::nodelete>>(m, "CppTriangularMesh2DSolver")
     py::class_<TriangularMesh2DSolver>(m, "CppTriangularMesh2DSolver")

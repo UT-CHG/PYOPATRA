@@ -42,6 +42,8 @@ class FileParserBase:
         """Raw velocity information"""
         self.winds = None
         """Raw wind information"""
+        self.wind_coef = None
+        """Wind coefficient for the whole mesh"""
         self.temperature = None
         """Raw temperature information"""
         self.salinity = None
@@ -158,7 +160,10 @@ class HYCOMFileParser(FileParserBase):
     def __init__(self):
         super().__init__()
 
-    def read(self, list_of_hycom_files, dimensions=2, triangulate=True, diffusion_coefficient=0.0, num_wind_time_steps=0):
+    def read(self, list_of_hycom_files, dimensions=2, triangulate=True, diffusion_coefficient=0.0, num_wind_time_steps=0, wind_coef=0.03):
+
+        self.wind_coef = wind_coef
+
         if triangulate:
             self.vertices_per_polygon = 3
         else:
@@ -237,8 +242,12 @@ class MOHIDStyleFileParser(FileParserBase):
     def __init__(self):
         super().__init__()
 
-    def read(self, mohid_file, latitude, longitude, mohid_wind_file=None, dimensions=2, num_time_steps=None, num_wind_time_steps=None,
-             starting_time_step=1, starting_wind_time_step=1, triangulate=True, diffusion_coefficient=0.0):
+    def read(self, mohid_file, latitude, longitude, mohid_wind_file=None, dimensions=2, num_time_steps=None,
+             num_wind_time_steps=None, starting_time_step=1, starting_wind_time_step=1, triangulate=True,
+             diffusion_coefficient=0.0, wind_coef=0.03):
+
+        self.wind_coef = wind_coef
+
         if rank == 0:
             print(latitude)
             latitude = (latitude[:, 1:] + latitude[:, :-1]) / 2.0

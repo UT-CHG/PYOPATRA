@@ -39,6 +39,7 @@ protected:
     PointerWrapper<Mesh<num_vertices_per_element, dimension>> ptr_wrapper; /**< Pointer wrapper for passing addresses through the Python layer. */
     int rank, num_water_columns, num_vertices, num_mesh_elements, num_depths, num_time_steps, num_wind_time_steps;
     MPI_Comm node_comm; /**< Node-level communication for accessing and initializing MPI shared memory. */
+    double wind_coef; /**< Wind contribution coefficient - mesh-wide. */
 
 public:
     /**
@@ -54,17 +55,19 @@ public:
         , num_vertices(0)
         , num_mesh_elements(0)
         , num_depths(0)
+        , wind_coef(0)
     {
         ptr_wrapper.set_pointer(this);
     }
 
-    Mesh(int num_water_columns, int num_vertices, std::vector<double>&& measured_times, std::vector<double>&& winds_measured_times)
+    Mesh(int num_water_columns, int num_vertices, std::vector<double>&& measured_times, std::vector<double>&& winds_measured_times, double wind_coef)
         : num_water_columns(num_water_columns)
         , num_vertices(num_vertices)
         , num_mesh_elements(num_water_columns)
         , num_depths(1)
         , num_time_steps(measured_times.size())
         , num_wind_time_steps(winds_measured_times.size())
+        , wind_coef(wind_coef)
     {
         int world_size, full_rank;
         MPI_Comm_rank(MPI_COMM_WORLD, &full_rank);
@@ -191,6 +194,8 @@ public:
     int get_num_vertices() { return num_vertices; }
     int get_num_columns() { return num_water_columns; }
     int get_num_elements() { return num_mesh_elements; }
+    void set_wind_coef(double new_wind_coef) { wind_coef = new_wind_coef; }
+    double get_wind_coef() { return wind_coef; }
     Eigen::MatrixXd get_vertex_locations() {
         Eigen::MatrixXd temp = Eigen::MatrixXd::Zero(num_vertices, dimension);
 

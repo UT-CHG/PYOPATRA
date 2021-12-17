@@ -28,6 +28,8 @@ class MeshBase:
 
         self.dimensions = None
 
+        self.wind_coef = None
+
     # Not efficient! For testing purposes only
     def get_vertex_locations(self):
         return self._cpp_mesh.get_vertex_locations()
@@ -100,7 +102,7 @@ class TriangularMesh2D(TriangularMesh):
         if dimensions == 2:
             # print(file_parser.num_elements, file_parser.num_vertices, file_parser.times)
             self._cpp_mesh = CppTriangularMesh2D(file_parser.num_elements, file_parser.num_vertices, file_parser.times,
-                                                 file_parser.wind_times)
+                                                 file_parser.wind_times, file_parser.wind_coef)
         elif dimensions == 3:
             raise NotImplementedError('3D Meshes are not yet implemented.')
         else:

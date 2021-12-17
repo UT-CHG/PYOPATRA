@@ -67,6 +67,7 @@ class TestMesh:
         ]).flatten()
 
         dummy_file.winds = np.zeros((2, dummy_file.num_vertices, 2))
+        dummy_file.wind_coef = 0.03
 
         dummy_file.diffusion_coefficient = 0.0 * np.ones((2, dummy_file.num_vertices, len(dummy_file.times)))
 

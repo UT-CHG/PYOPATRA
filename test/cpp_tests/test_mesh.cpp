@@ -6,7 +6,7 @@
 #include "PYOPATRA/cpp/mesh/mesh.h"
 
 TEST_CASE("Mesh Tests", "[mesh-tests]") {
-    TriangularMesh2D mesh(12, 12, {0, 3, 6, 9}, {});
+    TriangularMesh2D mesh(12, 12, {0, 3, 6, 9}, {}, 0.03);
 
     REQUIRE(mesh.get_num_vertices() == 12);
     REQUIRE(mesh.get_num_columns() == 12);

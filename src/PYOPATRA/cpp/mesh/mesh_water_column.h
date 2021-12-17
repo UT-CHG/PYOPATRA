@@ -48,7 +48,7 @@ public:
 
     void interpolate_velocity(const MeshElementT<vertices, dimension>* elements, const MeshVertex<dimension>* vertex_array,
                               Vector* velocities, Vector* diffusions, Vector* winds, const Vector& location, Eigen::Index time_index, Eigen::Index wind_time_index, double delta_t,
-                              double time, double lower_time, double upper_time, double lower_wind_time, double upper_wind_time, Vector &out_vec) {
+                              double time, double lower_time, double upper_time, double lower_wind_time, double upper_wind_time, double wind_coef, Vector &out_vec) {
         if constexpr (dimension == 2) {
             double t = ((time - lower_time) / (upper_time - lower_time));
             double wt = 0.0;
@@ -83,8 +83,8 @@ public:
 
             double cos_theta = cos(theta * M_PI / 180.0);
             double sin_theta = sin(theta * M_PI / 180.0);
-            out_vec(0) += 0.03 * (-1.0 * sin_theta * interpolated_wind(1) + cos_theta * interpolated_wind(0));
-            out_vec(1) += 0.03 * (cos_theta * interpolated_wind(1) + sin_theta * interpolated_wind(0));
+            out_vec(0) += wind_coef * (-1.0 * sin_theta * interpolated_wind(1) + cos_theta * interpolated_wind(0));
+            out_vec(1) += wind_coef * (cos_theta * interpolated_wind(1) + sin_theta * interpolated_wind(0));
         }
     }
     void set_num_depths(int new_num_depths) { num_depths = new_num_depths; }
