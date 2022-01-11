@@ -263,3 +263,7 @@ class TriangularMesh2D(TriangularMesh):
 
             return velocity
 
+    def set_wind_coef(self, new_coef):
+        if sharedrank == 0:
+            self._cpp_mesh.set_wind_coef(new_coef)
+
