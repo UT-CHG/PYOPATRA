@@ -18,7 +18,7 @@ if __name__ == '__main__':
     particle_lat = 28.736628
     release_loc = np.array((particle_lat, particle_lon))
     # Time elapsed
-    total_days = 8 * 7
+    total_days = 1
     total_time_steps = int(24 / time_delta * total_days) - 4
     # When to add particles (time steps, not hours)
     add_particles_time_step_interval = 3

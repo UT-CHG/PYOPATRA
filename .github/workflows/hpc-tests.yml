@@ -2,7 +2,7 @@ name: HPC-Tests
 
 on:
     push:
-        branches: [ hpc-test ]
+        branches: [ hpc-tests ]
         paths-ignore:
           - 'docs/**'
           - 'examples/**'
@@ -12,10 +12,10 @@ on:
     workflow_dispatch:
 
 jobs:
-    runs-on: self-hosted
-
-    steps:
-        - uses: actions/checkout@v2
-        - name: Step 1
-          run: ls $GITHUB_WORKSPACE
+    test:
+        runs-on: self-hosted
+        steps:
+            - uses: actions/checkout@v2
+            - name: Step 1
+              run: ls $GITHUB_WORKSPACE
 
