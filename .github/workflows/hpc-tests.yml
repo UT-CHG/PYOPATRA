@@ -9,7 +9,7 @@ on:
           - 'README.rst'
           - 'LICENSE.txt'
 
-    workflow-dispatch:
+    workflow_dispatch:
 
 jobs:
     runs-on: self-hosted
