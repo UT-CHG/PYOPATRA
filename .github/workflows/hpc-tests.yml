@@ -1,0 +1,21 @@
+name: HPC-Tests
+
+on:
+    push:
+        branches: [ hpc-test ]
+        paths-ignore:
+          - 'docs/**'
+          - 'examples/**'
+          - 'README.rst'
+          - 'LICENSE.txt'
+
+    workflow-dispatch:
+
+jobs:
+    runs-on: self-hosted
+
+    steps:
+        - uses: actions/checkout@v2
+        - name: Step 1
+          run: ls $GITHUB_WORKSPACE
+
