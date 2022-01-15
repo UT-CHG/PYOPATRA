@@ -65,7 +65,7 @@ if __name__ == '__main__':
 
     # Set up snapshot particle saving file
     if rank == 0:
-        with h5py.File('{}/data/snapshots.hdf5'.format(file_prefix), 'w') as fp:
+        with h5py.File('{}/snapshots.hdf5'.format(file_prefix), 'w') as fp:
             fp.create_dataset('snapshots', (total_particles, 2, total_time_steps // frame_interval + 1))
 
     print('Time stepping...')
@@ -89,7 +89,7 @@ if __name__ == '__main__':
             print('Saving particles')
             particle_locations = particles.get_all_particle_locations()
             if rank == 0:
-                with h5py.File('{}/data/snapshots.hdf5'.format(file_prefix), 'a') as fp:
+                with h5py.File('{}/snapshots.hdf5'.format(file_prefix), 'a') as fp:
                     fp['snapshots'][:particle_locations.shape[0], :, frame] = particle_locations
             frame += 1
 
@@ -98,6 +98,6 @@ if __name__ == '__main__':
     print('Saving particle locations...')
     particle_locations = particles.get_all_particle_locations()
     if rank == 0:
-        with h5py.File('{}/data/observed_particles.hdf5'.format(file_prefix), 'w') as fp:
+        with h5py.File('{}/observed_particles.hdf5'.format(file_prefix), 'w') as fp:
             fp.create_dataset('particles', particle_locations.shape, data=particle_locations)
 

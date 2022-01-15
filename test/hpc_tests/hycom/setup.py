@@ -1,12 +1,14 @@
 from ftplib import FTP
 from datetime import date, timedelta
 from time import time
+import os
 
 if __name__ == '__main__':
     total_days = 1
     start_date = date(2010, 4, 20)
     pull_start_date = start_date
     end_date = start_date + timedelta(days=total_days)
+    if not os.path.exists('data'): os.mkdir('data')
 
     print("Fetching HYCOM data from {} to {}".format(start_date, end_date))
 
