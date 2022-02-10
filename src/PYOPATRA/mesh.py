@@ -153,7 +153,7 @@ class TriangularMesh2D(TriangularMesh):
 
             # winds = comm.bcast(file_parser.winds, root=0)
             if sharedrank == 0:
-		if file_parser.winds is None: return
+                if file_parser.winds is None: return
                 for i in range(file_parser.regular_dimensions[0]):
                     for j in range(file_parser.regular_dimensions[1]):
                         for time in range(file_parser.winds.shape[2]):

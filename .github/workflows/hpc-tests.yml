@@ -1,19 +1,19 @@
 name: HPC-Tests
 
 on:
-    push:
-        branches: [ hpc-tests ]
-        paths-ignore:
-          - 'docs/**'
-          - 'examples/**'
-          - 'README.rst'
-          - 'LICENSE.txt'
+  workflow_run:
+    workflows:
+      - "PYOPATRA Docker Build"
+    types:
+      - completed
 
     workflow_dispatch:
 
 jobs:
     test:
         runs-on: self-hosted
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        if: github.ref == 'refs/heads/hpc-tests'
         steps:
             - uses: actions/checkout@v2
             - name: Run tests
