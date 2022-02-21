@@ -1,5 +1,4 @@
 name: HPC-Tests
-
 on:
   workflow_run:
     workflows:
@@ -7,12 +6,10 @@ on:
     types:
       - completed
 
-    workflow_dispatch:
-
 jobs:
     test:
         runs-on: self-hosted
-        if: ${{ github.event.workflow_run.conclusion == 'success' }} && github.ref == 'refs/heads/hpc-tests'
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
         steps:
             - uses: actions/checkout@v2
             - name: Run tests
