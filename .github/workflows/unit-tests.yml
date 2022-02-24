@@ -6,6 +6,7 @@ on:
       - 'examples/**'
       - 'README.rst'
       - 'LICENSE.txt'
+      - 'tests/hpc_tests/**'
 jobs:
   test:
     runs-on: ubuntu-20.04

@@ -1,0 +1,17 @@
+name: HPC-Tests
+on:
+  workflow_run:
+    workflows:
+      - "PYOPATRA Docker Build"
+    types:
+      - completed
+
+jobs:
+    test:
+        runs-on: self-hosted
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        steps:
+            - uses: actions/checkout@v2
+            - name: Run tests
+              run: run-pyopatra-tests $GITHUB_WORKSPACE/test/hpc_tests
+
