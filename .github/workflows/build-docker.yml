@@ -45,10 +45,3 @@ jobs:
               docker push "${{ secrets.DOCKER_USER }}"/pyopatra"${{ matrix.build_name }}":"$TAG_NAME"
             done
           fi
-  hpc-test:
-        needs: build
-        runs-on: self-hosted
-        steps:
-            - uses: actions/checkout@v2
-            - name: Run tests
-              run: run-pyopatra-tests $GITHUB_WORKSPACE/test/hpc_tests
