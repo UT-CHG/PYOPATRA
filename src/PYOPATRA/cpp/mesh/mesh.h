@@ -37,7 +37,7 @@ protected:
     MPI_Win diffusions_win; /**< Diffusions MPI window for accessing MPI shared memory. */
     MPI_Win wind_win; /**< Wind MPI window for accessing MPI shared memory. */
     PointerWrapper<Mesh<num_vertices_per_element, dimension>> ptr_wrapper; /**< Pointer wrapper for passing addresses through the Python layer. */
-    int rank, num_water_columns, num_vertices, num_mesh_elements, num_depths, num_time_steps, num_wind_time_steps;
+    size_t rank, num_water_columns, num_vertices, num_mesh_elements, num_depths, num_time_steps, num_wind_time_steps;
     MPI_Comm node_comm; /**< Node-level communication for accessing and initializing MPI shared memory. */
     double wind_coef; /**< Wind contribution coefficient - mesh-wide. */
 
@@ -60,7 +60,7 @@ public:
         ptr_wrapper.set_pointer(this);
     }
 
-    Mesh(int num_water_columns, int num_vertices, std::vector<double>&& measured_times, std::vector<double>&& winds_measured_times, double wind_coef)
+    Mesh(size_t num_water_columns, size_t num_vertices, std::vector<double>&& measured_times, std::vector<double>&& winds_measured_times, double wind_coef)
         : num_water_columns(num_water_columns)
         , num_vertices(num_vertices)
         , num_mesh_elements(num_water_columns)
@@ -125,26 +125,26 @@ public:
         winds = static_cast<Vector*>(wind_bsptr);
 
         if (rank == 0) {
-            for (int i = 0; i < num_vertices; i++) {
+            for (size_t i = 0; i < num_vertices; i++) {
                 new (vertices + i) Vertex(i, measured_times.size(), winds_measured_times.size());
             }
 
-            for (int i = 0; i < num_mesh_elements; i++) {
+            for (size_t i = 0; i < num_mesh_elements; i++) {
                 new (elements + i) MeshElement();
             }
 
-            for (int i = 0; i < num_water_columns; i++) {
+            for (size_t i = 0; i < num_water_columns; i++) {
                 new (water_columns + i) WaterCol();
                 water_columns[i].set_index(i);
                 water_columns[i].set_element_head(i);
             }
 
-            for (int i = 0; i < num_vertices * num_time_steps; i++) {
+            for (size_t i = 0; i < num_vertices * num_time_steps; i++) {
                 new (velocities + i) Vector();
                 new (diffusions + i) Vector();
             }
 
-            for (int i = 0; i < num_vertices * (num_wind_time_steps == 0 ? 2 : num_wind_time_steps); i++) {
+            for (size_t i = 0; i < num_vertices * (num_wind_time_steps == 0 ? 2 : num_wind_time_steps); i++) {
                 new (winds + i) Vector();
             }
         }
@@ -158,24 +158,24 @@ public:
         MPI_Barrier(node_comm);
 
         if (rank == 0) {
-            for (int i = 0; i < num_water_columns; i++) {
+            for (size_t i = 0; i < num_water_columns; i++) {
                 water_columns[i].~WaterCol();
             }
 
-            for (int i = 0; i < num_vertices; i++) {
+            for (size_t i = 0; i < num_vertices; i++) {
                 vertices[i].~Vertex();
             }
 
-            for (int i = 0; i < num_mesh_elements; i++) {
+            for (size_t i = 0; i < num_mesh_elements; i++) {
                 elements[i].~MeshElement();
             }
 
-            for (int i = 0; i < num_vertices * num_time_steps; i++) {
+            for (size_t i = 0; i < num_vertices * num_time_steps; i++) {
                 velocities[i].~Vector();
                 diffusions[i].~Vector();
             }
 
-            for (int i = 0; i < num_vertices * (num_wind_time_steps == 0 ? 2 : num_wind_time_steps); i++) {
+            for (size_t i = 0; i < num_vertices * (num_wind_time_steps == 0 ? 2 : num_wind_time_steps); i++) {
                 winds[i].~Vector();
             }
         }
@@ -191,15 +191,15 @@ public:
 
     PointerWrapper<Mesh<num_vertices_per_element, dimension>> get_pointer_wrapper() { return ptr_wrapper; }
     Vertex* get_vertices() { return vertices; }
-    int get_num_vertices() { return num_vertices; }
-    int get_num_columns() { return num_water_columns; }
-    int get_num_elements() { return num_mesh_elements; }
+    size_t get_num_vertices() { return num_vertices; }
+    size_t get_num_columns() { return num_water_columns; }
+    size_t get_num_elements() { return num_mesh_elements; }
     void set_wind_coef(double new_wind_coef) { wind_coef = new_wind_coef; }
     double get_wind_coef() { return wind_coef; }
     Eigen::MatrixXd get_vertex_locations() {
         Eigen::MatrixXd temp = Eigen::MatrixXd::Zero(num_vertices, dimension);
 
-        for (int index = 0; index < num_vertices; index++) {
+        for (size_t index = 0; index < num_vertices; index++) {
             temp.row(index) = vertices[index].get_location();
         }
         return temp;
@@ -207,51 +207,51 @@ public:
     Vector* get_velocities_ptr() { return velocities; }
     Vector* get_diffusions_ptr() { return diffusions; }
     Vector* get_winds_ptr() { return winds; }
-    Eigen::MatrixXd get_velocities(int time_index) {
+    Eigen::MatrixXd get_velocities(size_t time_index) {
         Eigen::MatrixXd temp = Eigen::MatrixXd::Zero(num_vertices, dimension);
-        for (int index = 0; index < num_vertices; index++) {
+        for (size_t index = 0; index < num_vertices; index++) {
             temp.row(index) = velocities[vertices[index].get_velocity() + time_index];
         }
         return temp;
     }
     MeshElement* get_elements() { return elements; }
     WaterCol* get_water_columns() { return water_columns; }
-    void set_vertex_location(int vertex_index, Vector new_location) {
+    void set_vertex_location(size_t vertex_index, Vector new_location) {
         vertices[vertex_index].set_location(new_location);
     }
 
-    void set_vertex_velocity(int vertex_index, int time_index, Vector new_velocity) {
+    void set_vertex_velocity(size_t vertex_index, size_t time_index, Vector new_velocity) {
         velocities[vertex_index * num_time_steps + time_index] = new_velocity;
     }
 
-    void set_vertex_diffusion(int vertex_index, int time_index, Vector new_diffusion) {
+    void set_vertex_diffusion(size_t vertex_index, size_t time_index, Vector new_diffusion) {
         diffusions[vertex_index * num_time_steps + time_index] = new_diffusion;
     }
 
-    void set_vertex_wind(int vertex_index, int time_index, Vector new_wind) {
+    void set_vertex_wind(size_t vertex_index, size_t time_index, Vector new_wind) {
         winds[vertex_index * (num_wind_time_steps == 0 ? 2 : num_wind_time_steps) + time_index] = new_wind;
     }
 
-    void set_water_column_adjacency(int water_column_index, int adjacent_index, int position) {
+    void set_water_column_adjacency(size_t water_column_index, size_t adjacent_index, int position) {
         if (rank == 0) {
             water_columns[water_column_index].set_adjacent_column(adjacent_index, position);
         }
     }
-    void set_element_vertex(int water_column_index, int element_depth_index, int position, int vertex_index) {
+    void set_element_vertex(size_t water_column_index, size_t element_depth_index, int position, size_t vertex_index) {
         if (rank == 0) {
             elements[water_column_index * num_depths + element_depth_index].set_vertex(vertex_index, position);
         }
     }
-    bool check_water_column_adjacency(int origin_index, int destination_index, int side) {
+    bool check_water_column_adjacency(size_t origin_index, size_t destination_index, int side) {
         return water_columns[origin_index].get_adjacencies()[side] == destination_index;
     }
-    bool check_mesh_element_vertex(int water_column_index, int element_index, int vertex_index, int position) {
+    bool check_mesh_element_vertex(size_t water_column_index, size_t element_index, size_t vertex_index, int position) {
         return elements[water_column_index * num_depths + element_index].get_vertices()[position] == vertex_index;
     }
     int get_water_columns_size() { return num_water_columns; }
-    Vertex* get_vertex_pointer(int vertex_index) { return &vertices[vertex_index]; }
-    const WaterCol* get_water_column_pointer(int water_column_index) const { return &water_columns[water_column_index]; }
-    const std::array<int, num_vertices_per_element>& get_water_column_adjacencies(int water_column_index) const { return  water_columns[water_column_index].get_adjacencies(); }
+    Vertex* get_vertex_pointer(size_t vertex_index) { return &vertices[vertex_index]; }
+    const WaterCol* get_water_column_pointer(size_t water_column_index) const { return &water_columns[water_column_index]; }
+    const std::array<int, num_vertices_per_element>& get_water_column_adjacencies(size_t water_column_index) const { return  water_columns[water_column_index].get_adjacencies(); }
 
     // From https://stackoverflow.com/questions/1903954/is-there-a-standard-sign-function-signum-sgn-in-c-c
     template <typename T>
