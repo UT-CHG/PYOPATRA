@@ -37,7 +37,8 @@ protected:
     MPI_Win diffusions_win; /**< Diffusions MPI window for accessing MPI shared memory. */
     MPI_Win wind_win; /**< Wind MPI window for accessing MPI shared memory. */
     PointerWrapper<Mesh<num_vertices_per_element, dimension>> ptr_wrapper; /**< Pointer wrapper for passing addresses through the Python layer. */
-    size_t rank, num_water_columns, num_vertices, num_mesh_elements, num_depths, num_time_steps, num_wind_time_steps;
+    size_t  num_water_columns, num_vertices, num_mesh_elements, num_depths, num_time_steps, num_wind_time_steps;
+    int rank;
     MPI_Comm node_comm; /**< Node-level communication for accessing and initializing MPI shared memory. */
     double wind_coef; /**< Wind contribution coefficient - mesh-wide. */
 
