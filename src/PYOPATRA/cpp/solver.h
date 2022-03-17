@@ -123,7 +123,7 @@ public:
     }
 
     void update_particle_mesh_location(typename ParticleList<dimension>::ParticleN& particle) {
-        int new_col = mesh->locate_new_water_column(&mesh->get_water_columns()[particle.get_last_known_water_column_index()], particle.get_location());
+        long int new_col = mesh->locate_new_water_column(&mesh->get_water_columns()[particle.get_last_known_water_column_index()], particle.get_location());
         if (new_col >= 0) {
             particle.set_water_column_index(new_col);
         } else {

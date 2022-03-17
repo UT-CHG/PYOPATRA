@@ -233,26 +233,26 @@ public:
         winds[vertex_index * (num_wind_time_steps == 0 ? 2 : num_wind_time_steps) + time_index] = new_wind;
     }
 
-    void set_water_column_adjacency(size_t water_column_index, size_t adjacent_index, int position) {
+    void set_water_column_adjacency(size_t water_column_index, size_t adjacent_index, size_t position) {
         if (rank == 0) {
             water_columns[water_column_index].set_adjacent_column(adjacent_index, position);
         }
     }
-    void set_element_vertex(size_t water_column_index, size_t element_depth_index, int position, size_t vertex_index) {
+    void set_element_vertex(size_t water_column_index, size_t element_depth_index, size_t position, size_t vertex_index) {
         if (rank == 0) {
             elements[water_column_index * num_depths + element_depth_index].set_vertex(vertex_index, position);
         }
     }
     bool check_water_column_adjacency(size_t origin_index, size_t destination_index, int side) {
-        return water_columns[origin_index].get_adjacencies()[side] == destination_index;
+        return water_columns[origin_index].get_adjacencies()[side] == (long int)destination_index;
     }
-    bool check_mesh_element_vertex(size_t water_column_index, size_t element_index, size_t vertex_index, int position) {
+    bool check_mesh_element_vertex(size_t water_column_index, size_t element_index, size_t vertex_index, size_t position) {
         return elements[water_column_index * num_depths + element_index].get_vertices()[position] == vertex_index;
     }
-    int get_water_columns_size() { return num_water_columns; }
+    size_t get_water_columns_size() { return num_water_columns; }
     Vertex* get_vertex_pointer(size_t vertex_index) { return &vertices[vertex_index]; }
     const WaterCol* get_water_column_pointer(size_t water_column_index) const { return &water_columns[water_column_index]; }
-    const std::array<int, num_vertices_per_element>& get_water_column_adjacencies(size_t water_column_index) const { return  water_columns[water_column_index].get_adjacencies(); }
+    const std::array<long int, num_vertices_per_element>& get_water_column_adjacencies(size_t water_column_index) const { return  water_columns[water_column_index].get_adjacencies(); }
 
     // From https://stackoverflow.com/questions/1903954/is-there-a-standard-sign-function-signum-sgn-in-c-c
     template <typename T>
@@ -260,17 +260,17 @@ public:
         return (T(0) < val) - (val < T(0));
     }
 
-    int locate_new_water_column(const WaterCol* starting_water_col, const Vector& location) {
+    long int locate_new_water_column(const WaterCol* starting_water_col, const Vector& location) {
         if constexpr (dimension == 2 && num_vertices_per_element == 3) {
-            int next_col;
+            long int next_col;
 
             Vector A = vertices[elements[starting_water_col->get_mesh_elements()].get_vertices()[0]].get_location();
             Vector B = vertices[elements[starting_water_col->get_mesh_elements()].get_vertices()[1]].get_location();
             Vector C = vertices[elements[starting_water_col->get_mesh_elements()].get_vertices()[2]].get_location();
 
-            int side_1 = sgn((B[0] - A[0]) * (location[1] - A[1]) - (B[1] - A[1]) * (location[0] - A[0]));
-            int side_2 = sgn((C[0] - B[0]) * (location[1] - B[1]) - (C[1] - B[1]) * (location[0] - B[0]));
-            int side_3 = sgn((A[0] - C[0]) * (location[1] - C[1]) - (A[1] - C[1]) * (location[0] - C[0]));
+            long int side_1 = sgn((B[0] - A[0]) * (location[1] - A[1]) - (B[1] - A[1]) * (location[0] - A[0]));
+            long int side_2 = sgn((C[0] - B[0]) * (location[1] - B[1]) - (C[1] - B[1]) * (location[0] - B[0]));
+            long int side_3 = sgn((A[0] - C[0]) * (location[1] - C[1]) - (A[1] - C[1]) * (location[0] - C[0]));
 
             if (side_1 <= 0 && side_2 <= 0 && side_3 <= 0) {
                 return starting_water_col->get_index();

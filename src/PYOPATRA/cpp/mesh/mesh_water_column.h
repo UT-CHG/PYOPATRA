@@ -20,11 +20,11 @@ class WaterColumn {
 public:
     using Vector = Eigen::Matrix<double, dimension, 1>;
 private:
-    int mesh_elements;
+    size_t mesh_elements;
     int num_depths;
-    std::array<int, vertices> adjacent_columns;
+    std::array<long int, vertices> adjacent_columns;
 //    std::tuple<MeshElementT<vertices, dimension>*, MeshElementT<vertices, dimension>*> get_element_depth_bounds(const Vector &location);
-    int index;
+    size_t index;
 
 public:
     WaterColumn()
@@ -88,13 +88,13 @@ public:
         }
     }
     void set_num_depths(int new_num_depths) { num_depths = new_num_depths; }
-    void set_element_head(int head) { mesh_elements = head; }
-    void set_adjacent_columns(int a, int b, int c) { adjacent_columns = {a, b, c}; }
-    void set_adjacent_column(int col, int position) { adjacent_columns[position] = col; }
-    const std::array<int, vertices>& get_adjacencies() const { return adjacent_columns; }
-    int get_mesh_elements() const { return mesh_elements; }
-    int get_index() const { return index; }
-    void set_index(int new_index) { index = new_index; }
+    void set_element_head(size_t head) { mesh_elements = head; }
+    void set_adjacent_columns(size_t a, size_t b, size_t c) { adjacent_columns = {a, b, c}; }
+    void set_adjacent_column(size_t col, size_t position) { adjacent_columns[position] = col; }
+    const std::array<long int, vertices>& get_adjacencies() const { return adjacent_columns; }
+    size_t get_mesh_elements() const { return mesh_elements; }
+    size_t get_index() const { return index; }
+    void set_index(size_t new_index) { index = new_index; }
 };
 
 using TriangularWaterColumn2D = WaterColumn<3, 2>;

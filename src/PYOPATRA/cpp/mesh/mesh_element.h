@@ -16,13 +16,13 @@
 template <int num_vertices, int dimensions>
 class MeshElementT {
 public:
-    using VertexArray = std::array<int, num_vertices>;
+    using VertexArray = std::array<size_t, num_vertices>;
     using VectorTd = Eigen::Matrix<double, num_vertices, 1>;
     using Vector = Eigen::Matrix<double, dimensions, 1>;
 
 protected:
     VertexArray vertices;
-    int mesh_index;
+    size_t mesh_index;
 
 public:
     MeshElementT()
@@ -30,30 +30,30 @@ public:
         , mesh_index(0)
     {}
 
-    MeshElementT(int a, int b, int c, int mesh_index)
+    MeshElementT(size_t a, size_t b, size_t c, size_t mesh_index)
         : vertices{a, b, c}
         , mesh_index(mesh_index)
     {}
 
-    MeshElementT(int a, int b, int c, int d, int mesh_index)
+    MeshElementT(size_t a, size_t b, size_t c, size_t d, size_t mesh_index)
         : vertices{a, b, c, d}
         , mesh_index(mesh_index)
     {}
 
-    void set_vertices(int a, int b, int c) { vertices = {a, b, c}; }
+    void set_vertices(size_t a, size_t b, size_t c) { vertices = {a, b, c}; }
 //    void set_vertices(MeshVertex<dimensions>* a, MeshVertex<dimensions>* b, MeshVertex<dimensions>* c, MeshVertex<dimensions>* d) { vertices = {a, b, c, d}; }
-    void set_vertex(int vert, int position) { vertices[position] = vert; }
-    void set_mesh_index(int new_mesh_index) { mesh_index = new_mesh_index; }
+    void set_vertex(size_t vert, size_t position) { vertices[position] = vert; }
+    void set_mesh_index(size_t new_mesh_index) { mesh_index = new_mesh_index; }
 
     VectorTd calculate_barycentric_coordinate(const MeshVertex<dimensions>* vertex_array, const Vector& point) const;
     double calculate_depth_at_point(const MeshVertex<dimensions>* vertex_array, const Vector& point) const;
     const VertexArray& get_vertices() const { return vertices; }
-    Vector sample_velocity(const MeshVertex<dimensions>* vertex_array, const Eigen::Matrix<double, dimensions, 1>* velocities, const VectorTd& barycentric_coordinates, int time_index) const;
+    Vector sample_velocity(const MeshVertex<dimensions>* vertex_array, const Eigen::Matrix<double, dimensions, 1>* velocities, const VectorTd& barycentric_coordinates, size_t time_index) const;
 //    double sample_density(const MeshVertex<dimensions>* vertex_array, const VectorTd& barycentric_coordinates, int time_index) const;
 //    double sample_viscosity(const MeshVertex<dimensions>* vertex_array, const VectorTd& barycentric_coordinates, int time_index) const;
 //    double sample_water_viscosity(const MeshVertex<dimensions>* vertex_array, const VectorTd& barycentric_coordinates, int time_index) const;
-    Vector sample_diffusion_coefficient(const MeshVertex<dimensions>* vertex_array, const Eigen::Matrix<double, dimensions, 1>* diffusions, const VectorTd& barycentric_coordinates, int time_index) const;
-    Vector sample_wind(const MeshVertex<dimensions>* vertex_array, const Eigen::Matrix<double, dimensions, 1>* winds, const VectorTd& barycentric_coordinates, int wind_time_index) const;
+    Vector sample_diffusion_coefficient(const MeshVertex<dimensions>* vertex_array, const Eigen::Matrix<double, dimensions, 1>* diffusions, const VectorTd& barycentric_coordinates, size_t time_index) const;
+    Vector sample_wind(const MeshVertex<dimensions>* vertex_array, const Eigen::Matrix<double, dimensions, 1>* winds, const VectorTd& barycentric_coordinates, size_t wind_time_index) const;
 
     // 1 if deeper, -1 if shallower, 0 if on the element
 //    virtual int check_halfspace(const MeshVertex<3>* vertex_array, const Vector& point) const;

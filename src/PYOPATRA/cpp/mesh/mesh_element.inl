@@ -82,10 +82,10 @@ void ignore(T &&)
 
 template <int num_vertices, int dimensions>
 typename MeshElementT<num_vertices, dimensions>::Vector
-MeshElementT<num_vertices, dimensions>::sample_velocity(const MeshVertex<dimensions>* vertex_array, const Eigen::Matrix<double, dimensions, 1>* velocities, const VectorTd& barycentric_coordinates, int time_index) const {
+MeshElementT<num_vertices, dimensions>::sample_velocity(const MeshVertex<dimensions>* vertex_array, const Eigen::Matrix<double, dimensions, 1>* velocities, const VectorTd& barycentric_coordinates, size_t time_index) const {
     MeshElementT<num_vertices, dimensions>::Vector velocity = MeshElementT<num_vertices, dimensions>::Vector::Zero();
 //    std::cout << barycentric_coordinates << std::endl;
-    for (int i = 0; i < num_vertices; i++) {
+    for (size_t i = 0; i < num_vertices; i++) {
         velocity += velocities[vertex_array[vertices[i]].get_velocity() + time_index] * barycentric_coordinates(i);
     }
 
@@ -141,10 +141,10 @@ MeshElementT<num_vertices, dimensions>::sample_velocity(const MeshVertex<dimensi
 //}
 
 template <int num_vertices, int dimensions>
-typename MeshElementT<num_vertices, dimensions>::Vector MeshElementT<num_vertices, dimensions>::sample_diffusion_coefficient(const MeshVertex<dimensions>* vertex_array, const Eigen::Matrix<double, dimensions, 1>* diffusions, const VectorTd& barycentric_coordinates, int time_index) const {
+typename MeshElementT<num_vertices, dimensions>::Vector MeshElementT<num_vertices, dimensions>::sample_diffusion_coefficient(const MeshVertex<dimensions>* vertex_array, const Eigen::Matrix<double, dimensions, 1>* diffusions, const VectorTd& barycentric_coordinates, size_t time_index) const {
     Vector diffusion = Vector::Zero();
 
-    for (int i = 0; i < num_vertices; i++) {
+    for (size_t i = 0; i < num_vertices; i++) {
         diffusion += diffusions[vertex_array[vertices[i]].get_diffusion_coefficient() + time_index] * barycentric_coordinates(i);
     }
 
@@ -154,10 +154,10 @@ typename MeshElementT<num_vertices, dimensions>::Vector MeshElementT<num_vertice
 template <int num_vertices, int dimensions>
 typename MeshElementT<num_vertices, dimensions>::Vector MeshElementT<num_vertices, dimensions>::sample_wind(
         const MeshVertex<dimensions> *vertex_array, const Eigen::Matrix<double, dimensions, 1> *winds,
-        const VectorTd &barycentric_coordinates, int wind_time_index) const {
+        const VectorTd &barycentric_coordinates, size_t wind_time_index) const {
     Vector wind = Vector::Zero();
 
-    for (int i = 0; i < num_vertices; i++) {
+    for (size_t i = 0; i < num_vertices; i++) {
         wind += winds[vertex_array[vertices[i]].get_wind() + wind_time_index] * barycentric_coordinates(i);
     }
 
