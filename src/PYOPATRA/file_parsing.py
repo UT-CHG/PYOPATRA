@@ -339,6 +339,7 @@ class MOHIDStyleFileParser(FileParserBase):
                     self.diffusion_coefficient = comm.recv(source=0, tag=6)
 
             self.times = comm.bcast(times, root=0)
+            self.wind_times = comm.bcast(wind_times, root=0)
 
         else:
             raise NotImplementedError('Only 2D files are currently implemented.')
