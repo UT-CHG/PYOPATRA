@@ -185,7 +185,7 @@ class TriangularMesh2D(TriangularMesh):
                 adjacencies = np.zeros((m, n, 2, 3), dtype=np.int64)
                 adjacencies[:] = -1
                 # even triangles
-                adjacencies[1:, :, 0, 0] = inds[1:, :, 0] - n
+                adjacencies[1:, :, 0, 0] = inds[1:, :, 0] - 2*n + 1
                 # odd ones
                 adjacencies[:, :-1, 1, 0] = inds[:, :-1, 1] + 1
 
@@ -193,7 +193,7 @@ class TriangularMesh2D(TriangularMesh):
                 # even triangles
                 adjacencies[:, :, 0, 1] = inds[:, :, 0] + 1
                 # odd ones
-                adjacencies[:-1, :, 1, 1] = inds[:-1, :, 1] + n
+                adjacencies[:-1, :, 1, 1] = inds[:-1, :, 1] + 2*n - 1
                 
                 # Third adjacency
                 # even triangles

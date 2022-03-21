@@ -257,7 +257,7 @@ public:
     }
 
     void set_winds(Eigen::MatrixXd new_winds) {
-        set_vertices_data(winds, new_winds, num_vertices * num_wind_time_steps);
+        set_vertices_data(winds, new_winds, num_vertices * (num_wind_time_steps == 0 ? 2 : num_wind_time_steps));
     }
 
     void set_water_column_adjacency(size_t water_column_index, size_t adjacent_index, size_t position) {
