@@ -14,6 +14,7 @@
 #include "../particle_list.h"
 #include "../inversion_tools/objective_functions.h"
 #include "../util.h"
+#include <stdexcept>
 
 template <int num_vertices_per_element, int dimension>
 class Mesh {
@@ -221,16 +222,42 @@ public:
         vertices[vertex_index].set_location(new_location);
     }
 
+    void set_vertex_locations(Eigen::MatrixXd new_locations) {
+        size_t num_rows = new_locations.rows();
+        size_t num_cols = new_locations.cols();
+
+        if (num_rows != num_vertices || num_cols != dimension) {
+            throw std::invalid_argument("Locations must have rows = " + std::to_string(num_vertices) + 
+                " and cols = " + std::to_string(dimension));
+        }
+
+        for (size_t i = 0; i < num_rows; i++) {
+            vertices[i].set_location(new_locations.row(i));
+        }
+    }
+
     void set_vertex_velocity(size_t vertex_index, size_t time_index, Vector new_velocity) {
         velocities[vertex_index * num_time_steps + time_index] = new_velocity;
+    }
+
+    void set_velocities(Eigen::MatrixXd new_velocities) {
+        set_vertices_data(velocities, new_velocities, num_vertices*num_time_steps);
     }
 
     void set_vertex_diffusion(size_t vertex_index, size_t time_index, Vector new_diffusion) {
         diffusions[vertex_index * num_time_steps + time_index] = new_diffusion;
     }
 
+    void set_diffusions(Eigen::MatrixXd new_diffusions) {
+        set_vertices_data(diffusions, new_diffusions, num_vertices*num_time_steps);
+    }
+
     void set_vertex_wind(size_t vertex_index, size_t time_index, Vector new_wind) {
         winds[vertex_index * (num_wind_time_steps == 0 ? 2 : num_wind_time_steps) + time_index] = new_wind;
+    }
+
+    void set_winds(Eigen::MatrixXd new_winds) {
+        set_vertices_data(winds, new_winds, num_vertices * num_wind_time_steps);
     }
 
     void set_water_column_adjacency(size_t water_column_index, size_t adjacent_index, size_t position) {
@@ -238,11 +265,65 @@ public:
             water_columns[water_column_index].set_adjacent_column(adjacent_index, position);
         }
     }
+
+    void set_water_column_adjacencies(Eigen::Matrix<long int, Eigen::Dynamic, num_vertices_per_element> new_adjacencies) {
+        if (rank != 0) return;
+
+        size_t num_rows = new_adjacencies.rows();
+        size_t num_cols = new_adjacencies.cols();
+
+        if (num_rows != num_water_columns) {
+            throw std::invalid_argument("Adjacencies must have rows = " + std::to_string(num_water_columns) + 
+                " and cols = " + std::to_string(num_vertices_per_element));
+        }
+
+        for (size_t i = 0; i < num_rows; i++) {
+            for (size_t j = 0; j < num_cols; j++) {
+                water_columns[i].set_adjacent_column(new_adjacencies(i,j), j);
+            }
+        }
+    }
+
     void set_element_vertex(size_t water_column_index, size_t element_depth_index, size_t position, size_t vertex_index) {
         if (rank == 0) {
             elements[water_column_index * num_depths + element_depth_index].set_vertex(vertex_index, position);
         }
     }
+
+    void set_element_vertices(Eigen::Matrix<size_t, Eigen::Dynamic, num_vertices_per_element> new_vertices) {
+        if (rank != 0) return;
+
+        size_t num_rows = new_vertices.rows();
+        size_t num_cols = new_vertices.cols();
+
+        if (num_rows != num_mesh_elements) {
+            throw std::invalid_argument("Vertices must have rows = " + std::to_string(num_water_columns) + 
+                " and cols = " + std::to_string(num_vertices_per_element));
+        }
+
+        for (size_t i = 0; i < num_rows; i++) {
+            for (size_t j = 0; j < num_cols; j++) {
+                elements[i].set_vertex(new_vertices(i,j), j);
+            }
+        }        
+    }
+
+    void set_vertices_data(Vector * target, Eigen::MatrixXd source, size_t expected_rows) {
+        size_t num_rows = source.rows();
+        size_t num_cols = source.cols();
+
+        if (num_rows != expected_rows || num_cols != dimension) {
+            throw std::invalid_argument("Input matrix must have rows = " + std::to_string(expected_rows) + 
+                "  and cols = " + std::to_string(num_cols));
+        }
+
+        for (size_t i = 0; i < num_rows; i++) {
+            for (size_t j = 0; j < num_cols; j++) {
+                target[i](j) = source(i,j);
+            }
+        }
+    }
+
     bool check_water_column_adjacency(size_t origin_index, size_t destination_index, int side) {
         return water_columns[origin_index].get_adjacencies()[side] == (long int)destination_index;
     }
