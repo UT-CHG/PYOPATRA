@@ -280,9 +280,9 @@ class MOHIDStyleFileParser(FileParserBase):
                 self.diffusion_coefficient = np.ones((2, self.num_vertices, num_time_steps)) * diffusion_coefficient
 
                 try:
-                    self.winds = np.zeros((2, self.num_vertices, num_wind_time_steps))
+                    self.winds = np.zeros((self.num_vertices, num_wind_time_steps, 2))
                 except TypeError:
-                    self.winds = np.zeros((2, self.num_vertices, 2))
+                    self.winds = np.zeros((self.num_vertices, 2, 2))
 
             # TODO: Make diffusion coefficient more flexible
             times = None
@@ -317,10 +317,10 @@ class MOHIDStyleFileParser(FileParserBase):
                     with h5py.File(mohid_wind_file, 'r') as fp:
                         for i in range(num_wind_time_steps):
                             wind_v = fp['Results']['wind velocity Y']['wind velocity Y_{:05d}'.format(i + starting_wind_time_step)][0, :, :].T.flatten()
-                            self.winds[0, :, i] = wind_v
+                            self.winds[:, i, 0] = wind_v
 
                             wind_u = fp['Results']['wind velocity X']['wind velocity X_{:05d}'.format(i + starting_wind_time_step)][0, :, :].T.flatten()
-                            self.winds[1, :, i] = wind_u
+                            self.winds[:, i, 1] = wind_u
 
                             temp_time = fp['Time']['Time_{:05d}'.format(i + starting_wind_time_step)][:]
                             temp_time = np.array(temp_time, dtype=int)
