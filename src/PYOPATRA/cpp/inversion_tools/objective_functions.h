@@ -200,7 +200,7 @@ class SlicedWassersteinDistance : public BinObjectiveFunctionBase<dimension> {
 private:
     using Parent = BinObjectiveFunctionBase<dimension>;
     Eigen::VectorXd proj, sample_proj, observed_proj, emd_vec;
-    Eigen::MatrixXd recv_bin;
+    Eigen::MatrixXd recv_bin, sparse_observed_bin;
     int num_proj;
     std::default_random_engine sw_generator;
 
@@ -220,6 +220,12 @@ public:
 
     void set_num_proj(int new_num_proj) { num_proj = new_num_proj; }
 
+protected:
+    void finish_observed_setup_impl(const Eigen::Ref<Eigen::MatrixXd> particle_locations) {
+        Parent::finish_observed_setup_impl(particle_locations);
+        sparse_observed_bin = sparsify(Parent::get_observed_bins());
+    }
+
 private:
     double calculate_value_impl(const ParticleList<dimension>& particles) {
         double sum = 0.0;
@@ -231,12 +237,14 @@ private:
 
         recv_bin /= num_particles;
 
+        auto sparse_bin = sparsify(recv_bin);
+
         for (int i = 0; i < num_proj; i++) {
             proj = Eigen::VectorXd::NullaryExpr(proj.size(), [&]() { return unif(sw_generator); });
             proj.normalize();
 
-            sample_proj = recv_bin * proj;
-            observed_proj = Parent::get_observed_bins() * proj;
+            sparse_matvec(sparse_bin, proj, sample_proj);
+            sparse_matvec(sparse_observed_bin, proj, observed_proj);
 
             sum += wasserstein_distance_1d(sample_proj, observed_proj);
         }
@@ -261,6 +269,33 @@ private:
         }
 
         return emd_vec.cwiseAbs().sum();
+    }
+
+    // For some reason Eigen's built-in sparse matrix-vector multiplication isn't performing well
+    // The two functions below implement sparsity simply.
+    Eigen::MatrixXd sparsify(Eigen::MatrixXd& bin_matrix) {
+        size_t num_nonzero = 0;
+        Eigen::MatrixXd result(bin_matrix.rows() * bin_matrix.cols(), 3);
+        for (int i = 0; i < bin_matrix.rows(); i++) {
+            for (int j = 0; j < bin_matrix.cols(); j++) {
+                if (bin_matrix(i,j) > 0.0) {
+                    result(num_nonzero, 0) = i;
+                    result(num_nonzero, 1) = j;
+                    result(num_nonzero, 2) = bin_matrix(i, j);
+                    num_nonzero++;
+                }
+            }
+        }
+
+        return result.topRows(num_nonzero);
+    }
+
+
+    void sparse_matvec(Eigen::MatrixXd& sparse_bin, Eigen::VectorXd& v, Eigen::VectorXd& out) {
+        out.setZero();
+        for (size_t k = 0; k < (size_t)(sparse_bin.rows()); k++) {
+            out(sparse_bin(k, 0)) += sparse_bin(k, 2) * v(sparse_bin(k, 1));
+        }
     }
 };
 
