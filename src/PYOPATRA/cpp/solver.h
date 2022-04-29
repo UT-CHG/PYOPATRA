@@ -26,6 +26,7 @@ public:
         , particles(nullptr)
         , obj_fn(nullptr)
         , current_time_step(0)
+        , current_wind_time_step(0)
         , starting_time(measured_times(0))
         , time(starting_time)
         , measured_times(Eigen::VectorXd::Zero())
@@ -37,6 +38,7 @@ public:
         , particles(particle_list_ptr.get_pointer())
         , obj_fn(obj_fn_ptr.get_pointer())
         , current_time_step(0)
+        , current_wind_time_step(0)
         , starting_time(measured_times(0))
         , time(starting_time)
         , measured_times(measured_times)
@@ -51,6 +53,7 @@ public:
             , particles(particle_list_ptr.get_pointer())
             , obj_fn(nullptr)
             , current_time_step(0)
+            , current_wind_time_step(0)
             , starting_time(measured_times(0))
             , time(starting_time)
             , measured_times(measured_times)
@@ -69,6 +72,7 @@ public:
     void reset_solver() {
         time = starting_time;
         current_time_step = 0;
+        current_wind_time_step = 0;
         particles->delete_all_particles();
     }
 
@@ -80,7 +84,9 @@ public:
 
         time += time_delta;
 
-        while (time >= measured_times[lower_bound + 1]) {
+        auto num_times = measured_times.size();
+        // Be careful to prevent out-of-bounds
+        while ((time >= measured_times[lower_bound]) && (lower_bound < num_times-1)) {
             lower_bound++;
         }
 
@@ -89,10 +95,11 @@ public:
         Eigen::Index lower_wind_bound = 0;
         double lower_wind_time = 0.0;
         double upper_wind_time = 0.0;
-        if (measured_wind_times.size() > 0) {
+        auto num_wind_times = measured_wind_times.size();
+        if (num_wind_times > 0) {
             lower_wind_bound = current_wind_time_step;
 
-            while (time >= measured_wind_times[lower_wind_bound + 1]) {
+            while ((time >= measured_wind_times[lower_wind_bound]) && (lower_wind_bound < num_wind_times-1)) {
                 lower_wind_bound++;
             }
 
