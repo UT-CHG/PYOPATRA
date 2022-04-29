@@ -118,33 +118,14 @@ class TriangularMesh2D(TriangularMesh):
 
             num_time_steps = int(len(self.times) / sharedsize) + (1 if len(self.times) % sharedsize > sharedrank else 0)
 
-            ts_list = sharedcomm.gather(num_time_steps, root=0)
-            if sharedrank == 0:
-                ts_list_array = np.array(ts_list)
-
-                for i, ts in enumerate(ts_list):
-                    if i == 0:
-                        velocities = file_parser.velocity[:, :, :ts]
-                        diffusions = file_parser.diffusion_coefficient[:, :, :ts]
-                        start_time = 0
-                    else:
-                        temp = file_parser.velocity[:, :, np.sum(ts_list_array[:i]):np.sum(ts_list_array[:i+1])]
-                        sharedcomm.send(temp, dest=i, tag=0)
-                        sharedcomm.send(np.sum(ts_list_array[:i]), dest=i, tag=1)
-                        temp = file_parser.diffusion_coefficient[:, :, np.sum(ts_list_array[:i]):np.sum(ts_list_array[:i+1])]
-                        sharedcomm.send(temp, dest=i, tag=2)
-            else:
-                velocities = sharedcomm.recv(source=0, tag=0)
-                start_time = sharedcomm.recv(source=0, tag=1)
-                diffusions = sharedcomm.recv(source=0, tag=2)
-
-            velocities = np.moveaxis(velocities, 0, 2).reshape((-1, 2))
-            diffusions = np.moveaxis(diffusions, 0, 2).reshape((-1, 2))
-
-            self._cpp_mesh.set_velocities(velocities)
-            self._cpp_mesh.set_diffusions(diffusions)
 
             if sharedrank == 0:
+                velocities = np.moveaxis(file_parser.velocity, 0, 2).reshape((-1, 2))
+                diffusions = np.moveaxis(file_parser.diffusion_coefficient, 0, 2).reshape((-1, 2))
+
+                self._cpp_mesh.set_velocities(velocities)
+                self._cpp_mesh.set_diffusions(diffusions)
+
                 num_lat, num_lon = file_parser.regular_dimensions[:2]
                 vertex_locations = np.zeros((num_lat, num_lon, 2))
                 vertex_locations[:, :, 0] = file_parser.latitude.reshape((num_lat, 1))

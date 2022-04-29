@@ -154,6 +154,8 @@ public:
         MPI_Barrier(node_comm);
 
         ptr_wrapper.set_pointer(this);
+        // Seed the random number generator with the rank to avoid duplicate behavior across processes
+        generator.seed(full_rank);
     }
 
     ~Mesh() {

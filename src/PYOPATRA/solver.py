@@ -17,7 +17,7 @@ class Solver:
         self.particles = particles
         self.objective_function = objective_function
 
-        if not wind_times:
+        if wind_times is None:
             wind_times = np.empty((0,))
 
         if objective_function is None:
