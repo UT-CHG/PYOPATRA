@@ -48,7 +48,8 @@ public:
 
     void interpolate_velocity(const MeshElementT<vertices, dimension>* elements, const MeshVertex<dimension>* vertex_array,
                               Vector* velocities, Vector* diffusions, Vector* winds, const Vector& location, Eigen::Index time_index, Eigen::Index wind_time_index, double delta_t,
-                              double time, double lower_time, double upper_time, double lower_wind_time, double upper_wind_time, double wind_coef, Vector &out_vec) {
+                              double time, double lower_time, double upper_time, double lower_wind_time, double upper_wind_time, 
+                              double wind_coef, bool constant_diffusion, double constant_diffusion_coef, Vector &out_vec) {
         if constexpr (dimension == 2) {
             double t = ((time - lower_time) / (upper_time - lower_time));
             double wt = 0.0;
@@ -60,9 +61,15 @@ public:
             Vector ub = elements[mesh_elements].sample_velocity(vertex_array, velocities, barycentric, time_index + 1);
             Vector interpolated_velocity = (1 - t) * lb + t * ub;
 
-            lb = elements[mesh_elements].sample_diffusion_coefficient(vertex_array, diffusions, barycentric, time_index);
-            ub = elements[mesh_elements].sample_diffusion_coefficient(vertex_array, diffusions, barycentric, time_index + 1);
-            Vector interpolated_diffusion = (1 - t) * lb + t * ub;
+            Vector interpolated_diffusion;
+            if (constant_diffusion) {
+                interpolated_diffusion << constant_diffusion_coef, constant_diffusion_coef;
+            }
+            else {
+                lb = elements[mesh_elements].sample_diffusion_coefficient(vertex_array, diffusions, barycentric, time_index);
+                ub = elements[mesh_elements].sample_diffusion_coefficient(vertex_array, diffusions, barycentric, time_index + 1);
+                interpolated_diffusion = (1 - t) * lb + t * ub;
+            }
 
             lb = elements[mesh_elements].sample_wind(vertex_array, winds, barycentric, wind_time_index);
             ub = elements[mesh_elements].sample_wind(vertex_array, winds, barycentric, wind_time_index + 1);

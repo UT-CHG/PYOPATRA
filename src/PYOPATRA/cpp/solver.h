@@ -113,7 +113,8 @@ public:
             mesh->get_water_columns()[current->get_last_known_water_column_index()]
                     .interpolate_velocity(mesh->get_elements(), mesh->get_vertices(), mesh->get_velocities_ptr(),
                                           mesh->get_diffusions_ptr(), mesh->get_winds_ptr(), current->get_location(), lower_bound, lower_wind_bound, time_delta, time,
-                                          measured_times[current_time_step], measured_times[current_time_step + 1], lower_wind_time, upper_wind_time, mesh->get_wind_coef(), velocity_update);
+                                          measured_times[current_time_step], measured_times[current_time_step + 1], lower_wind_time, upper_wind_time, mesh->get_wind_coef(),
+                                          mesh->check_constant_diffusion(), mesh->get_constant_diffusion_coef(), velocity_update);
             current->update_location(velocity_update, time_delta);
             update_particle_mesh_location(*current);
             current = temp;

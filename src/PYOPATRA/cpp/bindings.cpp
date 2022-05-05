@@ -68,7 +68,8 @@ PYBIND11_MODULE(pyopatra_pybind, m) {
             .def("set_element_vertices", &TriangularMesh2D::set_element_vertices)
             .def("get_water_columns_size", &TriangularMesh2D::get_water_columns_size)
             .def("get_pointer_wrapper", &TriangularMesh2D::get_pointer_wrapper, py::return_value_policy::copy)
-            .def("set_wind_coef", &TriangularMesh2D::set_wind_coef);
+            .def("set_wind_coef", &TriangularMesh2D::set_wind_coef)
+            .def("set_constant_diffusion_coef", &TriangularMesh2D::set_constant_diffusion_coef);
 
 //    py::class_<TriangularMesh2DSolver, std::unique_ptr<TriangularMesh2DSolver, py::nodelete>>(m, "CppTriangularMesh2DSolver")
     py::class_<TriangularMesh2DSolver>(m, "CppTriangularMesh2DSolver")

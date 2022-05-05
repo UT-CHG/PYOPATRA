@@ -42,6 +42,8 @@ protected:
     int rank;
     MPI_Comm node_comm; /**< Node-level communication for accessing and initializing MPI shared memory. */
     double wind_coef; /**< Wind contribution coefficient - mesh-wide. */
+    double constant_diffusion_coef; /** constant diffusion coeff if applicable */
+    bool constant_diffusion; /** Indicates if diffusion is constant */
 
 public:
     /**
@@ -58,6 +60,7 @@ public:
         , num_mesh_elements(0)
         , num_depths(0)
         , wind_coef(0)
+        , constant_diffusion(false)
     {
         ptr_wrapper.set_pointer(this);
     }
@@ -70,6 +73,7 @@ public:
         , num_time_steps(measured_times.size())
         , num_wind_time_steps(winds_measured_times.size())
         , wind_coef(wind_coef)
+        , constant_diffusion(false)
     {
         int world_size, full_rank;
         MPI_Comm_rank(MPI_COMM_WORLD, &full_rank);
@@ -200,6 +204,13 @@ public:
     size_t get_num_elements() { return num_mesh_elements; }
     void set_wind_coef(double new_wind_coef) { wind_coef = new_wind_coef; }
     double get_wind_coef() { return wind_coef; }
+    void set_constant_diffusion_coef(double new_diffusion_coef) {
+        constant_diffusion_coef = new_diffusion_coef;
+        constant_diffusion = true;
+    }
+    bool check_constant_diffusion() {return constant_diffusion;}
+    double get_constant_diffusion_coef() {return constant_diffusion_coef;}
+
     Eigen::MatrixXd get_vertex_locations() {
         Eigen::MatrixXd temp = Eigen::MatrixXd::Zero(num_vertices, dimension);
 

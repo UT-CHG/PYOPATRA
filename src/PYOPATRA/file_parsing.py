@@ -249,18 +249,14 @@ class MOHIDStyleFileParser(FileParserBase):
         self.wind_coef = wind_coef
 
         if rank == 0:
-            print(latitude)
             latitude = (latitude[:, 1:] + latitude[:, :-1]) / 2.0
             # latitude -= (latitude[0, 1] - latitude[0, 0]) / 2.0
             latitude = latitude[0, :]
-            print(latitude.shape)
             longitude = (longitude[1:, :] + longitude[:-1, :]) / 2.0
             longitude = longitude[:, 0]
-            print(longitude)
 
         self.latitude = comm.bcast(latitude, root=0)
         self.longitude = comm.bcast(longitude, root=0)
-        print(self.latitude.shape, self.longitude.shape)
 
         if dimensions == 2:
             if rank == 0:
