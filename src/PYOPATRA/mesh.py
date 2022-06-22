@@ -134,7 +134,7 @@ class TriangularMesh2D(TriangularMesh):
 
 
             if sharedrank == 0:
-                if file_parser.winds is None: return
+                if file_parser.winds is None or not file_parser.winds.size: return
                 winds = file_parser.winds.reshape((-1, 2))
                 self._cpp_mesh.set_winds(winds)
 
